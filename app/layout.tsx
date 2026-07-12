@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { BookOpen } from "lucide-react";
 import { BridgeProvider } from "@/components/bridge-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth-context";
@@ -16,6 +16,10 @@ const appName = "Expers";
 export const metadata: Metadata = {
   title: `${appName} — Каталог экспертных статей`,
   description: "Бесплатный каталог экспертных статей по 13 отраслям бизнеса",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/icons/favicon-180x180.png",
+  },
 };
 
 export default function RootLayout({
@@ -32,12 +36,16 @@ export default function RootLayout({
             <div className="mx-auto px-4 h-14 max-w-7xl flex items-center justify-between">
               <Link
                 href="/"
-                className="flex items-center gap-2 text-lg font-semibold tracking-tight text-[#2C3E50]"
+                className="flex items-center gap-2"
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#3498DB] text-white">
-                  <BookOpen className="h-4 w-4" />
-                </div>
-                {appName}
+                <Image
+                  src="/logo.svg"
+                  alt={appName}
+                  width={100}
+                  height={28}
+                  className="h-7 w-auto"
+                  priority
+                />
               </Link>
               <nav className="hidden sm:flex items-center gap-8">
                 <Link
