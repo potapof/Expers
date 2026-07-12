@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     authorId: payload.id,
     authorName: payload.name,
     readTime,
-    status: "published" as const,
+    status: "pending_payment" as const,
     expertId: payload.id,
     ...parsed.data,
   };

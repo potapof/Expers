@@ -57,7 +57,7 @@ export interface Article {
   methodology: string;
   sources: { title: string; url: string }[];
   readTime: string;
-  status: "draft" | "published" | "archived";
+  status: "draft" | "published" | "archived" | "pending_payment";
   expertId: string;
   createdAt: string;
   updatedAt: string;
@@ -595,6 +595,89 @@ export async function setSections(
     ...toRemove.map((sectionId) => removeSection(userId, sectionId)),
   ]);
 }
+
+export type PaymentStatus =
+  | "NEW"
+  | "CONFIRMED"
+  | "REJECTED"
+  | "CANCELED"
+  | "REFUNDED";
+
+export interface Payment {
+  orderId: string;
+  paymentId: string;
+  articleId: string;
+  userId: string;
+  amount: number;
+  status: PaymentStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function createPayment(
+  data: Omit<Payment, "createdAt" | "updatedAt">
+): Promise<Payment> {
+  const now = new Date().toISOString();
+  const payment: Payment = { ...data, createdAt: now, updatedAt: now };
+  await docClient.send(
+    new PutCommand({ TableName: TableName.PAYMENTS, Item: payment })
+  );
+  return payment;
+}
+
+export async function getPaymentByOrderId(
+  orderId: string
+): Promise<Payment | null> {
+  const result = await docClient.send(
+    new GetCommand({ TableName: TableName.PAYMENTS, Key: { orderId } })
+  );
+  return (result.Item as Payment) ?? null;
+}
+
+export async function updatePaymentStatus(
+  orderId: string,
+  status: PaymentStatus,
+  paymentId?: string
+): Promise<void> {
+  const names: Record<string, string> = { "#status": "status" };
+  const values: Record<string, unknown> = {
+    ":status": status,
+    ":updatedAt": new Date().toISOString(),
+  };
+  let expr = "set #status = :status, updatedAt = :updatedAt";
+  if (paymentId) {
+    expr += ", paymentId = :paymentId";
+    values[":paymentId"] = paymentId;
+  }
+  await docClient.send(
+    new UpdateCommand({
+      TableName: TableName.PAYMENTS,
+      Key: { orderId },
+      UpdateExpression: expr,
+      ExpressionAttributeNames: names,
+      ExpressionAttributeValues: values,
+    })
+  );
+}
+
+export async function setArticleStatus(
+  id: string,
+  status: Article["status"]
+): Promise<void> {
+  await docClient.send(
+    new UpdateCommand({
+      TableName: TableName.ARTICLES,
+      Key: { id },
+      UpdateExpression: "set #status = :status, updatedAt = :updatedAt",
+      ExpressionAttributeNames: { "#status": "status" },
+      ExpressionAttributeValues: {
+        ":status": status,
+        ":updatedAt": new Date().toISOString(),
+      },
+    })
+  );
+}
+
 
 
 

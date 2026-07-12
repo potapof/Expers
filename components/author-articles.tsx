@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type ArticleStatus = "draft" | "published" | "archived";
+type ArticleStatus = "draft" | "published" | "archived" | "pending_payment";
 
 const ARTICLES_KEY = "expers-articles";
 const PUBLISHED_KEY = "expers-published";
@@ -232,12 +232,14 @@ const STATUS_LABELS: Record<ArticleStatus, string> = {
   draft: "Черновик",
   published: "Опубликовано",
   archived: "Архивировано",
+  pending_payment: "Ожидает оплаты",
 };
 
 const STATUS_COLORS: Record<ArticleStatus, string> = {
   draft: "bg-gray-100 text-gray-600",
   published: "bg-green-100 text-green-700",
   archived: "bg-amber-100 text-amber-700",
+  pending_payment: "bg-orange-100 text-orange-700",
 };
 
 interface ArticleCardProps {
@@ -426,6 +428,7 @@ export function AuthorArticles() {
       draft: 0,
       published: 0,
       archived: 0,
+      pending_payment: 0,
     };
     for (const a of articles) {
       if (a.status in counts) counts[a.status]++;

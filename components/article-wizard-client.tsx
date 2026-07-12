@@ -19,8 +19,6 @@ import {
   Send,
   Plus,
   Trash2,
-  CreditCard,
-  CheckCircle2,
   Building2,
   Landmark,
   HeartPulse,
@@ -209,7 +207,6 @@ const defaultData: WizardData = {
 };
 
 const STORAGE_KEY = "expers-wizard-draft";
-const PAYMENT_KEY = "expers-payment-done";
 
 const industryIcons: Record<string, React.ReactNode> = {
   manufacturing: <Building2 className="h-5 w-5" />,
@@ -235,7 +232,6 @@ export function ArticleWizardClient() {
   const { expert, loading: authLoading } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState(1);
-  const [paid, setPaid] = useState(false);
   const [data, setData] = useState<WizardData>(defaultData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [publishing, setPublishing] = useState(false);
@@ -260,8 +256,6 @@ export function ArticleWizardClient() {
         /* ignore */
       }
     }
-    const paymentDone = localStorage.getItem(PAYMENT_KEY) === "true";
-    setPaid(paymentDone);
   }, []);
 
   useEffect(() => {
@@ -272,12 +266,6 @@ export function ArticleWizardClient() {
     setData((prev) => ({ ...prev, ...partial }));
     setErrors({});
   }, []);
-
-  function handlePayment() {
-    localStorage.setItem(PAYMENT_KEY, "true");
-    setPaid(true);
-    toast.success("Оплата прошла успешно");
-  }
 
   function validateStep(stepNum: number): boolean {
     setErrors({});
@@ -435,17 +423,30 @@ export function ArticleWizardClient() {
       const result = await res.json();
 
       if (res.ok) {
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem(PAYMENT_KEY);
-        toast.success("Статья опубликована!", { id });
-        router.push("/");
+        const articleId = result.article?.id;
+        const payRes = await fetch("/api/payments/init", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ articleId }),
+        });
+        const payData = await payRes.json();
+        if (payRes.ok && payData.paymentUrl) {
+          localStorage.removeItem(STORAGE_KEY);
+          toast.success("Переходим к оплате публикации (5 000 ₽)...", { id });
+          window.location.href = payData.paymentUrl;
+        } else {
+          toast.error(payData.error || "Не удалось начать оплату", { id });
+        }
       } else if (res.status === 503) {
         toast.error(
-          "База данных временно недоступна. Черновик сохранён — попробуйте опубликовать позже.",
+          "База данных временно недоступна. Черновик сохранён — попробуйте позже.",
           { id }
         );
       } else {
-        toast.error(result.error || "Ошибка публикации", { id });
+        toast.error(result.error || "Ошибка создания статьи", { id });
       }
     } catch {
       toast.error("Ошибка соединения", { id });
@@ -480,77 +481,6 @@ export function ArticleWizardClient() {
             : "Чтобы опубликовать статью, необходимо войти или зарегистрироваться"}
         </p>
         <Button onClick={() => router.push("/")}>На главную</Button>
-      </div>
-    );
-  }
-
-  if (!paid) {
-    return (
-      <div className="mx-auto px-4 max-w-2xl py-20">
-        <div className="text-center mb-10">
-          <div className="flex justify-center mb-6">
-            <div className="h-20 w-20 rounded-full bg-gradient-to-br from-[#3498DB] to-[#1ABC9C] flex items-center justify-center">
-              <PenSquare className="h-10 w-10 text-white" />
-            </div>
-          </div>
-          <h1 className="text-3xl font-bold text-[#2C3E50] mb-3">
-            Публикация статьи
-          </h1>
-          <p className="text-gray-500 max-w-md mx-auto">
-            12-шаговый мастер поможет создать GEO-оптимизированную экспертную
-            статью и опубликовать её в каталоге
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-gray-200 bg-white p-8 mb-6">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="h-12 w-12 rounded-full bg-[#3498DB] flex items-center justify-center text-white font-bold">
-              1
-            </div>
-            <div>
-              <h3 className="font-semibold text-[#2C3E50]">
-                Стоимость публикации
-              </h3>
-              <p className="text-sm text-gray-500">
-                Один платёж — бессрочное размещение в каталоге
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg p-6 text-center mb-6">
-            <span className="text-4xl font-bold text-[#2C3E50]">5 000 ₽</span>
-            <p className="text-sm text-gray-500 mt-1">
-              Включает проверку модератором и GEO-разметку
-            </p>
-          </div>
-
-          <ul className="space-y-3 mb-6">
-            {[
-              "12 шагов для создания статьи",
-              "Автоматическая GEO-разметка",
-              "Публикация в каталоге Expers",
-              "Бессрочное размещение",
-            ].map((item) => (
-              <li key={item} className="flex items-center gap-3 text-sm">
-                <CheckCircle2 className="h-4 w-4 text-[#27AE60] shrink-0" />
-                <span className="text-gray-600">{item}</span>
-              </li>
-            ))}
-          </ul>
-
-          <Button
-            className="w-full h-12 text-base gap-2"
-            onClick={handlePayment}
-          >
-            <CreditCard className="h-5 w-5" />
-            Оплатить 5 000 ₽
-          </Button>
-        </div>
-
-        <p className="text-center text-xs text-gray-400">
-          * Для MVP оплата является демонстрационной. Реальный платёжный шлюз
-          будет подключён позже.
-        </p>
       </div>
     );
   }

@@ -12,6 +12,7 @@ export const TableName = {
   VIEWING_HISTORY: "viewing_history",
   SUBSCRIPTIONS: "subscriptions",
   SECTION_SUBSCRIPTIONS: "section_subscriptions",
+  PAYMENTS: "payments",
 } as const;
 
 export type TableName = (typeof TableName)[keyof typeof TableName];
@@ -141,6 +142,11 @@ export const TABLE_SCHEMAS: Record<TableName, TableSchema> = {
       { AttributeName: "userId", AttributeType: "S" },
       { AttributeName: "sectionId", AttributeType: "S" },
     ],
+  },
+  [TableName.PAYMENTS]: {
+    name: TableName.PAYMENTS,
+    keySchema: [{ AttributeName: "orderId", KeyType: "HASH" }],
+    attributeDefinitions: [{ AttributeName: "orderId", AttributeType: "S" }],
   },
 };
 
