@@ -45,3 +45,5 @@ next-env.d.ts
 .opencode/
 opencode_logs.tar.gz
 src_cli_logs.tar.gz
+app-screen.png
+data/
