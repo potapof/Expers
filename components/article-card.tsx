@@ -3,26 +3,12 @@ import type { ReaderArticle } from "@/lib/reader-data";
 import { Calendar, Clock, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FavoriteButton } from "@/components/favorite-button";
+import { articleUrl } from "@/lib/routes";
 
 export type ViewMode = "grid" | "list" | "compact";
 
 function getArticleUrl(article: ReaderArticle) {
-  const staticIds = [
-    "article-1",
-    "article-2",
-    "article-3",
-    "article-4",
-    "article-5",
-    "article-6",
-    "article-7",
-    "article-8",
-    "article-9",
-    "article-10",
-  ];
-  if (staticIds.includes(article.id)) {
-    return `/articles/${article.id}`;
-  }
-  return `/articles/${article.id}`;
+  return articleUrl(article);
 }
 
 export function ArticleCard({

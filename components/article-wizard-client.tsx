@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { transliterate } from "@/lib/translit";
+import { getIndustrySlug } from "@/lib/industry-slugs";
 import {
   industries,
   articles as staticArticles,
@@ -104,6 +106,7 @@ interface WizardData {
   expertiseAreas: string[];
   crossLinks: { articleId: string; title: string; industryId: string }[];
   title: string;
+  slug: string;
   introduction: string;
   content: string;
   faq: { question: string; answer: string }[];
@@ -130,6 +133,7 @@ const defaultData: WizardData = {
   expertiseAreas: [],
   crossLinks: [],
   title: "",
+  slug: "",
   introduction: "",
   content: "",
   faq: [
@@ -409,6 +413,7 @@ export function ArticleWizardClient() {
         todo: data.todo.filter((t) => t.text),
         methodology: data.methodology,
         sources: data.sources.filter((s) => s.title),
+        ...(data.slug ? { slug: data.slug } : {}),
       };
 
       const res = await fetch("/api/articles", {
@@ -1138,6 +1143,15 @@ function Step6TitleIntro({
   errors: Record<string, string>;
 }) {
   const wordCount = data.introduction.split(/\s+/).filter(Boolean).length;
+  const industrySlug = data.industryId
+    ? getIndustrySlug(data.industryId)
+    : "otrasl";
+
+  const handleGenerateSlug = () => {
+    const slug = transliterate(data.title);
+    updateData({ slug });
+  };
+
   return (
     <div>
       <StepLabel
@@ -1181,6 +1195,35 @@ function Step6TitleIntro({
           </p>
           {errors.introduction && (
             <p className="text-xs text-red-500 mt-1">{errors.introduction}</p>
+          )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-[#2C3E50] mb-1.5">
+            URL статьи
+          </label>
+          <p className="text-xs text-gray-400 mb-2">
+            Префикс: /{industrySlug}/
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={data.slug}
+              onChange={(e) => updateData({ slug: e.target.value })}
+              placeholder="telemedicina-v-rossii"
+              className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB] outline-none"
+              maxLength={200}
+            />
+            <button
+              type="button"
+              onClick={handleGenerateSlug}
+              disabled={!data.title}
+              className="shrink-0 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-[#2C3E50] hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              Сгенерировать
+            </button>
+          </div>
+          {errors.slug && (
+            <p className="text-xs text-red-500 mt-1">{errors.slug}</p>
           )}
         </div>
       </div>

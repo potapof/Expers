@@ -1,6 +1,7 @@
 import { isDatabaseAvailable } from "./db";
 import {
   getArticleById,
+  getArticleBySlug,
   getPublishedArticles,
   getExpertById,
   type Article as DbArticle,
@@ -8,15 +9,18 @@ import {
 } from "./models";
 import {
   articles as staticArticles,
+  articleContents,
   getArticleContentById,
   getRelatedArticles,
   type Article as StaticArticle,
   type ArticleContent,
 } from "./data";
+import { getIndustrySlug } from "./industry-slugs";
 
 export interface CatalogArticle {
   id: string;
   title: string;
+  slug?: string;
   description: string;
   industryId: string;
   categoryId: string;
@@ -29,6 +33,7 @@ export interface CatalogArticle {
 export interface RelatedArticle {
   id: string;
   title: string;
+  slug?: string;
   industryId: string;
   authorName?: string;
   date?: string;
@@ -46,6 +51,8 @@ export interface ArticleViewAuthor {
 export interface ArticleView {
   id: string;
   title: string;
+  slug?: string;
+  industrySlug?: string;
   description: string;
   content: string;
   industryId: string;
@@ -78,6 +85,7 @@ function staticToCard(a: StaticArticle): CatalogArticle {
   return {
     id: a.id,
     title: a.title,
+    slug: (a as ArticleContent).slug,
     description: a.description,
     industryId: a.industryId,
     categoryId: a.categoryId,
@@ -92,6 +100,7 @@ function dbToCard(a: DbArticle): CatalogArticle {
   return {
     id: a.id,
     title: a.title,
+    slug: a.slug,
     description: a.description || a.tldr || "",
     industryId: a.industryId,
     categoryId: a.categoryId,
@@ -127,6 +136,8 @@ function staticToView(sc: ArticleContent): ArticleView {
   return {
     id: sc.id,
     title: sc.title,
+    slug: sc.slug,
+    industrySlug: getIndustrySlug(sc.industryId),
     description: sc.description,
     content: sc.content,
     industryId: sc.industryId,
@@ -165,6 +176,8 @@ function dbToView(a: DbArticle, expert: Expert | null): ArticleView {
   return {
     id: a.id,
     title: a.title,
+    slug: a.slug,
+    industrySlug: getIndustrySlug(a.industryId),
     description: a.description,
     content: a.content,
     industryId: a.industryId,
@@ -216,6 +229,37 @@ export async function getArticleView(id: string): Promise<ArticleView | null> {
   const staticContent = getArticleContentById(id);
   if (staticContent) {
     return staticToView(staticContent);
+  }
+
+  return null;
+}
+
+export async function getArticleViewBySlug(
+  industryId: string,
+  slug: string
+): Promise<ArticleView | null> {
+  if (await isDatabaseAvailable()) {
+    try {
+      const article = await getArticleBySlug(industryId, slug);
+      if (article && article.status !== "archived") {
+        let expert: Expert | null = null;
+        try {
+          expert = await getExpertById(article.authorId);
+        } catch {
+          expert = null;
+        }
+        return dbToView(article, expert);
+      }
+    } catch {
+      // fall back to static content
+    }
+  }
+
+  for (const sc of articleContents) {
+    const staticSlug = sc.slug ?? sc.id;
+    if (sc.industryId === industryId && staticSlug === slug) {
+      return staticToView(sc as ArticleContent);
+    }
   }
 
   return null;

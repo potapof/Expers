@@ -6,6 +6,7 @@ import { verifyToken } from "@/lib/auth";
 import {
   initPayment,
   isPaymentConfigured,
+  ensureProductionConfig,
   PUBLICATION_PRICE_KOPECKS,
 } from "@/lib/tbank";
 
@@ -45,6 +46,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (process.env.TBANK_TEST_MODE !== "true") {
+    const warnings = ensureProductionConfig();
+    if (warnings.length > 0) {
+      console.warn("T-Bank production config warnings:", warnings);
+    }
+  }
+
   if (!(await isDatabaseAvailable())) {
     return NextResponse.json(
       { error: "База данных недоступна" },
@@ -68,6 +76,17 @@ export async function POST(request: NextRequest) {
 
   const baseUrl =
     process.env.APP_BASE_URL || request.nextUrl.origin.replace(/\/$/, "");
+
+  if (
+    process.env.TBANK_TEST_MODE !== "true" &&
+    !baseUrl.startsWith("https://")
+  ) {
+    console.warn(
+      `T-Bank: APP_BASE_URL (${baseUrl}) не начинается с https://. ` +
+        "Webhook Т-Банка не сможет достучаться до сервера."
+    );
+  }
+
   const orderId = `order-${article.id}-${Date.now()}`;
 
   const result = await initPayment({

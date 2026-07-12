@@ -8,6 +8,7 @@ import {
   type ExpertProfile,
   type Article,
 } from "@/lib/data";
+import { articleUrl } from "@/lib/routes";
 import { SubscribeButton } from "@/components/subscribe-button";
 import {
   ChevronRight,
@@ -51,7 +52,7 @@ function ArticleCard({ article }: { article: Article }) {
   const industry = getIndustryById(article.industryId);
   return (
     <Link
-      href={`/articles/${article.id}`}
+      href={articleUrl(article)}
       className="group block rounded-xl border border-gray-100 bg-white p-5 hover:border-[#3498DB] hover:shadow-sm transition-all"
     >
       <div className="flex items-center gap-2 mb-2">

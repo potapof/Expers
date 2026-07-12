@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useViewingHistory } from "@/lib/use-viewing-history";
 import { getAllReaderArticles } from "@/lib/reader-data";
+import { articleUrl } from "@/lib/routes";
 import { Clock, Trash2, History } from "lucide-react";
 
 export function ReaderViewingHistory() {
@@ -88,7 +89,7 @@ export function ReaderViewingHistory() {
           return (
             <Link
               key={entry.articleId + entry.viewedAt}
-              href={`/articles/${entry.articleId}`}
+              href={articleUrl(article)}
               className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 px-4 py-3 transition-colors hover:border-gray-200 hover:bg-gray-50"
             >
               <div className="min-w-0 flex-1">

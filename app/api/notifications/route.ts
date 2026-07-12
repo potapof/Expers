@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { isDatabaseAvailable } from "@/lib/db";
 import {
   getArticlesByExpert,
+  getPublishedArticles,
   getCommentsByArticle,
   getFollowedAuthorIds,
   getSectionIds,
-  getPublishedArticles,
 } from "@/lib/models";
 import { verifyToken } from "@/lib/auth";
+import { articleUrl } from "@/lib/routes";
 
 interface DerivedNotification {
   id: string;
@@ -51,7 +53,9 @@ export async function GET(request: NextRequest) {
           id: `comment-${c.id}`,
           type: c.parentId ? "reply_to_comment" : "comment_on_article",
           message: `${c.authorName} оставил комментарий к статье «${article.title}»`,
-          link: `/articles/${article.id}`,
+          link: articleUrl(
+            article as { id: string; slug?: string; industryId: string }
+          ),
           createdAt: c.createdAt,
         });
       }
@@ -72,7 +76,7 @@ export async function GET(request: NextRequest) {
             id: `author-article-${art.id}`,
             type: "new_article_author",
             message: `Новая статья от ${art.authorName}: ${art.title}`,
-            link: `/articles/${art.id}`,
+            link: articleUrl(art),
             createdAt: art.createdAt,
           });
         }
@@ -85,7 +89,7 @@ export async function GET(request: NextRequest) {
             id: `section-article-${art.id}`,
             type: "new_article_section",
             message: `Новая статья в разделе «${art.industryName}»: ${art.title}`,
-            link: `/articles/${art.id}`,
+            link: articleUrl(art),
             createdAt: art.createdAt,
           });
         }

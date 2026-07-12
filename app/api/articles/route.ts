@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { isDatabaseAvailable } from "@/lib/db";
-import { createArticle, getPublishedArticles } from "@/lib/models";
+import { createArticle, getPublishedArticles, isSlugTaken } from "@/lib/models";
 import { mockArticles } from "@/lib/mock-data";
 import { verifyToken } from "@/lib/auth";
 
@@ -9,6 +9,12 @@ const articleSchema = z.object({
   title: z.string().min(10).max(200),
   description: z.string().min(40).max(600),
   content: z.string().min(100).max(10000),
+  slug: z
+    .string()
+    .min(2)
+    .max(200)
+    .regex(/^[a-z0-9-]+$/)
+    .optional(),
   industryId: z.string().min(1),
   industryName: z.string().min(1),
   subsectionId: z.string().min(1),
@@ -101,8 +107,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const { slug, ...articleFields } = parsed.data;
+
+  if (slug && dbAvailable) {
+    const taken = await isSlugTaken(articleFields.industryId, slug);
+    if (taken) {
+      return NextResponse.json(
+        { error: "URL статьи уже занят в этой отрасли" },
+        { status: 409 }
+      );
+    }
+  }
+
   const id = `article-${crypto.randomUUID()}`;
-  const wordCount = parsed.data.content.split(/\s+/).filter(Boolean).length;
+  const wordCount = articleFields.content.split(/\s+/).filter(Boolean).length;
   const readTime = `${Math.max(1, Math.round(wordCount / 150))} мин`;
 
   const articleData = {
@@ -112,7 +130,8 @@ export async function POST(request: NextRequest) {
     readTime,
     status: "pending_payment" as const,
     expertId: payload.id,
-    ...parsed.data,
+    ...(slug ? { slug } : {}),
+    ...articleFields,
   };
 
   if (!dbAvailable) {

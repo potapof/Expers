@@ -5,6 +5,7 @@ import {
   QueryCommand,
   UpdateCommand,
   DeleteCommand,
+  ScanCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { TableName, IndexName } from "./schema";
 
@@ -35,6 +36,7 @@ export interface Article {
   title: string;
   description: string;
   content: string;
+  slug?: string;
   authorId: string;
   authorName: string;
   industryId: string;
@@ -244,6 +246,58 @@ export async function deleteArticle(id: string): Promise<void> {
   );
 }
 
+export async function isSlugTaken(
+  industryId: string,
+  slug: string,
+  excludeArticleId?: string
+): Promise<boolean> {
+  const result = await docClient.send(
+    new ScanCommand({
+      TableName: TableName.ARTICLES,
+      FilterExpression:
+        "industryId = :industryId AND slug = :slug AND #status <> :archived",
+      ExpressionAttributeNames: { "#status": "status" },
+      ExpressionAttributeValues: {
+        ":industryId": industryId,
+        ":slug": slug,
+        ":archived": "archived",
+      },
+    })
+  );
+  const items = (result.Items as Article[]) ?? [];
+  return items.some((a) => a.id !== excludeArticleId);
+}
+
+export async function getArticleBySlug(
+  industryId: string,
+  slug: string
+): Promise<Article | null> {
+  const result = await docClient.send(
+    new ScanCommand({
+      TableName: TableName.ARTICLES,
+      FilterExpression: "industryId = :industryId AND slug = :slug",
+      ExpressionAttributeValues: {
+        ":industryId": industryId,
+        ":slug": slug,
+      },
+    })
+  );
+  const items = (result.Items as Article[]) ?? [];
+  return items[0] ?? null;
+}
+
+export async function getAllPublishedArticles(): Promise<Article[]> {
+  const result = await docClient.send(
+    new ScanCommand({
+      TableName: TableName.ARTICLES,
+      FilterExpression: "#status = :published",
+      ExpressionAttributeNames: { "#status": "status" },
+      ExpressionAttributeValues: { ":published": "published" },
+    })
+  );
+  return (result.Items as Article[]) ?? [];
+}
+
 export interface Comment {
   id: string;
   articleId: string;
@@ -349,9 +403,7 @@ export interface Favorite {
   createdAt: string;
 }
 
-export async function getFavoriteArticleIds(
-  userId: string
-): Promise<string[]> {
+export async function getFavoriteArticleIds(userId: string): Promise<string[]> {
   const result = await docClient.send(
     new QueryCommand({
       TableName: TableName.FAVORITES,
@@ -407,7 +459,8 @@ export async function getViewingHistory(
       ExpressionAttributeValues: { ":userId": userId },
     })
   );
-  const items = (result.Items as (ViewingHistoryEntry & { userId: string })[]) ?? [];
+  const items =
+    (result.Items as (ViewingHistoryEntry & { userId: string })[]) ?? [];
   return items
     .map((i) => ({ articleId: i.articleId, viewedAt: i.viewedAt }))
     .sort((a, b) => b.viewedAt.localeCompare(a.viewedAt));
@@ -691,8 +744,3 @@ export async function setArticleStatus(
     })
   );
 }
-
-
-
-
-

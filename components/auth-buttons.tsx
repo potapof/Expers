@@ -310,8 +310,8 @@ function RegisterDialog({
             <span className="text-sm text-gray-600">
               Я эксперт — хочу публиковать статьи
               <span className="block text-xs text-gray-400">
-                Без галочки вы регистрируетесь как читатель (избранное, подписки,
-                история).
+                Без галочки вы регистрируетесь как читатель (избранное,
+                подписки, история).
               </span>
             </span>
           </label>

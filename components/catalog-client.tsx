@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import { industries, getIndustryById } from "@/lib/data";
 import type { CatalogArticle } from "@/lib/article-view";
+import { articleUrl } from "@/lib/routes";
 import {
   Building2,
   Landmark,
@@ -232,7 +233,7 @@ export function CatalogClient({ articles }: { articles: CatalogArticle[] }) {
               return (
                 <Link
                   key={article.id}
-                  href={`/articles/${article.id}`}
+                  href={articleUrl(article)}
                   className="block group rounded-xl border border-gray-100 bg-white p-6 hover:border-gray-200 hover:shadow-sm transition-all"
                 >
                   <div className="flex items-start gap-4">

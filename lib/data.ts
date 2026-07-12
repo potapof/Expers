@@ -28,6 +28,7 @@ export interface Author {
 export interface Article {
   id: string;
   title: string;
+  slug?: string;
   description: string;
   author: Author;
   date: string;
@@ -64,6 +65,7 @@ export interface SourceItem {
 }
 
 export interface ArticleContent extends Article {
+  slug?: string;
   content: string;
   tldr: string;
   keyFacts: KeyFact[];
@@ -405,6 +407,7 @@ export const industries: Industry[] = [
 export const articles: Article[] = [
   {
     id: "article-1",
+    slug: "kak-ii-menyaet-avtomatizatsiyu-proizvodstva-v-2026-godu",
     title: "Как ИИ меняет автоматизацию производства в 2026 году",
     description:
       "Нейросети и компьютерное зрение радикально трансформируют контроль качества и управление производственными линиями. Разбираем ключевые тренды и реальные кейсы.",
@@ -416,6 +419,7 @@ export const articles: Article[] = [
   },
   {
     id: "article-2",
+    slug: "tsifrovoj-rubl-i-buduschee-roznichnogo-bankinga",
     title: "Цифровой рубль и будущее розничного банкинга",
     description:
       "Как внедрение цифрового рубля изменит ландшафт банковских услуг и какие стратегии выбирают крупнейшие банки для адаптации к новой реальности.",
@@ -427,6 +431,7 @@ export const articles: Article[] = [
   },
   {
     id: "article-3",
+    slug: "telemeditsina-v-rossii-zakonodatelstvo-i-praktika-2026",
     title: "Телемедицина в России: законодательство и практика 2026",
     description:
       "Обзор текущего регулирования телемедицинских услуг, проблемы лицензирования и перспективы развития удалённой медицинской помощи в регионах.",
@@ -438,6 +443,7 @@ export const articles: Article[] = [
   },
   {
     id: "article-4",
+    slug: "omnikanalnost-v-riteyle-kak-obedinit-onlayn-i-oflayn",
     title: "Омниканальность в ритейле: как объединить онлайн и офлайн",
     description:
       "Пошаговое руководство по построению омниканальной стратегии: от unified commerce до последней мили. Примеры российских и зарубежных сетей.",
@@ -449,6 +455,7 @@ export const articles: Article[] = [
   },
   {
     id: "article-5",
+    slug: "adaptivnoe-obuchenie-kak-ai-podstraivaetsya-pod-kazhdogo-studenta",
     title: "Адаптивное обучение: как AI подстраивается под каждого студента",
     description:
       "Технологии адаптивного обучения на базе ИИ меняют подход к персонализации образования. Анализ платформ и результатов внедрения.",
@@ -460,6 +467,7 @@ export const articles: Article[] = [
   },
   {
     id: "article-6",
+    slug: "spros-na-elektromobili-v-rossii-analitika-rynka-2026",
     title: "Спрос на электромобили в России: аналитика рынка 2026",
     description:
       "Рост продаж электромобилей продолжается несмотря на экономические вызовы. Какие бренды лидируют и как развивается зарядная инфраструктура.",
@@ -471,6 +479,7 @@ export const articles: Article[] = [
   },
   {
     id: "article-7",
+    slug: "github-copilot-i-buduschee-razrabotki-opyt-vnedreniya-v-komande",
     title: "GitHub Copilot и будущее разработки: опыт внедрения в команде",
     description:
       "Как AI-ассистенты меняют повседневную работу разработчиков. Метрики производительности, качество кода и уроки внедрения в продуктовой команде.",
@@ -482,6 +491,7 @@ export const articles: Article[] = [
   },
   {
     id: "article-8",
+    slug: "rynok-ofisnoy-nedvizhimosti-post-covid-transformatsiya",
     title: "Рынок офисной недвижимости: post-covid трансформация",
     description:
       "Гибридный формат работы меняет требования к офисным пространствам. Какие форматы востребованы и как меняются ставки аренды в крупных городах.",
@@ -493,6 +503,7 @@ export const articles: Article[] = [
   },
   {
     id: "article-9",
+    slug: "esg-strategiya-kak-biznesu-integrirovat-ustoychivoe-razvitie",
     title: "ESG-стратегия: как бизнесу интегрировать устойчивое развитие",
     description:
       "Практическое руководство по внедрению ESG-принципов в стратегию компании. От оценки углеродного следа до отчётности и коммуникации с инвесторами.",
@@ -504,6 +515,7 @@ export const articles: Article[] = [
   },
   {
     id: "article-10",
+    slug: "kiberbezopasnost-v-oblake-luchshie-praktiki-2026",
     title: "Кибербезопасность в облаке: лучшие практики 2026",
     description:
       "По мере миграции бизнеса в облако киберугрозы становятся всё изощрённее. Разбираем архитектуру zero-trust, защиту API и новые стандарты безопасности.",
@@ -518,6 +530,7 @@ export const articles: Article[] = [
 export const articleContents: ArticleContent[] = [
   {
     id: "article-1",
+    slug: "kak-ii-menyaet-avtomatizatsiyu-proizvodstva-v-2026-godu",
     title: "Как ИИ меняет автоматизацию производства в 2026 году",
     description:
       "Нейросети и компьютерное зрение радикально трансформируют контроль качества и управление производственными линиями. Разбираем ключевые тренды и реальные кейсы.",
@@ -742,6 +755,7 @@ AI-модели анализируют вибрацию, температуру,
   },
   {
     id: "article-2",
+    slug: "tsifrovoj-rubl-i-buduschee-roznichnogo-bankinga",
     title: "Цифровой рубль и будущее розничного банкинга",
     description:
       "Как внедрение цифрового рубля изменит ландшафт банковских услуг и какие стратегии выбирают крупнейшие банки для адаптации к новой реальности.",
@@ -923,6 +937,7 @@ AI-модели анализируют вибрацию, температуру,
   },
   {
     id: "article-3",
+    slug: "telemeditsina-v-rossii-zakonodatelstvo-i-praktika-2026",
     title: "Телемедицина в России: законодательство и практика 2026",
     description:
       "Обзор текущего регулирования телемедицинских услуг, проблемы лицензирования и перспективы развития удалённой медицинской помощи в регионах.",

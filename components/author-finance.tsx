@@ -68,10 +68,9 @@ export function AuthorFinance() {
           Платежи за публикации
         </h2>
         <p className="text-sm text-gray-500 mt-1">
-          Публикация статьи на Expers стоит {PUBLICATION_PRICE.toLocaleString(
-            "ru-RU"
-          )}{" "}
-          ₽. Здесь — история ваших платежей.
+          Публикация статьи на Expers стоит{" "}
+          {PUBLICATION_PRICE.toLocaleString("ru-RU")} ₽. Здесь — история ваших
+          платежей.
         </p>
       </div>
 

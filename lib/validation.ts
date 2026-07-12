@@ -45,6 +45,12 @@ export const step6Schema = z.object({
     .string()
     .min(40, "Введение должно быть не менее 40 слов")
     .max(600, "Введение должно быть не более 60 слов"),
+  slug: z
+    .string()
+    .min(2, "URL должен быть не менее 2 символов")
+    .max(200)
+    .regex(/^[a-z0-9-]+$/, "Только латиница, цифры и дефисы")
+    .optional(),
 });
 
 export const step7Schema = z.object({

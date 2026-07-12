@@ -10,10 +10,36 @@ function isTestMode(): boolean {
 }
 
 export function isPaymentConfigured(): boolean {
-  return (
-    isTestMode() ||
-    (!!process.env.TBANK_TERMINAL_KEY && !!process.env.TBANK_PASSWORD)
-  );
+  if (isTestMode()) return true;
+  const key = process.env.TBANK_TERMINAL_KEY;
+  const password = process.env.TBANK_PASSWORD;
+  return !!(key && password);
+}
+
+export function ensureProductionConfig(): string[] {
+  const warnings: string[] = [];
+  if (isTestMode()) {
+    warnings.push(
+      "TBANK_TEST_MODE=true включён — реальные платежи не выполняются"
+    );
+    return warnings;
+  }
+  if (!process.env.TBANK_TERMINAL_KEY) {
+    warnings.push("TBANK_TERMINAL_KEY не задан");
+  }
+  if (!process.env.TBANK_PASSWORD) {
+    warnings.push("TBANK_PASSWORD не задан");
+  }
+  if (!process.env.APP_BASE_URL) {
+    warnings.push(
+      "APP_BASE_URL не задан — webhook URL будет собран из origin запроса"
+    );
+  } else if (!process.env.APP_BASE_URL.startsWith("https://")) {
+    warnings.push(
+      "APP_BASE_URL должен начинаться с https:// для приёма webhook от Т-Банка"
+    );
+  }
+  return warnings;
 }
 
 type Scalar = string | number | boolean;
@@ -52,9 +78,6 @@ export interface InitPaymentResult {
 export async function initPayment(
   input: InitPaymentInput
 ): Promise<InitPaymentResult> {
-  const terminalKey = process.env.TBANK_TERMINAL_KEY || "TEST_TERMINAL";
-  const password = process.env.TBANK_PASSWORD || "test_password";
-
   if (isTestMode()) {
     return {
       ok: true,
@@ -62,6 +85,15 @@ export async function initPayment(
       paymentUrl: `${input.successUrl}?OrderId=${encodeURIComponent(
         input.orderId
       )}&TestMode=1`,
+    };
+  }
+
+  const terminalKey = process.env.TBANK_TERMINAL_KEY;
+  const password = process.env.TBANK_PASSWORD;
+  if (!terminalKey || !password) {
+    return {
+      ok: false,
+      error: "Платёжный сервис не настроен (отсутствуют ключи терминала)",
     };
   }
 
@@ -108,7 +140,11 @@ export async function initPayment(
 export function verifyNotificationToken(
   body: Record<string, unknown>
 ): boolean {
-  const password = process.env.TBANK_PASSWORD || "test_password";
+  const password = process.env.TBANK_PASSWORD;
+  if (!password) {
+    console.error("T-Bank webhook: TBANK_PASSWORD не задан");
+    return false;
+  }
   const provided = body.Token;
   if (typeof provided !== "string") return false;
 

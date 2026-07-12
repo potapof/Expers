@@ -3,6 +3,7 @@
 import { Share2, Link, Check } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { getIndustrySlug } from "@/lib/industry-slugs";
 
 import {
   Dialog,
@@ -70,17 +71,26 @@ function ShareOption({ icon, label, onClick }: ShareOptionProps) {
 export function ArticleShareButton({
   articleId,
   articleTitle,
+  industryId,
+  slug,
 }: {
   articleId: string;
   articleTitle: string;
+  industryId?: string;
+  slug?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  const urlBase =
+    industryId && slug
+      ? `/${getIndustrySlug(industryId)}/${slug}`
+      : `/articles/${articleId}`;
+
   const url =
     typeof window !== "undefined"
-      ? `${window.location.origin}/articles/${articleId}`
-      : `/articles/${articleId}`;
+      ? `${window.location.origin}${urlBase}`
+      : urlBase;
   const text = `${articleTitle} — читайте на Expers`;
 
   const handleCopyLink = async () => {
