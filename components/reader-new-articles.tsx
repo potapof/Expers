@@ -196,7 +196,7 @@ function Sitebar({
               className={cn(
                 "rounded-md p-1.5 transition-colors",
                 viewMode === key
-                  ? "bg-[#3498DB] text-white"
+                  ? "bg-[#0039CA] text-white"
                   : "text-gray-400 hover:text-[#2C3E50]"
               )}
             >

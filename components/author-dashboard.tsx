@@ -348,8 +348,8 @@ function ViewsChart({
       >
         <defs>
           <linearGradient id="barGradient" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="#3498DB" stopOpacity={0.6} />
-            <stop offset="100%" stopColor="#3498DB" stopOpacity={1} />
+            <stop offset="0%" stopColor="#0039CA" stopOpacity={0.6} />
+            <stop offset="100%" stopColor="#0039CA" stopOpacity={1} />
           </linearGradient>
         </defs>
         {chartData.map((item, i) => {
@@ -549,7 +549,7 @@ export function AuthorDashboard() {
           value={formatNumber(currentViews)}
           changePercent={getChangePercent(currentViews, previousViews)}
           iconBg="bg-blue-100"
-          iconColor="text-[#3498DB]"
+          iconColor="text-[#0039CA]"
         />
         <MetricCard
           icon={<FileText className="h-4 w-4" />}
@@ -608,7 +608,7 @@ export function AuthorDashboard() {
           </h3>
           <div className="flex items-center gap-3 text-xs text-gray-400">
             <span className="flex items-center gap-1">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#3498DB]" />
+              <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#0039CA]" />
               Текущий период
             </span>
           </div>

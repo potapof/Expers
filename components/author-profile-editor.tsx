@@ -67,7 +67,7 @@ function ExpertPreview({
 
         <div className="p-6">
           <div className="flex flex-col sm:flex-row gap-6 mb-8">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-[#3498DB] text-white text-3xl font-bold">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-[#0039CA] text-white text-3xl font-bold">
               {name?.charAt(0) || "?"}
             </div>
             <div className="flex-1">
@@ -98,7 +98,7 @@ function ExpertPreview({
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm text-[#3498DB] hover:text-[#1ABC9C] transition-colors"
+                      className="inline-flex items-center gap-1.5 text-sm text-[#0039CA] hover:text-[#1ABC9C] transition-colors"
                     >
                       <ExternalLink className="h-4 w-4" />
                       {link.platform}
@@ -107,7 +107,7 @@ function ExpertPreview({
                 {email && (
                   <a
                     href={`mailto:${email}`}
-                    className="inline-flex items-center gap-1.5 text-sm text-[#3498DB] hover:text-[#1ABC9C] transition-colors"
+                    className="inline-flex items-center gap-1.5 text-sm text-[#0039CA] hover:text-[#1ABC9C] transition-colors"
                   >
                     <Mail className="h-4 w-4" />
                     {email}
@@ -129,7 +129,7 @@ function ExpertPreview({
                 {expertise.map((exp) => (
                   <span
                     key={exp}
-                    className="inline-flex items-center rounded-md bg-blue-50 px-2.5 py-1 text-sm font-medium text-[#3498DB]"
+                    className="inline-flex items-center rounded-md bg-[#0039CA]/10 px-2.5 py-1 text-sm font-medium text-[#0039CA]"
                   >
                     {exp}
                   </span>
@@ -408,13 +408,13 @@ export function AuthorProfileEditor() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <User className="h-4 w-4 text-[#3498DB]" />
+            <User className="h-4 w-4 text-[#0039CA]" />
             Основная информация
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#3498DB] text-white text-xl font-bold">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#0039CA] text-white text-xl font-bold">
               {profile.name?.charAt(0) || "?"}
             </div>
             <div className="flex-1">
@@ -524,7 +524,7 @@ export function AuthorProfileEditor() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Globe className="h-4 w-4 text-[#3498DB]" />
+            <Globe className="h-4 w-4 text-[#0039CA]" />
             Социальные сети
           </CardTitle>
         </CardHeader>

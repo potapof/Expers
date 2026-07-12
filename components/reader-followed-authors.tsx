@@ -37,7 +37,7 @@ export function ReaderFollowedAuthors() {
             href={`/expert/${expert.id}`}
             className="flex items-center gap-3 min-w-0"
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3498DB] text-white text-sm font-bold">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0039CA] text-white text-sm font-bold">
               {expert.name.charAt(0)}
             </div>
             <div className="min-w-0">

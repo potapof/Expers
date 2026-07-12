@@ -103,7 +103,7 @@ export function ReaderManageSubscriptions() {
           <Users className="h-4 w-4" />
           Авторы
           {authorCount > 0 && (
-            <span className="ml-0.5 rounded-full bg-[#3498DB] px-1.5 py-0.5 text-[10px] font-semibold text-white">
+            <span className="ml-0.5 rounded-full bg-[#0039CA] px-1.5 py-0.5 text-[10px] font-semibold text-white">
               {authorCount}
             </span>
           )}
@@ -120,7 +120,7 @@ export function ReaderManageSubscriptions() {
           <FolderTree className="h-4 w-4" />
           Разделы и темы
           {sectionCount > 0 && (
-            <span className="ml-0.5 rounded-full bg-[#3498DB] px-1.5 py-0.5 text-[10px] font-semibold text-white">
+            <span className="ml-0.5 rounded-full bg-[#0039CA] px-1.5 py-0.5 text-[10px] font-semibold text-white">
               {sectionCount}
             </span>
           )}
@@ -143,7 +143,7 @@ export function ReaderManageSubscriptions() {
                   href={`/expert/${expert.id}`}
                   className="flex items-center gap-3 min-w-0"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3498DB] text-white text-sm font-bold">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0039CA] text-white text-sm font-bold">
                     {expert.name.charAt(0)}
                   </div>
                   <div className="min-w-0">
@@ -186,7 +186,7 @@ export function ReaderManageSubscriptions() {
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-medium uppercase tracking-wider text-[#3498DB]">
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-[#0039CA]">
                       {getSectionType(id)}
                     </span>
                   </div>

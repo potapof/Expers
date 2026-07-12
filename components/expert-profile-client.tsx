@@ -53,15 +53,15 @@ function ArticleCard({ article }: { article: Article }) {
   return (
     <Link
       href={articleUrl(article)}
-      className="group block rounded-xl border border-gray-100 bg-white p-5 hover:border-[#3498DB] hover:shadow-sm transition-all"
+      className="group block rounded-xl border border-gray-100 bg-white p-5 hover:border-[#0039CA] hover:shadow-sm transition-all"
     >
       <div className="flex items-center gap-2 mb-2">
-        <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-[#3498DB]">
+        <span className="inline-flex items-center rounded-full bg-[#0039CA]/10 px-2.5 py-0.5 text-xs font-medium text-[#0039CA]">
           {industry?.name || article.industryId}
         </span>
         <span className="text-xs text-gray-400">{article.readTime}</span>
       </div>
-      <h3 className="font-semibold text-[#2C3E50] group-hover:text-[#3498DB] transition-colors leading-snug mb-2">
+      <h3 className="font-semibold text-[#2C3E50] group-hover:text-[#0039CA] transition-colors leading-snug mb-2">
         {article.title}
       </h3>
       <p className="text-sm text-gray-600 leading-relaxed line-clamp-2 mb-3">
@@ -117,7 +117,7 @@ function ExpertiseBlock({ expert }: { expert: ExpertProfile }) {
             {expert.expertise.map((exp) => (
               <span
                 key={exp}
-                className="inline-flex items-center rounded-md bg-blue-50 px-2.5 py-1 text-sm font-medium text-[#3498DB]"
+                className="inline-flex items-center rounded-md bg-[#0039CA]/10 px-2.5 py-1 text-sm font-medium text-[#0039CA]"
               >
                 {exp}
               </span>
@@ -211,7 +211,7 @@ export default function ExpertProfileClient({
       <PageSchema expert={expert} />
       <div className="mx-auto px-4 max-w-4xl py-8">
         <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-          <Link href="/" className="hover:text-[#3498DB] transition-colors">
+          <Link href="/" className="hover:text-[#0039CA] transition-colors">
             Главная
           </Link>
           <ChevronRight className="h-3 w-3" />
@@ -219,7 +219,7 @@ export default function ExpertProfileClient({
         </div>
 
         <div className="flex flex-col sm:flex-row gap-6 mb-8">
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-[#3498DB] text-white text-3xl font-bold">
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-[#0039CA] text-white text-3xl font-bold">
             {expert.name.charAt(0)}
           </div>
           <div className="flex-1">
@@ -247,7 +247,7 @@ export default function ExpertProfileClient({
               {expert.email && (
                 <a
                   href={`mailto:${expert.email}`}
-                  className="inline-flex items-center gap-1.5 text-sm text-[#3498DB] hover:text-[#1ABC9C] transition-colors"
+                  className="inline-flex items-center gap-1.5 text-sm text-[#0039CA] hover:text-[#1ABC9C] transition-colors"
                 >
                   <Mail className="h-4 w-4" />
                   {expert.email}
@@ -259,7 +259,7 @@ export default function ExpertProfileClient({
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-sm text-[#3498DB] hover:text-[#1ABC9C] transition-colors"
+                  className="inline-flex items-center gap-1.5 text-sm text-[#0039CA] hover:text-[#1ABC9C] transition-colors"
                 >
                   <ExternalLink className="h-4 w-4" />
                   {link.platform}

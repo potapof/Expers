@@ -173,8 +173,8 @@ export function CatalogClient({ articles }: { articles: CatalogArticle[] }) {
                                       }
                                       className={`block w-full text-left px-3 py-1 text-xs rounded transition-colors ${
                                         isActive
-                                          ? "bg-[#3498DB] text-white font-medium"
-                                          : "text-gray-400 hover:text-[#3498DB] hover:bg-blue-50"
+                                          ? "bg-[#0039CA] text-white font-medium"
+                                          : "text-gray-400 hover:text-[#0039CA] hover:bg-[#0039CA]/10"
                                       }`}
                                     >
                                       {category.name}
@@ -207,7 +207,7 @@ export function CatalogClient({ articles }: { articles: CatalogArticle[] }) {
           {selectedCategoryId && (
             <button
               onClick={() => setSelectedCategoryId(null)}
-              className="text-sm text-[#3498DB] hover:text-[#2C3E50] transition-colors"
+              className="text-sm text-[#0039CA] hover:text-[#2C3E50] transition-colors"
             >
               Сбросить фильтр
             </button>
@@ -239,12 +239,12 @@ export function CatalogClient({ articles }: { articles: CatalogArticle[] }) {
                   <div className="flex items-start gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-[#3498DB]">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#0039CA]/10 px-2.5 py-0.5 text-xs font-medium text-[#0039CA]">
                           {industryIcons[article.industryId]}
                           {industry?.name}
                         </span>
                       </div>
-                      <h2 className="text-xl font-semibold text-[#2C3E50] group-hover:text-[#3498DB] transition-colors leading-snug mb-2">
+                      <h2 className="text-xl font-semibold text-[#2C3E50] group-hover:text-[#0039CA] transition-colors leading-snug mb-2">
                         {article.title}
                       </h2>
                       <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 mb-3">

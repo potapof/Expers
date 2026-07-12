@@ -149,7 +149,7 @@ export function CabinetClient() {
             <CardContent className="py-6">
               <div className="flex items-center gap-4">
                 <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                  <User className="h-8 w-8 text-[#3498DB]" />
+                  <User className="h-8 w-8 text-[#0039CA]" />
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-[#2C3E50]">
@@ -168,7 +168,7 @@ export function CabinetClient() {
           >
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#E8F4FD]">
-                <Bell className="h-5 w-5 text-[#3498DB]" />
+                <Bell className="h-5 w-5 text-[#0039CA]" />
               </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-[#2C3E50]">

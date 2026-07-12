@@ -189,7 +189,7 @@ export function AuthorComments() {
           </p>
         </div>
         {newCommentCount > 0 && (
-          <div className="flex items-center gap-1.5 rounded-full bg-[#3498DB]/10 px-3 py-1.5 text-xs font-medium text-[#3498DB]">
+          <div className="flex items-center gap-1.5 rounded-full bg-[#0039CA]/10 px-3 py-1.5 text-xs font-medium text-[#0039CA]">
             <Bell className="h-3.5 w-3.5" />+{newCommentCount} новых
           </div>
         )}
@@ -256,7 +256,7 @@ export function AuthorComments() {
                   <Link
                     href={`/articles/${articleId}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-1 text-xs text-[#3498DB] hover:text-[#2980B9] shrink-0 ml-2"
+                    className="flex items-center gap-1 text-xs text-[#0039CA] hover:text-[#2980B9] shrink-0 ml-2"
                   >
                     <ExternalLink className="h-3 w-3" />
                     Открыть
@@ -295,7 +295,7 @@ export function AuthorComments() {
                                 onClick={() =>
                                   handleReply(comment.id, articleId)
                                 }
-                                className="mt-2 flex items-center gap-1 text-xs text-[#3498DB] hover:text-[#2980B9] transition-colors"
+                                className="mt-2 flex items-center gap-1 text-xs text-[#0039CA] hover:text-[#2980B9] transition-colors"
                               >
                                 <Reply className="h-3 w-3" />
                                 Ответить
@@ -313,7 +313,7 @@ export function AuthorComments() {
                                           {reply.authorName}
                                         </span>
                                         {reply.isAuthorReply && (
-                                          <span className="inline-flex items-center rounded-full bg-[#3498DB]/10 px-2 py-0.5 text-[11px] font-medium text-[#3498DB]">
+                                          <span className="inline-flex items-center rounded-full bg-[#0039CA]/10 px-2 py-0.5 text-[11px] font-medium text-[#0039CA]">
                                             ответ автора
                                           </span>
                                         )}
@@ -332,7 +332,7 @@ export function AuthorComments() {
                               {replyToId === comment.id && (
                                 <form
                                   onSubmit={handleReplySubmit}
-                                  className="mt-3 rounded-lg border border-[#3498DB]/30 bg-blue-50 p-3"
+                                  className="mt-3 rounded-lg border border-[#0039CA]/30 bg-[#0039CA]/10 p-3"
                                 >
                                   <textarea
                                     value={replyText}
@@ -341,10 +341,10 @@ export function AuthorComments() {
                                     }
                                     placeholder="Напишите ответ..."
                                     rows={2}
-                                    className="w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#2C3E50] placeholder-gray-400 outline-none ring-[#3498DB] transition-all focus:border-[#3498DB] focus:ring-2"
+                                    className="w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#2C3E50] placeholder-gray-400 outline-none ring-[#0039CA] transition-all focus:border-[#0039CA] focus:ring-2"
                                   />
                                   <div className="mt-2 flex items-center justify-between">
-                                    <span className="text-xs text-[#3498DB]">
+                                    <span className="text-xs text-[#0039CA]">
                                       Ответ будет отмечен как «ответ автора»
                                     </span>
                                     <div className="flex gap-2">
@@ -362,7 +362,7 @@ export function AuthorComments() {
                                         type="submit"
                                         disabled={!replyText.trim()}
                                         size="sm"
-                                        className="gap-1.5 bg-[#3498DB] hover:bg-[#2980B9] text-xs h-7 px-3"
+                                        className="gap-1.5 bg-[#0039CA] hover:bg-[#2980B9] text-xs h-7 px-3"
                                       >
                                         <Send className="h-3 w-3" />
                                         Ответить

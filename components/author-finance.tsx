@@ -143,7 +143,7 @@ export function AuthorFinance() {
             <p className="text-sm text-gray-500">Платежей пока нет</p>
             <Link
               href="/articles/new"
-              className="mt-3 text-sm text-[#3498DB] hover:underline"
+              className="mt-3 text-sm text-[#0039CA] hover:underline"
             >
               Опубликовать статью
             </Link>
@@ -160,7 +160,7 @@ export function AuthorFinance() {
                   <div className="flex-1 min-w-0">
                     <Link
                       href={`/articles/${p.articleId}`}
-                      className="text-sm font-medium text-[#2C3E50] hover:text-[#3498DB] transition-colors line-clamp-1"
+                      className="text-sm font-medium text-[#2C3E50] hover:text-[#0039CA] transition-colors line-clamp-1"
                     >
                       {p.title}
                     </Link>

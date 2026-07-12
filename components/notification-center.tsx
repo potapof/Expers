@@ -19,7 +19,7 @@ function NotificationIcon({ type }: { type: AppNotification["type"] }) {
   switch (type) {
     case "comment_on_article":
     case "reply_to_comment":
-      return <MessageSquare className="h-4 w-4 shrink-0 text-[#3498DB]" />;
+      return <MessageSquare className="h-4 w-4 shrink-0 text-[#0039CA]" />;
     case "new_article_author":
       return <FileText className="h-4 w-4 shrink-0 text-[#1ABC9C]" />;
     case "new_article_section":
@@ -104,7 +104,7 @@ export function NotificationCenter() {
               <button
                 type="button"
                 onClick={markAllAsRead}
-                className="flex items-center gap-1 text-xs text-[#3498DB] hover:underline"
+                className="flex items-center gap-1 text-xs text-[#0039CA] hover:underline"
               >
                 <CheckCheck className="h-3.5 w-3.5" />
                 Прочитать всё
@@ -130,7 +130,7 @@ export function NotificationCenter() {
                       }}
                       className={cn(
                         "flex items-start gap-3 px-4 py-3 transition-colors hover:bg-gray-50",
-                        !n.read && "bg-blue-50/50"
+                        !n.read && "bg-[#0039CA]/10/50"
                       )}
                     >
                       <div className="mt-0.5">
@@ -152,7 +152,7 @@ export function NotificationCenter() {
                         </p>
                       </div>
                       {!n.read && (
-                        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#3498DB]" />
+                        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#0039CA]" />
                       )}
                     </Link>
                   </li>

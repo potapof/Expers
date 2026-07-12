@@ -224,8 +224,8 @@ function JsonLd({
 
 function TldrBlock({ text }: { text: string }) {
   return (
-    <section className="rounded-xl border border-blue-100 bg-blue-50/50 p-6 mb-8">
-      <div className="flex items-center gap-2 text-[#3498DB] mb-3">
+    <section className="rounded-xl border border-blue-100 bg-[#0039CA]/10/50 p-6 mb-8">
+      <div className="flex items-center gap-2 text-[#0039CA] mb-3">
         <Lightbulb className="h-5 w-5" />
         <span className="font-semibold text-sm tracking-wide uppercase">
           TL;DR
@@ -239,22 +239,22 @@ function TldrBlock({ text }: { text: string }) {
 function KeyFactsBlock({ facts }: { facts: { icon: string; text: string }[] }) {
   const iconMap: Record<string, React.ReactNode> = {
     chart: <BarChart3 className="h-4 w-4 text-[#27AE60]" />,
-    eye: <Target className="h-4 w-4 text-[#3498DB]" />,
+    eye: <Target className="h-4 w-4 text-[#0039CA]" />,
     tool: <WrenchIcon className="h-4 w-4 text-[#1ABC9C]" />,
     "trending-down": <TrendingUp className="h-4 w-4 text-[#e74c3c]" />,
     calendar: <Clock className="h-4 w-4 text-[#2C3E50]" />,
     "dollar-sign": <Zap className="h-4 w-4 text-[#27AE60]" />,
-    target: <Target className="h-4 w-4 text-[#3498DB]" />,
+    target: <Target className="h-4 w-4 text-[#0039CA]" />,
     ruble: <Zap className="h-4 w-4 text-[#27AE60]" />,
-    building: <Target className="h-4 w-4 text-[#3498DB]" />,
+    building: <Target className="h-4 w-4 text-[#0039CA]" />,
     store: <Target className="h-4 w-4 text-[#1ABC9C]" />,
-    smartphone: <Target className="h-4 w-4 text-[#3498DB]" />,
+    smartphone: <Target className="h-4 w-4 text-[#0039CA]" />,
     banknote: <Zap className="h-4 w-4 text-[#27AE60]" />,
-    "file-text": <FileText className="h-4 w-4 text-[#3498DB]" />,
+    "file-text": <FileText className="h-4 w-4 text-[#0039CA]" />,
     video: <Target className="h-4 w-4 text-[#1ABC9C]" />,
     prescription: <FileText className="h-4 w-4 text-[#27AE60]" />,
     prohibited: <Zap className="h-4 w-4 text-[#e74c3c]" />,
-    hospital: <Target className="h-4 w-4 text-[#3498DB]" />,
+    hospital: <Target className="h-4 w-4 text-[#0039CA]" />,
     scale: <BarChart3 className="h-4 w-4 text-[#2C3E50]" />,
   };
 
@@ -271,7 +271,7 @@ function KeyFactsBlock({ facts }: { facts: { icon: string; text: string }[] }) {
           <li key={index} className="flex items-start gap-3">
             <span className="mt-0.5 shrink-0 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100">
               {iconMap[fact.icon] || (
-                <BarChart3 className="h-4 w-4 text-[#3498DB]" />
+                <BarChart3 className="h-4 w-4 text-[#0039CA]" />
               )}
             </span>
             <span className="text-sm text-[#2C3E50]">{fact.text}</span>
@@ -307,7 +307,7 @@ function DefinitionBlock({ text }: { text: string }) {
           Определение
         </span>
       </div>
-      <blockquote className="border-l-4 border-[#3498DB] bg-white pl-4 py-3 text-[#2C3E50] text-base leading-relaxed italic">
+      <blockquote className="border-l-4 border-[#0039CA] bg-white pl-4 py-3 text-[#2C3E50] text-base leading-relaxed italic">
         {text}
       </blockquote>
     </section>
@@ -368,8 +368,8 @@ function ProblemSolutionResultBlock({
             {data.problem}
           </p>
         </div>
-        <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-5">
-          <div className="flex items-center gap-2 text-[#3498DB] mb-2">
+        <div className="rounded-xl border border-blue-100 bg-[#0039CA]/10/50 p-5">
+          <div className="flex items-center gap-2 text-[#0039CA] mb-2">
             <Lightbulb className="h-4 w-4" />
             <span className="font-semibold text-xs uppercase tracking-wide">
               Решение
@@ -402,7 +402,7 @@ function HowToBlock({
 }) {
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-6 mb-8">
-      <div className="flex items-center gap-2 text-[#3498DB] mb-5">
+      <div className="flex items-center gap-2 text-[#0039CA] mb-5">
         <ListChecks className="h-5 w-5" />
         <span className="font-semibold text-sm tracking-wide uppercase">
           HowTo — Пошаговая инструкция
@@ -411,7 +411,7 @@ function HowToBlock({
       <ol className="space-y-5">
         {steps.map((step, index) => (
           <li key={index} className="flex gap-4">
-            <span className="shrink-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#3498DB] text-white text-xs font-bold">
+            <span className="shrink-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#0039CA] text-white text-xs font-bold">
               {index + 1}
             </span>
             <div>
@@ -549,7 +549,7 @@ function AuthorBlock({
         </span>
       </div>
       <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#3498DB] text-white text-xl font-bold">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#0039CA] text-white text-xl font-bold">
           {author.name.charAt(0)}
         </div>
         <div className="flex-1">
@@ -568,7 +568,7 @@ function AuthorBlock({
                 {author.expertise.map((exp) => (
                   <span
                     key={exp}
-                    className="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-[#3498DB]"
+                    className="inline-flex items-center rounded-md bg-[#0039CA]/10 px-2 py-0.5 text-xs font-medium text-[#0039CA]"
                   >
                     {exp}
                   </span>
@@ -620,7 +620,7 @@ function SourcesBlock({
               href={source.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-[#3498DB] hover:text-[#1ABC9C] transition-colors"
+              className="flex items-center gap-2 text-sm text-[#0039CA] hover:text-[#1ABC9C] transition-colors"
             >
               <span className="text-xs text-gray-300">{index + 1}.</span>
               <span>{source.title}</span>
@@ -663,14 +663,14 @@ function CrossLinksBlock({ related }: { related: RelatedArticle[] }) {
             <Link
               key={item.id}
               href={articleUrl(item)}
-              className="group rounded-xl border border-gray-100 bg-white p-4 hover:border-[#3498DB] hover:shadow-sm transition-all"
+              className="group rounded-xl border border-gray-100 bg-white p-4 hover:border-[#0039CA] hover:shadow-sm transition-all"
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-[#3498DB]">
+                <span className="inline-flex items-center rounded-full bg-[#0039CA]/10 px-2 py-0.5 text-xs font-medium text-[#0039CA]">
                   {relIndustry?.name || item.industryId}
                 </span>
               </div>
-              <h4 className="text-sm font-medium text-[#2C3E50] group-hover:text-[#3498DB] transition-colors leading-snug">
+              <h4 className="text-sm font-medium text-[#2C3E50] group-hover:text-[#0039CA] transition-colors leading-snug">
                 {item.title}
               </h4>
               {(item.authorName || item.date) && (
@@ -785,11 +785,11 @@ export default async function ArticleSlugPage({
       <div className="mx-auto px-4 max-w-3xl py-8">
         <div className="mb-8">
           <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
-            <Link href="/" className="hover:text-[#3498DB] transition-colors">
+            <Link href="/" className="hover:text-[#0039CA] transition-colors">
               Главная
             </Link>
             <ChevronRight className="h-3 w-3" />
-            <span className="text-[#3498DB]">
+            <span className="text-[#0039CA]">
               {industryData?.name || articleView.industryId}
             </span>
           </div>
@@ -800,7 +800,7 @@ export default async function ArticleSlugPage({
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3498DB] text-white text-xs font-bold">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0039CA] text-white text-xs font-bold">
                 {articleView.author.name.charAt(0)}
               </div>
               <span className="font-medium text-[#2C3E50]">

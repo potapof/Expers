@@ -84,7 +84,7 @@ export default function AllArticlesPage() {
               className={cn(
                 "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
                 viewMode === key
-                  ? "bg-[#3498DB] text-white"
+                  ? "bg-[#0039CA] text-white"
                   : "text-gray-500 hover:bg-gray-100"
               )}
             >
@@ -160,7 +160,7 @@ function Pagination({
           className={cn(
             "h-8 w-8 rounded-md text-sm font-medium transition-colors",
             p === page
-              ? "bg-[#3498DB] text-white"
+              ? "bg-[#0039CA] text-white"
               : "text-gray-500 hover:bg-gray-100"
           )}
         >

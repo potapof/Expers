@@ -199,7 +199,7 @@ function CommentCard({
               value={editText}
               onChange={(e) => onEditTextChange(e.target.value)}
               rows={3}
-              className="w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#2C3E50] outline-none ring-[#3498DB] transition-all focus:border-[#3498DB] focus:ring-2"
+              className="w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#2C3E50] outline-none ring-[#0039CA] transition-all focus:border-[#0039CA] focus:ring-2"
             />
           ) : (
             <p className="text-sm leading-relaxed text-gray-700">
@@ -218,7 +218,7 @@ function CommentCard({
       <div className="mt-3 flex items-center gap-2">
         <Link
           href={`/articles/${comment.articleId}`}
-          className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-[#3498DB] hover:bg-blue-50 transition-colors"
+          className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-[#0039CA] hover:bg-[#0039CA]/10 transition-colors"
         >
           <ExternalLink className="h-3 w-3" />
           Смотреть

@@ -87,7 +87,7 @@ export function SectionSelectorDialog({
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => toggleSection(ind.id)}
-                    className="h-4 w-4 rounded border-gray-300 text-[#3498DB] focus:ring-[#3498DB]"
+                    className="h-4 w-4 rounded border-gray-300 text-[#0039CA] focus:ring-[#0039CA]"
                   />
                   <span
                     className={cn(
@@ -113,7 +113,7 @@ export function SectionSelectorDialog({
                             type="checkbox"
                             checked={subSelected}
                             onChange={() => toggleSection(sub.id)}
-                            className="h-3.5 w-3.5 rounded border-gray-300 text-[#3498DB] focus:ring-[#3498DB]"
+                            className="h-3.5 w-3.5 rounded border-gray-300 text-[#0039CA] focus:ring-[#0039CA]"
                           />
                           <span
                             className={cn(

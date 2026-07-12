@@ -314,7 +314,7 @@ function ArticleCard({
 
         {article.industryName && (
           <div className="shrink-0">
-            <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-[#3498DB]">
+            <span className="inline-flex items-center rounded-md bg-[#0039CA]/10 px-2 py-1 text-xs font-medium text-[#0039CA]">
               {article.industryName}
             </span>
           </div>
@@ -608,7 +608,7 @@ export function AuthorArticles() {
         </div>
         <Button
           onClick={handleCreate}
-          className="bg-[#3498DB] hover:bg-[#2C3E50] text-white text-sm h-9 px-4"
+          className="bg-[#0039CA] hover:bg-[#2C3E50] text-white text-sm h-9 px-4"
         >
           <Plus className="h-4 w-4 mr-1.5" />
           Создать статью
@@ -650,7 +650,7 @@ export function AuthorArticles() {
           {statusFilter === "all" && (
             <Button
               onClick={handleCreate}
-              className="bg-[#3498DB] hover:bg-[#2C3E50] text-white text-sm"
+              className="bg-[#0039CA] hover:bg-[#2C3E50] text-white text-sm"
             >
               <Plus className="h-4 w-4 mr-1.5" />
               Создать первую статью

@@ -52,7 +52,7 @@ function CommentItem({
           {comment.authorName}
         </span>
         {comment.isAuthorReply && (
-          <span className="inline-flex items-center rounded-full bg-[#3498DB]/10 px-2 py-0.5 text-[11px] font-medium text-[#3498DB]">
+          <span className="inline-flex items-center rounded-full bg-[#0039CA]/10 px-2 py-0.5 text-[11px] font-medium text-[#0039CA]">
             ответ автора
           </span>
         )}
@@ -72,7 +72,7 @@ function CommentItem({
         <button
           type="button"
           onClick={() => onReply(comment.id)}
-          className="mt-2 flex items-center gap-1 text-xs text-[#3498DB] hover:text-[#2980B9] transition-colors"
+          className="mt-2 flex items-center gap-1 text-xs text-[#0039CA] hover:text-[#2980B9] transition-colors"
         >
           <Reply className="h-3 w-3" />
           Ответить
@@ -101,7 +101,7 @@ function CommentItem({
                       {reply.authorName}
                     </span>
                     {reply.isAuthorReply && (
-                      <span className="inline-flex items-center rounded-full bg-[#3498DB]/10 px-2 py-0.5 text-[11px] font-medium text-[#3498DB]">
+                      <span className="inline-flex items-center rounded-full bg-[#0039CA]/10 px-2 py-0.5 text-[11px] font-medium text-[#0039CA]">
                         ответ автора
                       </span>
                     )}
@@ -172,7 +172,7 @@ export function ArticleComments({
       <Separator className="mb-8" />
 
       <h2 className="mb-6 flex items-center gap-2 text-xl font-bold text-[#2C3E50]">
-        <MessageSquare className="h-5 w-5 text-[#3498DB]" />
+        <MessageSquare className="h-5 w-5 text-[#0039CA]" />
         Комментарии
         {topLevelComments.length > 0 && (
           <span className="text-sm font-normal text-gray-500">
@@ -197,13 +197,13 @@ export function ArticleComments({
             onChange={(e) => setText(e.target.value)}
             placeholder="Напишите комментарий..."
             rows={3}
-            className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-[#2C3E50] placeholder-gray-400 outline-none ring-[#3498DB] transition-all focus:border-[#3498DB] focus:ring-2"
+            className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-[#2C3E50] placeholder-gray-400 outline-none ring-[#0039CA] transition-all focus:border-[#0039CA] focus:ring-2"
           />
           <div className="mt-3 flex justify-end">
             <Button
               type="submit"
               disabled={!text.trim() || submitting}
-              className="gap-2 bg-[#3498DB] hover:bg-[#2980B9]"
+              className="gap-2 bg-[#0039CA] hover:bg-[#2980B9]"
             >
               <Send className="h-4 w-4" />
               Отправить
@@ -213,9 +213,9 @@ export function ArticleComments({
       )}
 
       {replyTo && expert && (
-        <div className="mb-6 rounded-xl border border-[#3498DB]/30 bg-blue-50 px-5 py-4">
+        <div className="mb-6 rounded-xl border border-[#0039CA]/30 bg-[#0039CA]/10 px-5 py-4">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-medium text-[#3498DB]">
+            <span className="text-xs font-medium text-[#0039CA]">
               Ответ на комментарий
             </span>
             <button
@@ -232,14 +232,14 @@ export function ArticleComments({
               onChange={(e) => setReplyText(e.target.value)}
               placeholder="Напишите ответ..."
               rows={2}
-              className="w-full resize-none rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-[#2C3E50] placeholder-gray-400 outline-none ring-[#3498DB] transition-all focus:border-[#3498DB] focus:ring-2"
+              className="w-full resize-none rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-[#2C3E50] placeholder-gray-400 outline-none ring-[#0039CA] transition-all focus:border-[#0039CA] focus:ring-2"
             />
             <div className="mt-2 flex justify-end">
               <Button
                 type="submit"
                 disabled={!replyText.trim()}
                 size="sm"
-                className="gap-1.5 bg-[#3498DB] hover:bg-[#2980B9] text-xs h-8"
+                className="gap-1.5 bg-[#0039CA] hover:bg-[#2980B9] text-xs h-8"
               >
                 <Reply className="h-3 w-3" />
                 {expert.id === articleAuthorId

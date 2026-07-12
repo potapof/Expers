@@ -68,7 +68,7 @@ export function SubscribeSectionButton({
       className={`shrink-0 rounded p-1 transition-colors cursor-pointer ${
         subscribed
           ? "text-[#1ABC9C] hover:text-[#16a085]"
-          : "text-gray-300 hover:text-[#3498DB]"
+          : "text-gray-300 hover:text-[#0039CA]"
       }`}
       title={
         subscribed

@@ -474,7 +474,7 @@ export function ArticleWizardClient() {
       <div className="mx-auto px-4 max-w-3xl py-20 text-center">
         <div className="flex justify-center mb-6">
           <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
-            <User className="h-8 w-8 text-[#3498DB]" />
+            <User className="h-8 w-8 text-[#0039CA]" />
           </div>
         </div>
         <h1 className="text-2xl font-bold text-[#2C3E50] mb-3">
@@ -610,7 +610,7 @@ function ProgressBar({
                 s.id < currentStep
                   ? "bg-[#27AE60] text-white"
                   : s.id === currentStep
-                    ? "bg-[#3498DB] text-white ring-2 ring-blue-200"
+                    ? "bg-[#0039CA] text-white ring-2 ring-[#0039CA]/30"
                     : "bg-gray-100 text-gray-400"
               )}
             >
@@ -634,7 +634,7 @@ function ProgressBar({
             className={cn(
               "text-[10px] font-medium transition-colors",
               s.id === currentStep
-                ? "text-[#3498DB]"
+                ? "text-[#0039CA]"
                 : s.id < currentStep
                   ? "text-[#27AE60]"
                   : "text-gray-300"
@@ -659,7 +659,7 @@ function StepLabel({
 }) {
   return (
     <div className="mb-8">
-      <span className="text-xs font-medium text-[#3498DB] uppercase tracking-wide">
+      <span className="text-xs font-medium text-[#0039CA] uppercase tracking-wide">
         Шаг {step} из 12
       </span>
       <h2 className="text-2xl font-bold text-[#2C3E50] mt-1 mb-2">{title}</h2>
@@ -710,7 +710,7 @@ function InputField({
           maxLength={maxLength}
           className={cn(
             "w-full rounded-lg border bg-white px-3 py-2 text-sm outline-none transition-colors resize-y",
-            "focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]",
+            "focus:border-[#0039CA] focus:ring-1 focus:ring-[#0039CA]",
             error ? "border-red-300" : "border-gray-200"
           )}
         />
@@ -764,7 +764,7 @@ function Step1Sector({
               className={cn(
                 "flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left",
                 selected
-                  ? "border-[#3498DB] bg-blue-50"
+                  ? "border-[#0039CA] bg-[#0039CA]/10"
                   : "border-gray-100 hover:border-gray-200 bg-white"
               )}
             >
@@ -772,7 +772,7 @@ function Step1Sector({
                 className={cn(
                   "flex h-10 w-10 items-center justify-center rounded-lg",
                   selected
-                    ? "bg-[#3498DB] text-white"
+                    ? "bg-[#0039CA] text-white"
                     : "bg-gray-100 text-gray-500"
                 )}
               >
@@ -781,13 +781,13 @@ function Step1Sector({
               <span
                 className={cn(
                   "font-medium",
-                  selected ? "text-[#3498DB]" : "text-[#2C3E50]"
+                  selected ? "text-[#0039CA]" : "text-[#2C3E50]"
                 )}
               >
                 {ind.name}
               </span>
               {selected && (
-                <Check className="h-5 w-5 text-[#3498DB] ml-auto shrink-0" />
+                <Check className="h-5 w-5 text-[#0039CA] ml-auto shrink-0" />
               )}
             </button>
           );
@@ -842,14 +842,14 @@ function Step2Subsector({
               className={cn(
                 "flex items-center justify-between w-full p-4 rounded-xl border-2 transition-all text-left",
                 selected
-                  ? "border-[#3498DB] bg-blue-50"
+                  ? "border-[#0039CA] bg-[#0039CA]/10"
                   : "border-gray-100 hover:border-gray-200 bg-white"
               )}
             >
               <span
                 className={cn(
                   "font-medium",
-                  selected ? "text-[#3498DB]" : "text-[#2C3E50]"
+                  selected ? "text-[#0039CA]" : "text-[#2C3E50]"
                 )}
               >
                 {sub.name}
@@ -858,7 +858,7 @@ function Step2Subsector({
                 {sub.categories.length} категорий
               </span>
               {selected && (
-                <Check className="h-5 w-5 text-[#3498DB] ml-3 shrink-0" />
+                <Check className="h-5 w-5 text-[#0039CA] ml-3 shrink-0" />
               )}
             </button>
           );
@@ -907,20 +907,20 @@ function Step3Category({
               className={cn(
                 "flex items-center justify-between w-full p-3 rounded-xl border-2 transition-all text-left",
                 selected
-                  ? "border-[#3498DB] bg-blue-50"
+                  ? "border-[#0039CA] bg-[#0039CA]/10"
                   : "border-gray-100 hover:border-gray-200 bg-white"
               )}
             >
               <span
                 className={cn(
                   "font-medium text-sm",
-                  selected ? "text-[#3498DB]" : "text-[#2C3E50]"
+                  selected ? "text-[#0039CA]" : "text-[#2C3E50]"
                 )}
               >
                 {cat.name}
               </span>
               {selected && (
-                <Check className="h-4 w-4 text-[#3498DB] shrink-0" />
+                <Check className="h-4 w-4 text-[#0039CA] shrink-0" />
               )}
             </button>
           );
@@ -1072,7 +1072,7 @@ function Step5CrossLinks({
             return (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100"
+                className="flex items-center justify-between p-3 bg-[#0039CA]/10 rounded-lg border border-blue-100"
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[#2C3E50] truncate">
@@ -1116,7 +1116,7 @@ function Step5CrossLinks({
                       {ind?.name} · {article.author.name}
                     </p>
                   </div>
-                  <Plus className="h-4 w-4 text-[#3498DB] shrink-0 ml-2" />
+                  <Plus className="h-4 w-4 text-[#0039CA] shrink-0 ml-2" />
                 </button>
               );
             })}
@@ -1210,7 +1210,7 @@ function Step6TitleIntro({
               value={data.slug}
               onChange={(e) => updateData({ slug: e.target.value })}
               placeholder="telemedicina-v-rossii"
-              className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB] outline-none"
+              className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-[#0039CA] focus:ring-1 focus:ring-[#0039CA] outline-none"
               maxLength={200}
             />
             <button
@@ -1480,7 +1480,7 @@ function Step10StructuredData({
       <div className="space-y-8">
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <h3 className="font-semibold text-[#2C3E50] mb-3 flex items-center gap-2">
-            <Lightbulb className="h-4 w-4 text-[#3498DB]" />
+            <Lightbulb className="h-4 w-4 text-[#0039CA]" />
             TL;DR — краткое содержание
           </h3>
           <InputField
@@ -1635,7 +1635,7 @@ function Step10StructuredData({
 
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <h3 className="font-semibold text-[#2C3E50] mb-3 flex items-center gap-2">
-            <ListChecks className="h-4 w-4 text-[#3498DB]" />
+            <ListChecks className="h-4 w-4 text-[#0039CA]" />
             HowTo — пошаговая инструкция
           </h3>
           <div className="space-y-4">
@@ -1775,7 +1775,7 @@ function Step11Preview({
 
   return (
     <div>
-      <div className="flex items-center gap-2 text-[#3498DB] mb-4">
+      <div className="flex items-center gap-2 text-[#0039CA] mb-4">
         <Eye className="h-5 w-5" />
         <span className="font-semibold text-sm tracking-wide uppercase">
           Предпросмотр статьи
@@ -1789,7 +1789,7 @@ function Step11Preview({
       <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
         <div className="max-w-3xl mx-auto px-6 py-8">
           <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
-            <span className="text-[#3498DB]">
+            <span className="text-[#0039CA]">
               {ind?.name || data.industryName}
             </span>
             <ChevronRight className="h-3 w-3" />
@@ -1804,7 +1804,7 @@ function Step11Preview({
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-8">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3498DB] text-white text-xs font-bold">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0039CA] text-white text-xs font-bold">
                 {expertName.charAt(0)}
               </div>
               <span className="font-medium text-[#2C3E50]">{expertName}</span>
@@ -1821,8 +1821,8 @@ function Step11Preview({
           </div>
 
           {data.tldr && (
-            <section className="rounded-xl border border-blue-100 bg-blue-50/50 p-6 mb-8">
-              <div className="flex items-center gap-2 text-[#3498DB] mb-3">
+            <section className="rounded-xl border border-blue-100 bg-[#0039CA]/10/50 p-6 mb-8">
+              <div className="flex items-center gap-2 text-[#0039CA] mb-3">
                 <Lightbulb className="h-5 w-5" />
                 <span className="font-semibold text-sm tracking-wide uppercase">
                   TL;DR
@@ -1848,7 +1848,7 @@ function Step11Preview({
                   .map((fact, index) => (
                     <li key={index} className="flex items-start gap-3">
                       <span className="mt-0.5 shrink-0 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100">
-                        <BarChart3 className="h-4 w-4 text-[#3498DB]" />
+                        <BarChart3 className="h-4 w-4 text-[#0039CA]" />
                       </span>
                       <span className="text-sm text-[#2C3E50]">
                         {fact.text}
@@ -1867,7 +1867,7 @@ function Step11Preview({
                   Определение
                 </span>
               </div>
-              <blockquote className="border-l-4 border-[#3498DB] bg-white pl-4 py-3 text-[#2C3E50] text-base leading-relaxed italic">
+              <blockquote className="border-l-4 border-[#0039CA] bg-white pl-4 py-3 text-[#2C3E50] text-base leading-relaxed italic">
                 {data.definition}
               </blockquote>
             </section>
@@ -1920,8 +1920,8 @@ function Step11Preview({
                     {data.problemSolutionResult.problem}
                   </p>
                 </div>
-                <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-5">
-                  <div className="flex items-center gap-2 text-[#3498DB] mb-2">
+                <div className="rounded-xl border border-blue-100 bg-[#0039CA]/10/50 p-5">
+                  <div className="flex items-center gap-2 text-[#0039CA] mb-2">
                     <Lightbulb className="h-4 w-4" />
                     <span className="font-semibold text-xs uppercase">
                       Решение
@@ -2090,7 +2090,7 @@ function Step11Preview({
 
           {data.howTo.filter((h) => h.title).length > 0 && (
             <section className="rounded-xl border border-gray-200 bg-white p-6 mb-8">
-              <div className="flex items-center gap-2 text-[#3498DB] mb-5">
+              <div className="flex items-center gap-2 text-[#0039CA] mb-5">
                 <ListChecks className="h-5 w-5" />
                 <span className="font-semibold text-sm tracking-wide uppercase">
                   HowTo — Инструкция
@@ -2101,7 +2101,7 @@ function Step11Preview({
                   .filter((h) => h.title)
                   .map((step, index) => (
                     <li key={index} className="flex gap-4">
-                      <span className="shrink-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#3498DB] text-white text-xs font-bold">
+                      <span className="shrink-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#0039CA] text-white text-xs font-bold">
                         {index + 1}
                       </span>
                       <div>
@@ -2213,7 +2213,7 @@ function Step11Preview({
                   .filter((s) => s.title)
                   .map((source, index) => (
                     <li key={index}>
-                      <span className="flex items-center gap-2 text-sm text-[#3498DB]">
+                      <span className="flex items-center gap-2 text-sm text-[#0039CA]">
                         <span className="text-xs text-gray-300">
                           {index + 1}.
                         </span>
@@ -2233,7 +2233,7 @@ function Step11Preview({
               </span>
             </div>
             <div className="flex gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#3498DB] text-white text-xl font-bold">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#0039CA] text-white text-xl font-bold">
                 {expertName.charAt(0)}
               </div>
               <div>
@@ -2247,7 +2247,7 @@ function Step11Preview({
                       {data.expertiseAreas.filter(Boolean).map((exp) => (
                         <span
                           key={exp}
-                          className="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-[#3498DB]"
+                          className="inline-flex items-center rounded-md bg-[#0039CA]/10 px-2 py-0.5 text-xs font-medium text-[#0039CA]"
                         >
                           {exp}
                         </span>

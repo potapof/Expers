@@ -305,7 +305,7 @@ function RegisterDialog({
               type="checkbox"
               checked={isExpert}
               onChange={(e) => onIsExpertChange(e.target.checked)}
-              className="mt-0.5 h-4 w-4 accent-[#3498DB]"
+              className="mt-0.5 h-4 w-4 accent-[#0039CA]"
             />
             <span className="text-sm text-gray-600">
               Я эксперт — хочу публиковать статьи

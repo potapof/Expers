@@ -174,7 +174,7 @@ function DesignSelector({
             onClick={() => onChange(opt.id)}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all border ${
               selected
-                ? "border-[#3498DB] bg-blue-50 text-[#3498DB]"
+                ? "border-[#0039CA] bg-[#0039CA]/10 text-[#0039CA]"
                 : "border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700"
             }`}
           >
@@ -553,7 +553,7 @@ function ResizableSplit({
             ref={editorRef}
             contentEditable
             suppressContentEditableWarning
-            className="w-full h-full min-h-[200px] p-3 text-sm text-gray-700 leading-relaxed outline-none rounded-lg border border-gray-200 focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB] overflow-auto"
+            className="w-full h-full min-h-[200px] p-3 text-sm text-gray-700 leading-relaxed outline-none rounded-lg border border-gray-200 focus:border-[#0039CA] focus:ring-1 focus:ring-[#0039CA] overflow-auto"
             dangerouslySetInnerHTML={{ __html: textContent }}
             onInput={(e) =>
               onTextChange((e.target as HTMLDivElement).innerHTML)
@@ -585,7 +585,7 @@ function ResizableSplit({
             ref={editorRef}
             contentEditable
             suppressContentEditableWarning
-            className="w-full h-full min-h-[200px] p-3 text-sm text-gray-700 leading-relaxed outline-none rounded-lg border border-gray-200 focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB] overflow-auto"
+            className="w-full h-full min-h-[200px] p-3 text-sm text-gray-700 leading-relaxed outline-none rounded-lg border border-gray-200 focus:border-[#0039CA] focus:ring-1 focus:ring-[#0039CA] overflow-auto"
             dangerouslySetInnerHTML={{ __html: textContent }}
             onInput={(e) =>
               onTextChange((e.target as HTMLDivElement).innerHTML)
@@ -679,7 +679,7 @@ function TableEditor({
                 <button
                   type="button"
                   onClick={addColumn}
-                  className="p-1 text-gray-400 hover:text-[#3498DB] transition-colors"
+                  className="p-1 text-gray-400 hover:text-[#0039CA] transition-colors"
                   title="Добавить колонку"
                 >
                   <Plus className="h-3.5 w-3.5" />
@@ -764,7 +764,7 @@ function SectionCard({
               <button
                 type="button"
                 onClick={() => setEditing(false)}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#3498DB] hover:bg-blue-50 transition-colors"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#0039CA] hover:bg-[#0039CA]/10 transition-colors"
               >
                 <Save className="h-3.5 w-3.5" />
                 Сохранить
@@ -807,7 +807,7 @@ function SectionCard({
                   onChange={(e) => update({ description: e.target.value })}
                   placeholder="Описание раздела (опционально)"
                   rows={2}
-                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none transition-colors resize-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]"
+                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none transition-colors resize-none focus:border-[#0039CA] focus:ring-1 focus:ring-[#0039CA]"
                 />
               </div>
               <DesignSelector
@@ -826,7 +826,7 @@ function SectionCard({
                   ref={editorRef}
                   contentEditable
                   suppressContentEditableWarning
-                  className="w-full min-h-[200px] p-3 text-sm text-gray-700 leading-relaxed outline-none rounded-lg border border-gray-200 focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB] overflow-auto"
+                  className="w-full min-h-[200px] p-3 text-sm text-gray-700 leading-relaxed outline-none rounded-lg border border-gray-200 focus:border-[#0039CA] focus:ring-1 focus:ring-[#0039CA] overflow-auto"
                   dangerouslySetInnerHTML={{ __html: section.text }}
                   onInput={(e) =>
                     update({ text: (e.target as HTMLDivElement).innerHTML })
@@ -874,7 +874,7 @@ function SectionCard({
             )}
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Columns2 className="h-3.5 w-3.5 text-[#3498DB]" />
+                <Columns2 className="h-3.5 w-3.5 text-[#0039CA]" />
                 <span className="text-xs font-medium text-gray-400">
                   {DESIGN_OPTIONS.find((d) => d.id === section.design)?.label}
                 </span>
@@ -1005,7 +1005,7 @@ export function SectionCardBuilder({
   return (
     <div>
       <div className="mb-8">
-        <span className="text-xs font-medium text-[#3498DB] uppercase tracking-wide">
+        <span className="text-xs font-medium text-[#0039CA] uppercase tracking-wide">
           Шаг 7 из 12
         </span>
         <h2 className="text-2xl font-bold text-[#2C3E50] mt-1 mb-2">

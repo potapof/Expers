@@ -42,7 +42,7 @@
   --radius-xl: calc(var(--radius) + 4px);
   --font-sans: var(--font-sans);
   --color-brand-navy: #2c3e50;
-  --color-brand-bright-blue: #3498db;
+  --color-brand-bright-blue: #0039CA;
   --color-brand-teal: #1abc9c;
   --color-brand-green: #27ae60;
 }

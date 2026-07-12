@@ -265,7 +265,7 @@ export function AuthorSubscribers() {
                 href={`/expert/${subscriber.id}`}
                 className="flex items-center gap-3 min-w-0"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3498DB] text-white text-sm font-bold">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0039CA] text-white text-sm font-bold">
                   {subscriber.name.charAt(0)}
                 </div>
                 <div className="min-w-0">
@@ -280,7 +280,7 @@ export function AuthorSubscribers() {
               <div className="flex items-center gap-2 shrink-0">
                 <Link
                   href={`/expert/${subscriber.id}`}
-                  className="flex items-center gap-1 text-xs text-[#3498DB] hover:text-[#2980B9] transition-colors"
+                  className="flex items-center gap-1 text-xs text-[#0039CA] hover:text-[#2980B9] transition-colors"
                 >
                   <ExternalLink className="h-3 w-3" />
                   Профиль
@@ -312,7 +312,7 @@ export function AuthorSubscribers() {
                       toggleSubscription(subscriber.id);
                       toast.success(`Вы подписались на ${subscriber.name}`);
                     }}
-                    className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-[#3498DB] hover:bg-blue-50 transition-colors"
+                    className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-[#0039CA] hover:bg-[#0039CA]/10 transition-colors"
                   >
                     <UserPlus className="h-3 w-3" />
                     Подписаться

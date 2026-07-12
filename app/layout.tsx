@@ -53,7 +53,7 @@ export default function RootLayout({
               <nav className="hidden sm:flex items-center gap-8">
                 <Link
                   href="/"
-                  className="text-sm font-medium text-[#2C3E50] hover:text-[#3498DB] transition-colors"
+                  className="text-sm font-medium text-[#2C3E50] hover:text-[#0039CA] transition-colors"
                 >
                   Главная
                 </Link>

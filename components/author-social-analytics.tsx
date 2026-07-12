@@ -335,7 +335,7 @@ export function AuthorSocialAnalytics() {
           label="Просмотры"
           value={formatNumber(totalViews)}
           iconBg="bg-blue-100"
-          iconColor="text-[#3498DB]"
+          iconColor="text-[#0039CA]"
         />
         <MetricCard
           icon={<BookOpen className="h-4 w-4" />}
@@ -392,7 +392,7 @@ export function AuthorSocialAnalytics() {
 
       <div className="rounded-xl border border-gray-100 bg-white p-5">
         <div className="flex items-center gap-2 mb-4">
-          <Target className="h-4 w-4 text-[#3498DB]" />
+          <Target className="h-4 w-4 text-[#0039CA]" />
           <h3 className="text-sm font-semibold text-[#2C3E50]">
             Конверсия статья → подписка
           </h3>
@@ -411,9 +411,9 @@ export function AuthorSocialAnalytics() {
               {subscriberCount}
             </p>
           </div>
-          <div className="rounded-lg bg-gradient-to-br from-[#3498DB]/10 to-[#2C3E50]/10 p-4 text-center">
+          <div className="rounded-lg bg-gradient-to-br from-[#0039CA]/10 to-[#2C3E50]/10 p-4 text-center">
             <p className="text-xs text-gray-400 mb-1">Конверсия</p>
-            <p className="text-3xl font-bold text-[#3498DB]">
+            <p className="text-3xl font-bold text-[#0039CA]">
               {conversionRate}%
             </p>
             <p className="text-[10px] text-gray-300 mt-1">
@@ -447,7 +447,7 @@ export function AuthorSocialAnalytics() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="rounded-xl border border-gray-100 bg-white p-5">
           <div className="flex items-center gap-2 mb-4">
-            <AlarmClock className="h-4 w-4 text-[#3498DB]" />
+            <AlarmClock className="h-4 w-4 text-[#0039CA]" />
             <h3 className="text-sm font-semibold text-[#2C3E50]">
               Лучшее время публикации
             </h3>
@@ -463,8 +463,8 @@ export function AuthorSocialAnalytics() {
                   <div
                     className={`h-full rounded transition-all ${
                       slot.hour === bestTimeSlot.hour
-                        ? "bg-gradient-to-r from-[#3498DB] to-[#2C3E50]"
-                        : "bg-[#3498DB]/40"
+                        ? "bg-gradient-to-r from-[#0039CA] to-[#2C3E50]"
+                        : "bg-[#0039CA]/40"
                     }`}
                     style={{
                       width: `${(slot.engagement / maxTimeEngagement) * 100}%`,
@@ -478,8 +478,8 @@ export function AuthorSocialAnalytics() {
             ))}
           </div>
 
-          <div className="mt-4 p-3 rounded-lg bg-[#3498DB]/5 border border-[#3498DB]/10">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-[#3498DB]">
+          <div className="mt-4 p-3 rounded-lg bg-[#0039CA]/5 border border-[#0039CA]/10">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-[#0039CA]">
               <TrendingUp className="h-3.5 w-3.5" />
               Лучшее время: {bestTimeSlot.label} ({bestTimeSlot.hour})
             </div>
@@ -502,8 +502,8 @@ export function AuthorSocialAnalytics() {
                     <div
                       className={`w-full rounded transition-all ${
                         slot.day === bestDaySlot.day
-                          ? "bg-gradient-to-t from-[#3498DB] to-[#2C3E50]"
-                          : "bg-[#3498DB]/40"
+                          ? "bg-gradient-to-t from-[#0039CA] to-[#2C3E50]"
+                          : "bg-[#0039CA]/40"
                       }`}
                       style={{
                         height: `${(slot.engagement / maxDayEngagement) * 100}%`,
@@ -523,7 +523,7 @@ export function AuthorSocialAnalytics() {
 
         <div className="rounded-xl border border-gray-100 bg-white p-5">
           <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="h-4 w-4 text-[#3498DB]" />
+            <BarChart3 className="h-4 w-4 text-[#0039CA]" />
             <h3 className="text-sm font-semibold text-[#2C3E50]">
               Самые вовлекающие темы
             </h3>
@@ -555,7 +555,7 @@ export function AuthorSocialAnalytics() {
                     max={maxTopicEngagement}
                     label={topic.expertiseAreas.slice(0, 2).join(", ")}
                     sublabel={`${topic.comments} комм. · ${topic.favorites} избр. · ${topic.views} просм.`}
-                    color="bg-gradient-to-r from-[#3498DB] to-[#2C3E50]"
+                    color="bg-gradient-to-r from-[#0039CA] to-[#2C3E50]"
                   />
                 </div>
               ))}

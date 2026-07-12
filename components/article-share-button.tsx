@@ -124,7 +124,7 @@ export function ArticleShareButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="shrink-0 text-gray-300 hover:text-[#3498DB] transition-colors"
+        className="shrink-0 text-gray-300 hover:text-[#0039CA] transition-colors"
         aria-label="Поделиться"
       >
         <Share2 className="h-5 w-5" />

@@ -57,14 +57,14 @@ export function ArticleCard({
         href={href}
         className="flex gap-5 rounded-xl border border-gray-100 p-5 transition-colors hover:border-gray-200 hover:bg-gray-50"
       >
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-blue-50">
-          <span className="text-lg font-bold text-[#3498DB]">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-[#0039CA]/10">
+          <span className="text-lg font-bold text-[#0039CA]">
             {article.title.charAt(0)}
           </span>
         </div>
         <div className="min-w-0 flex-1">
           <div className="mb-1">
-            <span className="inline-block rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-[#3498DB]">
+            <span className="inline-block rounded-full bg-[#0039CA]/10 px-2.5 py-0.5 text-xs font-medium text-[#0039CA]">
               {article.industryName}
             </span>
           </div>
@@ -102,7 +102,7 @@ export function ArticleCard({
       )}
     >
       <div className="mb-3 flex items-center justify-between">
-        <span className="inline-block rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-[#3498DB]">
+        <span className="inline-block rounded-full bg-[#0039CA]/10 px-2.5 py-0.5 text-xs font-medium text-[#0039CA]">
           {article.industryName}
         </span>
         <div className="flex items-center gap-2">
@@ -110,7 +110,7 @@ export function ArticleCard({
           <span className="text-xs text-gray-400">{article.readTime}</span>
         </div>
       </div>
-      <h3 className="mb-2 text-base font-semibold leading-snug text-[#2C3E50] group-hover:text-[#3498DB]">
+      <h3 className="mb-2 text-base font-semibold leading-snug text-[#2C3E50] group-hover:text-[#0039CA]">
         {article.title}
       </h3>
       <p className="mb-4 line-clamp-3 flex-1 text-sm leading-relaxed text-gray-500">

@@ -39,7 +39,7 @@ export function SubscribeButton({
       className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
         subscribed
           ? "bg-[#1ABC9C] text-white hover:bg-[#16a085]"
-          : "border border-[#3498DB] text-[#3498DB] hover:bg-blue-50"
+          : "border border-[#0039CA] text-[#0039CA] hover:bg-[#0039CA]/10"
       }`}
     >
       {subscribed ? (
