@@ -68,10 +68,7 @@ export async function DELETE(request: NextRequest) {
 
   const articleId = request.nextUrl.searchParams.get("articleId");
   if (!articleId) {
-    return NextResponse.json(
-      { error: "Требуется articleId" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Требуется articleId" }, { status: 400 });
   }
 
   if (!(await isDatabaseAvailable())) {
