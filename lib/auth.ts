@@ -2,14 +2,16 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { Expert, SafeExpert } from "./models";
 
-const jwtSecret = process.env.JWT_SECRET;
-if (!jwtSecret) {
-  throw new Error(
-    "JWT_SECRET environment variable is not set. " +
-      "Set it in .env.local or .env.docker before starting the application."
-  );
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error(
+      "JWT_SECRET environment variable is not set. " +
+        "Set it in .env before starting the application."
+    );
+  }
+  return secret;
 }
-const JWT_SECRET: string = jwtSecret;
 const SALT_ROUNDS = 10;
 
 export function hashPassword(password: string): Promise<string> {
@@ -31,7 +33,7 @@ export function generateToken(expert: Expert): string {
       name: expert.name,
       role: expert.role ?? "expert",
     },
-    JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: "7d" }
   );
 }
@@ -43,7 +45,7 @@ export function verifyToken(token: string): {
   role: "reader" | "expert";
 } | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as {
+    const decoded = jwt.verify(token, getJwtSecret()) as {
       id: string;
       email: string;
       name: string;
