@@ -91,10 +91,7 @@ async function addView(articleId: string) {
   if (!token) return;
 
   const filtered = history.filter((e) => e.articleId !== articleId);
-  setHistory([
-    { articleId, viewedAt: new Date().toISOString() },
-    ...filtered,
-  ]);
+  setHistory([{ articleId, viewedAt: new Date().toISOString() }, ...filtered]);
 
   try {
     await fetch("/api/history", {
@@ -145,5 +142,9 @@ export function useViewingHistory() {
     clearHistory();
   }, []);
 
-  return { history: snapshot, addView: addViewCb, clearHistory: clearHistoryCb };
+  return {
+    history: snapshot,
+    addView: addViewCb,
+    clearHistory: clearHistoryCb,
+  };
 }

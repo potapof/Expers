@@ -97,10 +97,13 @@ async function toggle(articleId: string) {
 
   try {
     const res = has
-      ? await fetch(`/api/favorites?articleId=${encodeURIComponent(articleId)}`, {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        })
+      ? await fetch(
+          `/api/favorites?articleId=${encodeURIComponent(articleId)}`,
+          {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
       : await fetch("/api/favorites", {
           method: "POST",
           headers: {

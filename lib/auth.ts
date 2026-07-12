@@ -36,9 +36,12 @@ export function generateToken(expert: Expert): string {
   );
 }
 
-export function verifyToken(
-  token: string
-): { id: string; email: string; name: string; role: "reader" | "expert" } | null {
+export function verifyToken(token: string): {
+  id: string;
+  email: string;
+  name: string;
+  role: "reader" | "expert";
+} | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as {
       id: string;

@@ -146,7 +146,11 @@ async function apiCreate(articleId: string, text: string, parentId?: string) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ articleId, text, ...(parentId ? { parentId } : {}) }),
+      body: JSON.stringify({
+        articleId,
+        text,
+        ...(parentId ? { parentId } : {}),
+      }),
     });
     const data = await res.json();
     if (res.ok && data.comment) {
