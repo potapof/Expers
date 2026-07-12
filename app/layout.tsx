@@ -46,6 +46,9 @@ export default function RootLayout({
                   className="h-7 w-auto"
                   priority
                 />
+                <span className="text-lg font-semibold tracking-tight text-[#2C3E50]">
+                  EXPERS
+                </span>
               </Link>
               <nav className="hidden sm:flex items-center gap-8">
                 <Link
