@@ -146,7 +146,21 @@ export const TABLE_SCHEMAS: Record<TableName, TableSchema> = {
   [TableName.PAYMENTS]: {
     name: TableName.PAYMENTS,
     keySchema: [{ AttributeName: "orderId", KeyType: "HASH" }],
-    attributeDefinitions: [{ AttributeName: "orderId", AttributeType: "S" }],
+    attributeDefinitions: [
+      { AttributeName: "orderId", AttributeType: "S" },
+      { AttributeName: "userId", AttributeType: "S" },
+      { AttributeName: "createdAt", AttributeType: "S" },
+    ],
+    globalSecondaryIndexes: [
+      {
+        IndexName: "user-index",
+        KeySchema: [
+          { AttributeName: "userId", KeyType: "HASH" },
+          { AttributeName: "createdAt", KeyType: "RANGE" },
+        ],
+        Projection: { ProjectionType: "ALL" },
+      },
+    ],
   },
 };
 
@@ -159,6 +173,7 @@ export const IndexName = {
   COMMENTS_ARTICLE: "article-index",
   COMMENTS_AUTHOR: "author-index",
   SUBSCRIPTIONS_AUTHOR: "author-index",
+  PAYMENTS_USER: "user-index",
 } as const;
 
 export type IndexName = (typeof IndexName)[keyof typeof IndexName];

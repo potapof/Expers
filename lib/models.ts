@@ -607,6 +607,7 @@ export interface Payment {
   orderId: string;
   paymentId: string;
   articleId: string;
+  title: string;
   userId: string;
   amount: number;
   status: PaymentStatus;
@@ -632,6 +633,19 @@ export async function getPaymentByOrderId(
     new GetCommand({ TableName: TableName.PAYMENTS, Key: { orderId } })
   );
   return (result.Item as Payment) ?? null;
+}
+
+export async function getPaymentsByUser(userId: string): Promise<Payment[]> {
+  const result = await docClient.send(
+    new QueryCommand({
+      TableName: TableName.PAYMENTS,
+      IndexName: IndexName.PAYMENTS_USER,
+      KeyConditionExpression: "userId = :u",
+      ExpressionAttributeValues: { ":u": userId },
+      ScanIndexForward: false,
+    })
+  );
+  return (result.Items as Payment[]) ?? [];
 }
 
 export async function updatePaymentStatus(

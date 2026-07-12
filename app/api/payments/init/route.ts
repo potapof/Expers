@@ -91,6 +91,7 @@ export async function POST(request: NextRequest) {
       orderId,
       paymentId: result.paymentId || "",
       articleId: article.id,
+      title: article.title,
       userId: payload.id,
       amount: PUBLICATION_PRICE_KOPECKS,
       status: "NEW",

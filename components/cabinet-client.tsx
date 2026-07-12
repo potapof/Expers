@@ -331,7 +331,7 @@ export function CabinetClient() {
               }`}
             >
               <Wallet className="h-4 w-4" />
-              Финансы
+              Платежи
             </button>
             <button
               type="button"
