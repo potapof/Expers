@@ -78,7 +78,12 @@ describe("generateToken", () => {
     const result = generateToken(mockExpert);
 
     expect(mockSign).toHaveBeenCalledWith(
-      { id: "exp-1", email: "ivan@example.com", name: "Иван Петров" },
+      {
+        id: "exp-1",
+        email: "ivan@example.com",
+        name: "Иван Петров",
+        role: "expert",
+      },
       "test-secret-for-unit-tests",
       { expiresIn: "7d" }
     );
@@ -103,7 +108,7 @@ describe("verifyToken", () => {
       "valid-token",
       "test-secret-for-unit-tests"
     );
-    expect(result).toEqual(payload);
+    expect(result).toEqual({ ...payload, role: "expert" });
   });
 
   it("should return null for invalid token", async () => {

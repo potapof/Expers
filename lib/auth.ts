@@ -25,7 +25,12 @@ export function verifyPassword(
 
 export function generateToken(expert: Expert): string {
   return jwt.sign(
-    { id: expert.id, email: expert.email, name: expert.name },
+    {
+      id: expert.id,
+      email: expert.email,
+      name: expert.name,
+      role: expert.role ?? "expert",
+    },
     JWT_SECRET,
     { expiresIn: "7d" }
   );
@@ -33,12 +38,19 @@ export function generateToken(expert: Expert): string {
 
 export function verifyToken(
   token: string
-): { id: string; email: string; name: string } | null {
+): { id: string; email: string; name: string; role: "reader" | "expert" } | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as {
+    const decoded = jwt.verify(token, JWT_SECRET) as {
       id: string;
       email: string;
       name: string;
+      role?: "reader" | "expert";
+    };
+    return {
+      id: decoded.id,
+      email: decoded.email,
+      name: decoded.name,
+      role: decoded.role ?? "expert",
     };
   } catch {
     return null;

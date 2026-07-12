@@ -23,6 +23,9 @@ export function AuthButtons() {
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
+  const [regIsExpert, setRegIsExpert] = useState(false);
+
+  const isExpert = expert?.role === "expert";
 
   function switchToRegister() {
     setShowLogin(false);
@@ -36,13 +39,24 @@ export function AuthButtons() {
   if (expert) {
     return (
       <div className="flex items-center gap-3">
-        <Link href="/articles/new">
-          <Button variant="default" size="sm" className="gap-2">
-            <PenSquare className="h-4 w-4" />
-            Опубликовать статью
-          </Button>
-        </Link>
-        <NotificationCenter />
+        {isExpert ? (
+          <>
+            <Link href="/articles/new">
+              <Button variant="default" size="sm" className="gap-2">
+                <PenSquare className="h-4 w-4" />
+                Опубликовать статью
+              </Button>
+            </Link>
+            <NotificationCenter />
+          </>
+        ) : (
+          <Link href="/cabinet/favorites">
+            <Button variant="ghost" size="sm" className="gap-2">
+              <User className="h-4 w-4" />
+              Мой кабинет
+            </Button>
+          </Link>
+        )}
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <User className="h-4 w-4" />
           {expert.name}
@@ -74,8 +88,15 @@ export function AuthButtons() {
           onEmailChange={setRegEmail}
           password={regPassword}
           onPasswordChange={setRegPassword}
+          isExpert={regIsExpert}
+          onIsExpertChange={setRegIsExpert}
           onSubmit={() => {
-            register(regName, regEmail, regPassword);
+            register(
+              regName,
+              regEmail,
+              regPassword,
+              regIsExpert ? "expert" : "reader"
+            );
             setShowRegister(false);
           }}
         />
@@ -117,8 +138,15 @@ export function AuthButtons() {
         onEmailChange={setRegEmail}
         password={regPassword}
         onPasswordChange={setRegPassword}
+        isExpert={regIsExpert}
+        onIsExpertChange={setRegIsExpert}
         onSubmit={() => {
-          register(regName, regEmail, regPassword);
+          register(
+            regName,
+            regEmail,
+            regPassword,
+            regIsExpert ? "expert" : "reader"
+          );
           setShowRegister(false);
         }}
       />
@@ -213,6 +241,8 @@ function RegisterDialog({
   onEmailChange,
   password,
   onPasswordChange,
+  isExpert,
+  onIsExpertChange,
   onSubmit,
 }: {
   open: boolean;
@@ -223,13 +253,15 @@ function RegisterDialog({
   onEmailChange: (v: string) => void;
   password: string;
   onPasswordChange: (v: string) => void;
+  isExpert: boolean;
+  onIsExpertChange: (v: boolean) => void;
   onSubmit: () => void;
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Регистрация эксперта</DialogTitle>
+          <DialogTitle>Регистрация</DialogTitle>
         </DialogHeader>
         <form
           onSubmit={(e) => {
@@ -268,6 +300,21 @@ function RegisterDialog({
               minLength={6}
             />
           </div>
+          <label className="flex items-start gap-2 rounded-lg border border-gray-200 p-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={isExpert}
+              onChange={(e) => onIsExpertChange(e.target.checked)}
+              className="mt-0.5 h-4 w-4 accent-[#3498DB]"
+            />
+            <span className="text-sm text-gray-600">
+              Я эксперт — хочу публиковать статьи
+              <span className="block text-xs text-gray-400">
+                Без галочки вы регистрируетесь как читатель (избранное, подписки,
+                история).
+              </span>
+            </span>
+          </label>
           <div className="flex gap-2 justify-end">
             <Button
               type="button"

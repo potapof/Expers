@@ -4,7 +4,11 @@ RUN apk add --no-cache openssl
 
 WORKDIR /app
 
-# Код и node_modules будут примаунчены с хоста
+# Install dependencies inside the image so native binaries match Alpine (musl).
+# Host node_modules must NOT be mounted over this (see docker-compose anonymous volume).
+COPY package.json package-lock.json ./
+RUN npm ci
+
 EXPOSE 8080
 
 CMD ["npm", "run", "dev:docker"]

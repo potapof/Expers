@@ -397,8 +397,6 @@ export function ArticleWizardClient() {
 
     try {
       const token = localStorage.getItem("token");
-      const wordCount = data.content.split(/\s+/).filter(Boolean).length;
-      const readTime = `${Math.max(1, Math.round(wordCount / 150))} мин`;
 
       const body = {
         title: data.title,
@@ -442,13 +440,10 @@ export function ArticleWizardClient() {
         toast.success("Статья опубликована!", { id });
         router.push("/");
       } else if (res.status === 503) {
-        const articleId =
-          result.article?.id || `article-${crypto.randomUUID()}`;
-        saveToLocalCatalog(articleId, body, readTime);
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem(PAYMENT_KEY);
-        toast.success("Статья сохранена локально (БД недоступна)", { id });
-        router.push("/");
+        toast.error(
+          "База данных временно недоступна. Черновик сохранён — попробуйте опубликовать позже.",
+          { id }
+        );
       } else {
         toast.error(result.error || "Ошибка публикации", { id });
       }
@@ -456,32 +451,6 @@ export function ArticleWizardClient() {
       toast.error("Ошибка соединения", { id });
     } finally {
       setPublishing(false);
-    }
-  }
-
-  function saveToLocalCatalog(
-    articleId: string,
-    body: Record<string, unknown>,
-    readTime: string
-  ) {
-    try {
-      const existing = JSON.parse(
-        localStorage.getItem("expers-published") || "[]"
-      );
-      existing.push({
-        id: articleId,
-        title: body.title,
-        description: body.description,
-        author: { name: expert?.name || "Эксперт" },
-        date: new Date().toISOString().split("T")[0],
-        industryId: body.industryId,
-        categoryId: body.categoryId,
-        readTime,
-        _full: body,
-      });
-      localStorage.setItem("expers-published", JSON.stringify(existing));
-    } catch {
-      /* ignore */
     }
   }
 
@@ -494,7 +463,7 @@ export function ArticleWizardClient() {
     );
   }
 
-  if (!expert) {
+  if (!expert || expert.role !== "expert") {
     return (
       <div className="mx-auto px-4 max-w-3xl py-20 text-center">
         <div className="flex justify-center mb-6">
@@ -503,10 +472,12 @@ export function ArticleWizardClient() {
           </div>
         </div>
         <h1 className="text-2xl font-bold text-[#2C3E50] mb-3">
-          Войдите в систему
+          {expert ? "Только для экспертов" : "Войдите в систему"}
         </h1>
         <p className="text-gray-500 mb-6">
-          Чтобы опубликовать статью, необходимо войти или зарегистрироваться
+          {expert
+            ? "Публикация статей доступна только аккаунтам экспертов. Зарегистрируйтесь как эксперт, чтобы публиковать материалы."
+            : "Чтобы опубликовать статью, необходимо войти или зарегистрироваться"}
         </p>
         <Button onClick={() => router.push("/")}>На главную</Button>
       </div>

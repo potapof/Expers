@@ -16,6 +16,7 @@ interface Expert {
   id: string;
   name: string;
   email: string;
+  role?: "reader" | "expert";
   createdAt: string;
   updatedAt: string;
 }
@@ -24,11 +25,22 @@ interface AuthContextType {
   expert: Expert | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    role?: "reader" | "expert"
+  ) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
+
+function emitAuthChanged() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("expers-auth-changed"));
+  }
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [expert, setExpert] = useState<Expert | null>(null);
@@ -51,7 +63,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return res.json();
       })
       .then((data) => {
-        if (!cancelled) setExpert(data.expert);
+        if (!cancelled) {
+          setExpert(data.expert);
+          emitAuthChanged();
+        }
       })
       .catch(() => {
         if (!cancelled) localStorage.removeItem("token");
@@ -84,8 +99,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         localStorage.setItem("token", data.token);
         setExpert(data.expert);
+        emitAuthChanged();
         toast.success("Вы вошли в систему", { id });
-        router.push("/cabinet");
+        router.push(data.expert?.role === "reader" ? "/" : "/cabinet");
       } catch {
         toast.error("Ошибка соединения", { id });
       }
@@ -94,13 +110,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const register = useCallback(
-    async (name: string, email: string, password: string) => {
+    async (
+      name: string,
+      email: string,
+      password: string,
+      role: "reader" | "expert" = "reader"
+    ) => {
       const id = toast.loading("Регистрация...");
       try {
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
+          body: JSON.stringify({ name, email, password, role }),
         });
 
         const data = await res.json();
@@ -112,8 +133,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         localStorage.setItem("token", data.token);
         setExpert(data.expert);
+        emitAuthChanged();
         toast.success("Регистрация завершена", { id });
-        router.push("/cabinet");
+        router.push(data.expert?.role === "reader" ? "/" : "/cabinet");
       } catch {
         toast.error("Ошибка соединения", { id });
       }
@@ -124,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     localStorage.removeItem("token");
     setExpert(null);
+    emitAuthChanged();
     toast.success("Вы вышли из системы");
     router.refresh();
   }, [router]);

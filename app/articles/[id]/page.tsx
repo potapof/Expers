@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getIndustryById } from "@/lib/data";
 import {
-  getArticleContentById,
-  getRelatedArticles,
-  getIndustryById,
-} from "@/lib/data";
-import type { ArticleContent } from "@/lib/data";
+  getArticleView,
+  type ArticleView,
+  type RelatedArticle,
+} from "@/lib/article-view";
 import {
   Clock,
   User,
@@ -32,28 +32,32 @@ import { ArticleShareButton } from "@/components/article-share-button";
 import { ArticleComments } from "@/components/article-comments";
 import { ArticleViewTracker } from "@/components/article-view-tracker";
 
-function JsonLd({ articleContent }: { articleContent: ArticleContent }) {
-  const industry = getIndustryById(articleContent.industryId);
-  const siteUrl = "https://expers.ru";
-  const articleUrl = `${siteUrl}/articles/${articleContent.id}`;
+export const dynamic = "force-dynamic";
 
-  const articleSchema = {
+function JsonLd({ articleView }: { articleView: ArticleView }) {
+  const industry = getIndustryById(articleView.industryId);
+  const siteUrl = "https://expers.ru";
+  const articleUrl = `${siteUrl}/articles/${articleView.id}`;
+
+  const schemas: Record<string, unknown>[] = [];
+
+  schemas.push({
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: articleContent.title,
-    description: articleContent.description,
+    headline: articleView.title,
+    description: articleView.description,
     author: {
       "@type": "Person",
-      name: articleContent.author.name,
-      description: articleContent.author.bio,
-      knowsAbout: articleContent.author.expertise,
-      credential: articleContent.author.credentials?.map((c) => ({
+      name: articleView.author.name,
+      description: articleView.author.bio,
+      knowsAbout: articleView.author.expertise,
+      credential: articleView.author.credentials?.map((c) => ({
         "@type": "EducationalOccupationalCredential",
         name: c,
       })),
     },
-    datePublished: articleContent.date + "T00:00:00Z",
-    dateModified: articleContent.date + "T00:00:00Z",
+    datePublished: articleView.date + "T00:00:00Z",
+    dateModified: articleView.date + "T00:00:00Z",
     image: `${siteUrl}/og-image.jpg`,
     publisher: {
       "@type": "Organization",
@@ -66,92 +70,102 @@ function JsonLd({ articleContent }: { articleContent: ArticleContent }) {
     },
     about: {
       "@type": "Thing",
-      name: industry?.name || articleContent.industryId,
-      description: articleContent.definition,
+      name: industry?.name || articleView.industryId,
+      description: articleView.definition,
     },
-    wordCount: articleContent.content.split(/\s+/).length,
-  };
+    wordCount: articleView.content.split(/\s+/).length,
+  });
 
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: articleContent.faq.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer,
-      },
-    })),
-  };
+  if (articleView.faq.length > 0) {
+    schemas.push({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: articleView.faq.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
+    });
+  }
 
-  const howToSchema = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: articleContent.title,
-    description: articleContent.description,
-    step: articleContent.howTo.map((step, index) => ({
-      "@type": "HowToStep",
-      position: index + 1,
-      name: step.title,
-      itemListElement: {
-        "@type": "HowToDirection",
-        text: step.description,
-      },
-    })),
-  };
+  if (articleView.howTo.length > 0) {
+    schemas.push({
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      name: articleView.title,
+      description: articleView.description,
+      step: articleView.howTo.map((step, index) => ({
+        "@type": "HowToStep",
+        position: index + 1,
+        name: step.title,
+        itemListElement: {
+          "@type": "HowToDirection",
+          text: step.description,
+        },
+      })),
+    });
+  }
 
-  const qaSchema = {
+  schemas.push({
     "@context": "https://schema.org",
     "@type": "QAPage",
     mainEntity: {
       "@type": "Question",
-      name: articleContent.featuredSnippet.question,
+      name: articleView.featuredSnippet.question,
       acceptedAnswer: {
         "@type": "Answer",
-        text: articleContent.featuredSnippet.answer,
+        text: articleView.featuredSnippet.answer,
       },
       author: {
         "@type": "Person",
-        name: articleContent.author.name,
+        name: articleView.author.name,
       },
     },
-  };
+  });
 
-  const reviewSchema = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: articleContent.title,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: articleContent.aggregateRating.ratingValue,
-      reviewCount: articleContent.aggregateRating.reviewCount,
-      bestRating: articleContent.aggregateRating.bestRating,
-    },
-    review: articleContent.reviews.map((r) => ({
-      "@type": "Review",
-      author: { "@type": "Person", name: r.author },
-      reviewBody: r.text,
-      reviewRating: {
-        "@type": "Rating",
-        ratingValue: r.rating,
-        bestRating: 5,
+  if (
+    articleView.reviews &&
+    articleView.reviews.length > 0 &&
+    articleView.aggregateRating
+  ) {
+    schemas.push({
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: articleView.title,
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: articleView.aggregateRating.ratingValue,
+        reviewCount: articleView.aggregateRating.reviewCount,
+        bestRating: articleView.aggregateRating.bestRating,
       },
-    })),
-  };
+      review: articleView.reviews.map((r) => ({
+        "@type": "Review",
+        author: { "@type": "Person", name: r.author },
+        reviewBody: r.text,
+        reviewRating: {
+          "@type": "Rating",
+          ratingValue: r.rating,
+          bestRating: 5,
+        },
+      })),
+    });
+  }
 
-  const personSchema = {
+  schemas.push({
     "@context": "https://schema.org",
     "@type": "Person",
-    name: articleContent.author.name,
-    description: articleContent.author.bio,
-    knowsAbout: articleContent.author.expertise,
-    ...(articleContent.author.socialLinks?.length
-      ? { sameAs: articleContent.author.socialLinks.map((l) => l.url) }
+    name: articleView.author.name,
+    description: articleView.author.bio,
+    knowsAbout: articleView.author.expertise,
+    ...(articleView.author.socialLinks?.length
+      ? { sameAs: articleView.author.socialLinks.map((l) => l.url) }
       : {}),
-  };
+  });
 
-  const breadcrumbSchema = {
+  schemas.push({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
@@ -160,76 +174,43 @@ function JsonLd({ articleContent }: { articleContent: ArticleContent }) {
         "@type": "ListItem",
         position: 2,
         name: industry?.name || "Категория",
-        item: `${siteUrl}/?industry=${articleContent.industryId}`,
+        item: `${siteUrl}/?industry=${articleView.industryId}`,
       },
       {
         "@type": "ListItem",
         position: 3,
-        name: articleContent.title,
+        name: articleView.title,
         item: articleUrl,
       },
     ],
-  };
+  });
 
-  const itemListSchema = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: `${articleContent.title} — Key Facts`,
-    description: "Ключевые факты статьи",
-    itemListElement: articleContent.keyFacts.map((fact, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      item: {
-        "@type": "Thing",
-        name: fact.text,
-      },
-    })),
-  };
+  if (articleView.keyFacts.length > 0) {
+    schemas.push({
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: `${articleView.title} — Key Facts`,
+      description: "Ключевые факты статьи",
+      itemListElement: articleView.keyFacts.map((fact, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+          "@type": "Thing",
+          name: fact.text,
+        },
+      })),
+    });
+  }
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(articleSchema),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(qaSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(reviewSchema),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(personSchema),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(breadcrumbSchema),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(itemListSchema),
-        }}
-      />
+      {schemas.map((schema, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
     </>
   );
 }
@@ -659,13 +640,7 @@ function MethodologyBlock({ text }: { text: string }) {
   );
 }
 
-function CrossLinksBlock({
-  articleContent,
-}: {
-  articleContent: ArticleContent;
-}) {
-  const relatedArticles = getRelatedArticles(articleContent.id);
-
+function CrossLinksBlock({ related }: { related: RelatedArticle[] }) {
   return (
     <section className="border-t border-gray-200 pt-8 mt-8">
       <div className="flex items-center gap-2 text-[#2C3E50] mb-5">
@@ -675,28 +650,34 @@ function CrossLinksBlock({
         </span>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        {relatedArticles.map((related) => {
-          const relIndustry = getIndustryById(related.industryId);
+        {related.map((item) => {
+          const relIndustry = getIndustryById(item.industryId);
           return (
             <Link
-              key={related.id}
-              href={`/articles/${related.id}`}
+              key={item.id}
+              href={`/articles/${item.id}`}
               className="group rounded-xl border border-gray-100 bg-white p-4 hover:border-[#3498DB] hover:shadow-sm transition-all"
             >
               <div className="flex items-center gap-2 mb-1">
                 <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-[#3498DB]">
-                  {relIndustry?.name || related.industryId}
+                  {relIndustry?.name || item.industryId}
                 </span>
               </div>
               <h4 className="text-sm font-medium text-[#2C3E50] group-hover:text-[#3498DB] transition-colors leading-snug">
-                {related.title}
+                {item.title}
               </h4>
-              <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
-                <User className="h-3 w-3" />
-                <span>{related.author.name}</span>
-                <span>·</span>
-                <span>{related.date}</span>
-              </div>
+              {(item.authorName || item.date) && (
+                <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+                  {item.authorName && (
+                    <>
+                      <User className="h-3 w-3" />
+                      <span>{item.authorName}</span>
+                    </>
+                  )}
+                  {item.authorName && item.date && <span>·</span>}
+                  {item.date && <span>{item.date}</span>}
+                </div>
+              )}
             </Link>
           );
         })}
@@ -782,17 +763,17 @@ export default async function ArticlePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const articleContent = getArticleContentById(id);
+  const articleView = await getArticleView(id);
 
-  if (!articleContent) {
+  if (!articleView) {
     notFound();
   }
 
-  const industry = getIndustryById(articleContent.industryId);
+  const industry = getIndustryById(articleView.industryId);
 
   return (
     <>
-      <JsonLd articleContent={articleContent} />
+      <JsonLd articleView={articleView} />
       <div className="mx-auto px-4 max-w-3xl py-8">
         <div className="mb-8">
           <div className="flex items-center gap-2 text-sm text-gray-400 mb-4">
@@ -801,74 +782,84 @@ export default async function ArticlePage({
             </Link>
             <ChevronRight className="h-3 w-3" />
             <span className="text-[#3498DB]">
-              {industry?.name || articleContent.industryId}
+              {industry?.name || articleView.industryId}
             </span>
           </div>
 
           <h1 className="text-3xl font-bold tracking-tight text-[#2C3E50] leading-tight mb-4">
-            {articleContent.title}
+            {articleView.title}
           </h1>
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3498DB] text-white text-xs font-bold">
-                {articleContent.author.name.charAt(0)}
+                {articleView.author.name.charAt(0)}
               </div>
               <span className="font-medium text-[#2C3E50]">
-                {articleContent.author.name}
+                {articleView.author.name}
               </span>
             </div>
             <span className="flex items-center gap-1">
               <Clock className="h-3.5 w-3.5" />
-              {articleContent.date}
+              {articleView.date}
             </span>
             <span className="flex items-center gap-1">
               <BookOpen className="h-3.5 w-3.5" />
-              {articleContent.readTime}
+              {articleView.readTime}
             </span>
             <span className="text-gray-300">|</span>
             <FavoriteButton articleId={id} size="md" />
             <ArticleShareButton
               articleId={id}
-              articleTitle={articleContent.title}
+              articleTitle={articleView.title}
             />
           </div>
         </div>
 
-        <TldrBlock text={articleContent.tldr} />
+        <TldrBlock text={articleView.tldr} />
 
-        <KeyFactsBlock facts={articleContent.keyFacts} />
+        {articleView.keyFacts.length > 0 && (
+          <KeyFactsBlock facts={articleView.keyFacts} />
+        )}
 
-        <DefinitionBlock text={articleContent.definition} />
+        <DefinitionBlock text={articleView.definition} />
 
-        <FeaturedSnippetBlock snippet={articleContent.featuredSnippet} />
+        <FeaturedSnippetBlock snippet={articleView.featuredSnippet} />
 
-        <ProblemSolutionResultBlock
-          data={articleContent.problemSolutionResult}
-        />
+        <ProblemSolutionResultBlock data={articleView.problemSolutionResult} />
 
-        <ArticleContentBlock content={articleContent.content} />
+        <ArticleContentBlock content={articleView.content} />
 
-        <HowToBlock steps={articleContent.howTo} />
+        {articleView.howTo.length > 0 && (
+          <HowToBlock steps={articleView.howTo} />
+        )}
 
-        <FaqBlock items={articleContent.faq} />
+        {articleView.faq.length > 0 && <FaqBlock items={articleView.faq} />}
 
-        <ReviewsBlock
-          reviews={articleContent.reviews}
-          aggregateRating={articleContent.aggregateRating}
-        />
+        {articleView.reviews &&
+          articleView.reviews.length > 0 &&
+          articleView.aggregateRating && (
+            <ReviewsBlock
+              reviews={articleView.reviews}
+              aggregateRating={articleView.aggregateRating}
+            />
+          )}
 
-        <AuthorBlock author={articleContent.author} />
+        <AuthorBlock author={articleView.author} />
 
-        <MethodologyBlock text={articleContent.methodology} />
+        <MethodologyBlock text={articleView.methodology} />
 
-        <SourcesBlock sources={articleContent.sources} />
+        {articleView.sources.length > 0 && (
+          <SourcesBlock sources={articleView.sources} />
+        )}
 
-        <CrossLinksBlock articleContent={articleContent} />
+        {articleView.related.length > 0 && (
+          <CrossLinksBlock related={articleView.related} />
+        )}
 
         <ArticleComments
-          articleId={articleContent.id}
-          articleAuthorId={articleContent.author.id}
+          articleId={articleView.id}
+          articleAuthorId={articleView.author.id}
         />
       </div>
 

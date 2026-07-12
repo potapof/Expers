@@ -2,13 +2,8 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import {
-  industries,
-  articles,
-  getIndustryById,
-  type Article,
-} from "@/lib/data";
-import type { Article as ModelArticle } from "@/lib/models";
+import { industries, getIndustryById } from "@/lib/data";
+import type { CatalogArticle } from "@/lib/article-view";
 import {
   Building2,
   Landmark,
@@ -59,30 +54,7 @@ function findCategoryParentIds(
   return null;
 }
 
-export function CatalogClient() {
-  const [localArticles] = useState<Article[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      const raw = localStorage.getItem("expers-published");
-      if (raw) {
-        const parsed: ModelArticle[] = JSON.parse(raw);
-        return parsed.map((a) => ({
-          id: a.id,
-          title: a.title,
-          description: a.description || a.tldr || "",
-          industryId: a.industryId,
-          categoryId: a.categoryId,
-          author: { id: a.expertId, name: a.authorName || a.expertId },
-          date: new Date(a.createdAt).toLocaleDateString("ru-RU"),
-          readTime:
-            a.readTime || `${Math.ceil((a.content?.length || 0) / 1500)} мин`,
-        }));
-      }
-    } catch {
-      // ignore
-    }
-    return [];
-  });
+export function CatalogClient({ articles }: { articles: CatalogArticle[] }) {
   const [expandedIndustries, setExpandedIndustries] = useState<Set<string>>(
     new Set()
   );
@@ -134,8 +106,8 @@ export function CatalogClient() {
     }
   }, []);
 
-  const allArticles = [...articles, ...localArticles];
-  const filteredArticles: Article[] = selectedCategoryId
+  const allArticles = articles;
+  const filteredArticles: CatalogArticle[] = selectedCategoryId
     ? allArticles.filter((a) => a.categoryId === selectedCategoryId)
     : allArticles;
 
@@ -280,7 +252,7 @@ export function CatalogClient() {
                       <div className="flex items-center gap-3 text-xs text-gray-400">
                         <span className="flex items-center gap-1">
                           <User className="h-3 w-3" />
-                          {article.author.name}
+                          {article.authorName}
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />

@@ -9,6 +9,7 @@ const registerSchema = z.object({
   name: z.string().min(1).max(200),
   email: z.string().email().max(200),
   password: z.string().min(6).max(100),
+  role: z.enum(["reader", "expert"]).default("reader"),
 });
 
 export async function POST(request: NextRequest) {
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { name, email, password } = parsed.data;
+  const { name, email, password, role } = parsed.data;
 
   if (!dbAvailable) {
     return NextResponse.json(
@@ -39,19 +40,20 @@ export async function POST(request: NextRequest) {
   const existing = await getExpertByEmail(email);
   if (existing) {
     return NextResponse.json(
-      { error: "Эксперт с таким email уже зарегистрирован" },
+      { error: "Пользователь с таким email уже зарегистрирован" },
       { status: 409 }
     );
   }
 
   const passwordHash = await hashPassword(password);
-  const id = `expert-${crypto.randomUUID()}`;
+  const id = `${role}-${crypto.randomUUID()}`;
 
   const expert = await createExpert({
     id,
     name,
     email,
     passwordHash,
+    role,
   });
 
   resetRateLimit(request);
