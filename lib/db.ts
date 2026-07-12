@@ -1,62 +1,73 @@
-import { DynamoDBClient, ListTablesCommand } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import { mkdirSync } from "fs";
+import { dirname } from "path";
+import * as schema from "./schema";
+
+const DB_PATH = process.env.DB_PATH || "./data/expers.db";
 
 const globalForDb = globalThis as unknown as {
-  docClient: DynamoDBDocumentClient | undefined;
+  _sqlite: Database.Database | undefined;
+  _drizzle: ReturnType<typeof drizzle> | undefined;
+  _dbAvailable: boolean | null;
+  _initLock: boolean;
 };
 
-function createDocClient() {
-  const client = new DynamoDBClient({
-    endpoint: process.env.DOCUMENT_API_ENDPOINT,
-    region: process.env.DOCUMENT_API_REGION ?? "ru-central1",
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? "",
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? "",
-    },
-  });
+function initDb() {
+  if (globalForDb._initLock) {
+    while (!globalForDb._drizzle && !globalForDb._sqlite) {
+      // spin-wait for concurrent inits (Next.js parallel page builds)
+    }
+    return;
+  }
+  globalForDb._initLock = true;
 
-  return DynamoDBDocumentClient.from(client);
+  mkdirSync(dirname(DB_PATH), { recursive: true });
+  const sqlite = new Database(DB_PATH);
+
+  sqlite.pragma("journal_mode = WAL");
+  sqlite.pragma("busy_timeout = 5000");
+  sqlite.pragma("foreign_keys = ON");
+  sqlite.pragma("cache_size = -64000");
+  sqlite.pragma("synchronous = NORMAL");
+  sqlite.pragma("mmap_size = 268435456");
+  sqlite.pragma("temp_store = MEMORY");
+  sqlite.pragma("wal_autocheckpoint = 1000");
+
+  const drz = drizzle(sqlite, { schema });
+
+  globalForDb._sqlite = sqlite;
+  globalForDb._drizzle = drz;
 }
 
-export const docClient = globalForDb.docClient ?? createDocClient();
-
-if (process.env.NODE_ENV !== "production") globalForDb.docClient = docClient;
-
-const globalForDbAvailable = globalThis as unknown as {
-  _dbAvailable: boolean | null;
-  _dbAvailablePromise: Promise<boolean> | null;
-};
+export const db = new Proxy({} as ReturnType<typeof drizzle>, {
+  get(_, prop) {
+    if (!globalForDb._drizzle) initDb();
+    return (globalForDb._drizzle as ReturnType<typeof drizzle>)[
+      prop as keyof ReturnType<typeof drizzle>
+    ];
+  },
+});
 
 export async function isDatabaseAvailable(): Promise<boolean> {
   if (process.env.USE_DATABASE === "false") {
     return false;
   }
-
-  if (globalForDbAvailable._dbAvailable != null) {
-    return globalForDbAvailable._dbAvailable;
+  if (globalForDb._dbAvailable != null) {
+    return globalForDb._dbAvailable;
   }
-
-  if (globalForDbAvailable._dbAvailablePromise) {
-    return globalForDbAvailable._dbAvailablePromise;
+  try {
+    if (!globalForDb._drizzle) initDb();
+    globalForDb._sqlite!.prepare("SELECT 1").get();
+    globalForDb._dbAvailable = true;
+    return true;
+  } catch {
+    console.warn("Database is not available. Running in static mode.");
+    globalForDb._dbAvailable = false;
+    return false;
   }
-
-  const promise = (async () => {
-    try {
-      await docClient.send(new ListTablesCommand({}));
-      globalForDbAvailable._dbAvailable = true;
-      return true;
-    } catch {
-      console.warn("Database is not available. Running in static mode.");
-      globalForDbAvailable._dbAvailable = false;
-      return false;
-    }
-  })();
-
-  globalForDbAvailable._dbAvailablePromise = promise;
-  return promise;
 }
 
 export function resetDbAvailableCache(): void {
-  globalForDbAvailable._dbAvailable = null;
-  globalForDbAvailable._dbAvailablePromise = null;
+  globalForDb._dbAvailable = null;
 }

@@ -6,14 +6,13 @@
 - Never shut down the dev server. Starting it and restarting/recreating the app container are OK.
 - Run build/check/lint/format/typecheck commands locally on the host, never through `docker compose exec`.
 - The only project command that must run through Docker exec is the DB migration: `docker compose exec app npm run db:migrate`.
-- Use DynamoDB for persistent data. Do not add Postgres, Redis, file storage, or another persistence layer.
+- Use SQLite for persistent data. Do not add Postgres, Redis, file storage, or another persistence layer.
 - Keep `app/api/health/route.ts`, `<HandshakeListener />`, and `<Toaster />` intact.
 
 ## Environment
 
-- Tech stack: Next.js, DynamoDB, Tailwind, shadcn/ui.
+- Tech stack: Next.js, SQLite (better-sqlite3 + drizzle-orm), Tailwind, shadcn/ui.
 - The user accesses the app through a remote HTTPS proxy, but local smoke tests still use `http://localhost:8080`.
-- Yandex Cloud Document API is DynamoDB-compatible; existing plumbing is already set up.
 - Internet access is available. Prefer official sources for framework/block lookups and keep local fallback paths when external access fails.
 
 ## Request Classification
@@ -23,11 +22,10 @@ Before building, classify the request:
 1. **Static prototype**: landing pages, portfolios, marketing pages, and other screens with no real CRUD or persistence.
    - Build the actual page in `app/page.tsx`.
    - Hardcode data inline or in `lib/data.ts`.
-   - Do not add DynamoDB tables, mock-data arrays, or `/api/*` routes.
+   - Do not add tables or mock-data outside the checkpoint below.
    - Skip the CRUD/Data and Input Validation sections unless a form submits real user data.
 2. **CRUD/data app**: any feature that creates, reads, updates, or deletes user data.
-   - Use DynamoDB, API routes, mock fallback data, zod validation, and migrations.
-   - If the feature does not fit DynamoDB's key-value/document model, push back at the product level instead of adding another database.
+   - Use SQLite, API routes, zod validation, and migrations.
 
 ## Command Policy
 
@@ -59,7 +57,7 @@ Before building, classify the request:
 - Main page: `app/page.tsx`. Replace the welcome screen wholesale on the first real build.
 - Root chrome/metadata: `app/layout.tsx`. Product name lives in the single `appName` constant.
 - Demo CRUD: `app/demo/`, `app/api/services/`, `components/service-catalog.tsx`. Use it only as a learning reference before the first real build.
-- DynamoDB schema: `lib/schema.ts`.
+- DB schema: `lib/schema.ts`.
 - Typed data access: `lib/models.ts`.
 - Static/mock fallback data: `lib/mock-data.ts`.
 - DB availability/client plumbing: `lib/db.ts`.
@@ -87,7 +85,7 @@ Never remove or rewrite:
 - `app/api/health/route.ts`
 - `<HandshakeListener />` in layout
 - `<Toaster />` in layout
-- Existing DynamoDB plumbing in `lib/db.ts`, unless the request explicitly requires it
+- Existing plumbing in `lib/db.ts`, unless the request explicitly requires it
 
 Do not "fix" build errors by deleting required infrastructure such as `BridgeProvider`, `<HandshakeListener />`, `<Toaster />`, or health checks. Diagnose and fix the actual local build error.
 
@@ -132,10 +130,10 @@ shadcn workflow:
 
 ## CRUD/Data
 
-For new or changed DynamoDB-backed CRUD resources, use the `dynamodb-crud-resource` skill if it is available. Otherwise follow this checklist:
+For new or changed SQLite-backed CRUD resources, follow this checklist:
 
-1. `lib/schema.ts`: add the table to `TableName` and a `TableSchema` entry under `TABLE_SCHEMAS`.
-2. `lib/models.ts`: add typed interfaces and CRUD functions using DynamoDB document commands.
+1. `lib/schema.ts`: add the SQLite table definition.
+2. `lib/models.ts`: add typed interfaces and CRUD functions using better-sqlite3.
 3. `lib/mock-data.ts`: add mock arrays for every entity read by a page so static-mode builds still render.
 4. `app/api/<entity>/route.ts`: add REST endpoints. `GET` may fall back to mock data when `isDatabaseAvailable()` is false; writes return `503` when DB is unavailable.
 5. Run `docker compose exec app npm run db:migrate` after schema changes.

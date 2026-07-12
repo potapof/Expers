@@ -1,179 +1,138 @@
-import {
-  type KeySchemaElement,
-  type AttributeDefinition,
-  type GlobalSecondaryIndex,
-} from "@aws-sdk/client-dynamodb";
+import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 
-export const TableName = {
-  EXPERTS: "experts",
-  ARTICLES: "articles",
-  COMMENTS: "comments",
-  FAVORITES: "favorites",
-  VIEWING_HISTORY: "viewing_history",
-  SUBSCRIPTIONS: "subscriptions",
-  SECTION_SUBSCRIPTIONS: "section_subscriptions",
-  PAYMENTS: "payments",
-} as const;
+export const experts = sqliteTable("experts", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  role: text("role").default("reader"),
+  avatar: text("avatar"),
+  bio: text("bio"),
+  expertise: text("expertise"),
+  credentials: text("credentials"),
+  socialLinks: text("social_links"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
 
-export type TableName = (typeof TableName)[keyof typeof TableName];
+export const articles = sqliteTable(
+  "articles",
+  {
+    id: text("id").primaryKey(),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    content: text("content").notNull(),
+    slug: text("slug"),
+    authorId: text("author_id").notNull(),
+    authorName: text("author_name").notNull(),
+    industryId: text("industry_id").notNull(),
+    industryName: text("industry_name").notNull(),
+    subsectionId: text("subsection_id").notNull(),
+    subsectionName: text("subsection_name").notNull(),
+    categoryId: text("category_id").notNull(),
+    categoryName: text("category_name").notNull(),
+    customCategory: text("custom_category").default(""),
+    expertiseAreas: text("expertise_areas"),
+    crossLinks: text("cross_links"),
+    tldr: text("tldr").notNull(),
+    keyFacts: text("key_facts").notNull(),
+    definition: text("definition").notNull(),
+    featuredSnippet: text("featured_snippet").notNull(),
+    problemSolutionResult: text("problem_solution_result").notNull(),
+    howTo: text("how_to").notNull(),
+    faq: text("faq").notNull(),
+    todo: text("todo"),
+    methodology: text("methodology").notNull(),
+    sources: text("sources").notNull(),
+    readTime: text("read_time").notNull(),
+    status: text("status").notNull().default("draft"),
+    expertId: text("expert_id").notNull(),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [
+    index("articles_status_idx").on(table.status),
+    index("articles_expert_idx").on(table.expertId),
+    index("articles_slug_idx").on(table.industryId, table.slug),
+  ]
+);
 
-export interface TableSchema {
-  name: TableName;
-  keySchema: KeySchemaElement[];
-  attributeDefinitions: AttributeDefinition[];
-  globalSecondaryIndexes?: GlobalSecondaryIndex[];
-}
+export const comments = sqliteTable(
+  "comments",
+  {
+    id: text("id").primaryKey(),
+    articleId: text("article_id").notNull(),
+    parentId: text("parent_id"),
+    authorId: text("author_id").notNull(),
+    authorName: text("author_name").notNull(),
+    text: text("text").notNull(),
+    isAuthorReply: integer("is_author_reply", { mode: "boolean" }),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    index("comments_article_idx").on(table.articleId, table.createdAt),
+    index("comments_author_idx").on(table.authorId, table.createdAt),
+  ]
+);
 
-export const TABLE_SCHEMAS: Record<TableName, TableSchema> = {
-  [TableName.EXPERTS]: {
-    name: TableName.EXPERTS,
-    keySchema: [{ AttributeName: "id", KeyType: "HASH" }],
-    attributeDefinitions: [
-      { AttributeName: "id", AttributeType: "S" },
-      { AttributeName: "email", AttributeType: "S" },
-    ],
-    globalSecondaryIndexes: [
-      {
-        IndexName: "email-index",
-        KeySchema: [{ AttributeName: "email", KeyType: "HASH" }],
-        Projection: { ProjectionType: "ALL" },
-      },
-    ],
+export const favorites = sqliteTable(
+  "favorites",
+  {
+    userId: text("user_id").notNull(),
+    articleId: text("article_id").notNull(),
+    createdAt: text("created_at").notNull(),
   },
-  [TableName.ARTICLES]: {
-    name: TableName.ARTICLES,
-    keySchema: [{ AttributeName: "id", KeyType: "HASH" }],
-    attributeDefinitions: [
-      { AttributeName: "id", AttributeType: "S" },
-      { AttributeName: "status", AttributeType: "S" },
-      { AttributeName: "expertId", AttributeType: "S" },
-    ],
-    globalSecondaryIndexes: [
-      {
-        IndexName: "status-index",
-        KeySchema: [{ AttributeName: "status", KeyType: "HASH" }],
-        Projection: { ProjectionType: "ALL" },
-      },
-      {
-        IndexName: "expert-index",
-        KeySchema: [{ AttributeName: "expertId", KeyType: "HASH" }],
-        Projection: { ProjectionType: "ALL" },
-      },
-    ],
-  },
-  [TableName.COMMENTS]: {
-    name: TableName.COMMENTS,
-    keySchema: [{ AttributeName: "id", KeyType: "HASH" }],
-    attributeDefinitions: [
-      { AttributeName: "id", AttributeType: "S" },
-      { AttributeName: "articleId", AttributeType: "S" },
-      { AttributeName: "authorId", AttributeType: "S" },
-      { AttributeName: "createdAt", AttributeType: "S" },
-    ],
-    globalSecondaryIndexes: [
-      {
-        IndexName: "article-index",
-        KeySchema: [
-          { AttributeName: "articleId", KeyType: "HASH" },
-          { AttributeName: "createdAt", KeyType: "RANGE" },
-        ],
-        Projection: { ProjectionType: "ALL" },
-      },
-      {
-        IndexName: "author-index",
-        KeySchema: [
-          { AttributeName: "authorId", KeyType: "HASH" },
-          { AttributeName: "createdAt", KeyType: "RANGE" },
-        ],
-        Projection: { ProjectionType: "ALL" },
-      },
-    ],
-  },
-  [TableName.FAVORITES]: {
-    name: TableName.FAVORITES,
-    keySchema: [
-      { AttributeName: "userId", KeyType: "HASH" },
-      { AttributeName: "articleId", KeyType: "RANGE" },
-    ],
-    attributeDefinitions: [
-      { AttributeName: "userId", AttributeType: "S" },
-      { AttributeName: "articleId", AttributeType: "S" },
-    ],
-  },
-  [TableName.VIEWING_HISTORY]: {
-    name: TableName.VIEWING_HISTORY,
-    keySchema: [
-      { AttributeName: "userId", KeyType: "HASH" },
-      { AttributeName: "articleId", KeyType: "RANGE" },
-    ],
-    attributeDefinitions: [
-      { AttributeName: "userId", AttributeType: "S" },
-      { AttributeName: "articleId", AttributeType: "S" },
-    ],
-  },
-  [TableName.SUBSCRIPTIONS]: {
-    name: TableName.SUBSCRIPTIONS,
-    keySchema: [
-      { AttributeName: "subscriberId", KeyType: "HASH" },
-      { AttributeName: "authorId", KeyType: "RANGE" },
-    ],
-    attributeDefinitions: [
-      { AttributeName: "subscriberId", AttributeType: "S" },
-      { AttributeName: "authorId", AttributeType: "S" },
-    ],
-    globalSecondaryIndexes: [
-      {
-        IndexName: "author-index",
-        KeySchema: [
-          { AttributeName: "authorId", KeyType: "HASH" },
-          { AttributeName: "subscriberId", KeyType: "RANGE" },
-        ],
-        Projection: { ProjectionType: "ALL" },
-      },
-    ],
-  },
-  [TableName.SECTION_SUBSCRIPTIONS]: {
-    name: TableName.SECTION_SUBSCRIPTIONS,
-    keySchema: [
-      { AttributeName: "userId", KeyType: "HASH" },
-      { AttributeName: "sectionId", KeyType: "RANGE" },
-    ],
-    attributeDefinitions: [
-      { AttributeName: "userId", AttributeType: "S" },
-      { AttributeName: "sectionId", AttributeType: "S" },
-    ],
-  },
-  [TableName.PAYMENTS]: {
-    name: TableName.PAYMENTS,
-    keySchema: [{ AttributeName: "orderId", KeyType: "HASH" }],
-    attributeDefinitions: [
-      { AttributeName: "orderId", AttributeType: "S" },
-      { AttributeName: "userId", AttributeType: "S" },
-      { AttributeName: "createdAt", AttributeType: "S" },
-    ],
-    globalSecondaryIndexes: [
-      {
-        IndexName: "user-index",
-        KeySchema: [
-          { AttributeName: "userId", KeyType: "HASH" },
-          { AttributeName: "createdAt", KeyType: "RANGE" },
-        ],
-        Projection: { ProjectionType: "ALL" },
-      },
-    ],
-  },
-};
+  (table) => [index("favorites_pk").on(table.userId, table.articleId)]
+);
 
-export const TABLE_NAMES: TableName[] = Object.values(TableName);
+export const viewingHistory = sqliteTable(
+  "viewing_history",
+  {
+    userId: text("user_id").notNull(),
+    articleId: text("article_id").notNull(),
+    viewedAt: text("viewed_at").notNull(),
+  },
+  (table) => [index("viewing_history_pk").on(table.userId, table.articleId)]
+);
 
-export const IndexName = {
-  EXPERTS_EMAIL: "email-index",
-  ARTICLES_STATUS: "status-index",
-  ARTICLES_EXPERT: "expert-index",
-  COMMENTS_ARTICLE: "article-index",
-  COMMENTS_AUTHOR: "author-index",
-  SUBSCRIPTIONS_AUTHOR: "author-index",
-  PAYMENTS_USER: "user-index",
-} as const;
+export const subscriptions = sqliteTable(
+  "subscriptions",
+  {
+    subscriberId: text("subscriber_id").notNull(),
+    subscriberName: text("subscriber_name"),
+    authorId: text("author_id").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    index("subscriptions_pk").on(table.subscriberId, table.authorId),
+    index("subscriptions_author_idx").on(table.authorId),
+  ]
+);
 
-export type IndexName = (typeof IndexName)[keyof typeof IndexName];
+export const sectionSubscriptions = sqliteTable(
+  "section_subscriptions",
+  {
+    userId: text("user_id").notNull(),
+    sectionId: text("section_id").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    index("section_subscriptions_pk").on(table.userId, table.sectionId),
+  ]
+);
+
+export const payments = sqliteTable(
+  "payments",
+  {
+    orderId: text("order_id").primaryKey(),
+    paymentId: text("payment_id").notNull(),
+    articleId: text("article_id").notNull(),
+    title: text("title").notNull(),
+    userId: text("user_id").notNull(),
+    amount: integer("amount").notNull(),
+    status: text("status").notNull(),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [index("payments_user_idx").on(table.userId, table.createdAt)]
+);
