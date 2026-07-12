@@ -818,3 +818,14 @@ export async function setArticleStatus(
     .where(eq(articles.id, id))
     .run();
 }
+
+export async function hasConfirmedPayment(userId: string): Promise<boolean> {
+  const rows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(payments)
+    .where(
+      and(eq(payments.userId, userId), eq(payments.status, "CONFIRMED"))
+    )
+    .all();
+  return (rows[0]?.count ?? 0) > 0;
+}

@@ -31,6 +31,7 @@ import {
   MessageSquare,
   Users,
   Settings,
+  Lock,
   BarChart3,
   Wallet,
 } from "lucide-react";
@@ -84,7 +85,8 @@ export function CabinetClient() {
   }, [loading, expert, router]);
 
   const isExpert = expert?.role === "expert";
-  const effectiveMode: CabinetMode = isExpert ? mode : "reader";
+  const canUseExpert = isExpert && expert?.hasPaid;
+  const effectiveMode: CabinetMode = canUseExpert ? mode : "reader";
 
   const switchMode = (newMode: CabinetMode) => {
     setMode(newMode);
@@ -128,19 +130,29 @@ export function CabinetClient() {
         >
           <BookOpen className="h-4 w-4" />Я читатель
         </button>
-        {isExpert && (
-          <button
-            type="button"
-            onClick={() => switchMode("author")}
-            className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-              effectiveMode === "author"
-                ? "bg-white text-[#2C3E50] shadow-sm"
-                : "text-gray-500 hover:text-[#2C3E50]"
-            }`}
-          >
-            <PenSquare className="h-4 w-4" />Я автор
-          </button>
-        )}
+        {isExpert &&
+          (canUseExpert ? (
+            <button
+              type="button"
+              onClick={() => switchMode("author")}
+              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                effectiveMode === "author"
+                  ? "bg-white text-[#2C3E50] shadow-sm"
+                  : "text-gray-500 hover:text-[#2C3E50]"
+              }`}
+            >
+              <PenSquare className="h-4 w-4" />Я автор
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled
+              title="Страница автора станет доступна после публикации первой оплаченной статьи"
+              className="flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-gray-300 cursor-not-allowed"
+            >
+              <Lock className="h-4 w-4" />Я автор
+            </button>
+          ))}
       </div>
 
       {effectiveMode === "reader" && readerView === "main" && (

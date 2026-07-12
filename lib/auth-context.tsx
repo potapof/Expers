@@ -17,6 +17,7 @@ interface Expert {
   name: string;
   email: string;
   role?: "reader" | "expert";
+  hasPaid?: boolean;
   createdAt: string;
   updatedAt: string;
 }

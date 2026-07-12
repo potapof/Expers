@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getExpertById, updateExpert } from "@/lib/models";
+import { getExpertById, updateExpert, hasConfirmedPayment } from "@/lib/models";
 import { verifyToken, toSafeExpert } from "@/lib/auth";
 import { isDatabaseAvailable } from "@/lib/db";
 import { updateProfileSchema } from "@/lib/validation/profile";
@@ -93,6 +93,16 @@ export async function PUT(request: NextRequest) {
   const dbAvailable = await isDatabaseAvailable();
 
   if (dbAvailable) {
+    const hasPaid = await hasConfirmedPayment(payload.id);
+    if (!hasPaid) {
+      return NextResponse.json(
+        {
+          error:
+            "Страница автора станет доступна после публикации первой оплаченной статьи",
+        },
+        { status: 403 }
+      );
+    }
     const expert = await updateExpert(payload.id, data);
     return NextResponse.json({ expert: toSafeExpert(expert) });
   }

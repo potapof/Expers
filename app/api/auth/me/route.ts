@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getExpertById } from "@/lib/models";
+import { getExpertById, hasConfirmedPayment } from "@/lib/models";
 import { verifyToken, toSafeExpert } from "@/lib/auth";
 import { isDatabaseAvailable } from "@/lib/db";
 
@@ -31,5 +31,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Эксперт не найден" }, { status: 404 });
   }
 
-  return NextResponse.json({ expert: toSafeExpert(expert) });
+  const hasPaid = await hasConfirmedPayment(payload.id);
+
+  return NextResponse.json({
+    expert: { ...toSafeExpert(expert), hasPaid },
+  });
 }
