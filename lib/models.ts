@@ -390,4 +390,212 @@ export async function removeFavorite(
   );
 }
 
+export interface ViewingHistoryEntry {
+  articleId: string;
+  viewedAt: string;
+}
+
+const MAX_HISTORY_ENTRIES = 50;
+
+export async function getViewingHistory(
+  userId: string
+): Promise<ViewingHistoryEntry[]> {
+  const result = await docClient.send(
+    new QueryCommand({
+      TableName: TableName.VIEWING_HISTORY,
+      KeyConditionExpression: "userId = :userId",
+      ExpressionAttributeValues: { ":userId": userId },
+    })
+  );
+  const items = (result.Items as (ViewingHistoryEntry & { userId: string })[]) ?? [];
+  return items
+    .map((i) => ({ articleId: i.articleId, viewedAt: i.viewedAt }))
+    .sort((a, b) => b.viewedAt.localeCompare(a.viewedAt));
+}
+
+export async function addViewingHistory(
+  userId: string,
+  articleId: string
+): Promise<void> {
+  await docClient.send(
+    new PutCommand({
+      TableName: TableName.VIEWING_HISTORY,
+      Item: {
+        userId,
+        articleId,
+        viewedAt: new Date().toISOString(),
+      },
+    })
+  );
+
+  const history = await getViewingHistory(userId);
+  if (history.length > MAX_HISTORY_ENTRIES) {
+    const stale = history.slice(MAX_HISTORY_ENTRIES);
+    await Promise.all(
+      stale.map((e) =>
+        docClient.send(
+          new DeleteCommand({
+            TableName: TableName.VIEWING_HISTORY,
+            Key: { userId, articleId: e.articleId },
+          })
+        )
+      )
+    );
+  }
+}
+
+export async function clearViewingHistory(userId: string): Promise<void> {
+  const result = await docClient.send(
+    new QueryCommand({
+      TableName: TableName.VIEWING_HISTORY,
+      KeyConditionExpression: "userId = :userId",
+      ExpressionAttributeValues: { ":userId": userId },
+    })
+  );
+  const items = (result.Items as { userId: string; articleId: string }[]) ?? [];
+  await Promise.all(
+    items.map((i) =>
+      docClient.send(
+        new DeleteCommand({
+          TableName: TableName.VIEWING_HISTORY,
+          Key: { userId, articleId: i.articleId },
+        })
+      )
+    )
+  );
+}
+
+export interface SubscriberInfo {
+  id: string;
+  name: string;
+  subscribedAt: string;
+}
+
+export async function getFollowedAuthorIds(
+  subscriberId: string
+): Promise<string[]> {
+  const result = await docClient.send(
+    new QueryCommand({
+      TableName: TableName.SUBSCRIPTIONS,
+      KeyConditionExpression: "subscriberId = :s",
+      ExpressionAttributeValues: { ":s": subscriberId },
+    })
+  );
+  return ((result.Items as { authorId: string }[]) ?? []).map(
+    (i) => i.authorId
+  );
+}
+
+export async function getSubscribersOf(
+  authorId: string
+): Promise<SubscriberInfo[]> {
+  const result = await docClient.send(
+    new QueryCommand({
+      TableName: TableName.SUBSCRIPTIONS,
+      IndexName: IndexName.SUBSCRIPTIONS_AUTHOR,
+      KeyConditionExpression: "authorId = :a",
+      ExpressionAttributeValues: { ":a": authorId },
+    })
+  );
+  const items =
+    (result.Items as {
+      subscriberId: string;
+      subscriberName?: string;
+      createdAt?: string;
+    }[]) ?? [];
+  return items
+    .map((i) => ({
+      id: i.subscriberId,
+      name: i.subscriberName || i.subscriberId,
+      subscribedAt: (i.createdAt || new Date().toISOString()).split("T")[0],
+    }))
+    .sort((a, b) => b.subscribedAt.localeCompare(a.subscribedAt));
+}
+
+export async function addSubscription(
+  subscriberId: string,
+  subscriberName: string,
+  authorId: string
+): Promise<void> {
+  await docClient.send(
+    new PutCommand({
+      TableName: TableName.SUBSCRIPTIONS,
+      Item: {
+        subscriberId,
+        subscriberName,
+        authorId,
+        createdAt: new Date().toISOString(),
+      },
+    })
+  );
+}
+
+export async function removeSubscription(
+  subscriberId: string,
+  authorId: string
+): Promise<void> {
+  await docClient.send(
+    new DeleteCommand({
+      TableName: TableName.SUBSCRIPTIONS,
+      Key: { subscriberId, authorId },
+    })
+  );
+}
+
+export async function getSectionIds(userId: string): Promise<string[]> {
+  const result = await docClient.send(
+    new QueryCommand({
+      TableName: TableName.SECTION_SUBSCRIPTIONS,
+      KeyConditionExpression: "userId = :u",
+      ExpressionAttributeValues: { ":u": userId },
+    })
+  );
+  return ((result.Items as { sectionId: string }[]) ?? []).map(
+    (i) => i.sectionId
+  );
+}
+
+export async function addSection(
+  userId: string,
+  sectionId: string
+): Promise<void> {
+  await docClient.send(
+    new PutCommand({
+      TableName: TableName.SECTION_SUBSCRIPTIONS,
+      Item: { userId, sectionId, createdAt: new Date().toISOString() },
+    })
+  );
+}
+
+export async function removeSection(
+  userId: string,
+  sectionId: string
+): Promise<void> {
+  await docClient.send(
+    new DeleteCommand({
+      TableName: TableName.SECTION_SUBSCRIPTIONS,
+      Key: { userId, sectionId },
+    })
+  );
+}
+
+export async function setSections(
+  userId: string,
+  sectionIds: string[]
+): Promise<void> {
+  const current = await getSectionIds(userId);
+  const next = new Set(sectionIds);
+  const currentSet = new Set(current);
+
+  const toAdd = sectionIds.filter((id) => !currentSet.has(id));
+  const toRemove = current.filter((id) => !next.has(id));
+
+  await Promise.all([
+    ...toAdd.map((sectionId) => addSection(userId, sectionId)),
+    ...toRemove.map((sectionId) => removeSection(userId, sectionId)),
+  ]);
+}
+
+
+
 

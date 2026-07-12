@@ -1,87 +1,6 @@
 "use client";
 
-import { useSyncExternalStore, useCallback } from "react";
-
-const STORAGE_KEY = "expers-subscriptions";
-
-let cachedSnapshot: Set<string> | null = null;
-
-function getSnapshot(): Set<string> {
-  if (typeof window === "undefined") return new Set();
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = new Set<string>(JSON.parse(raw));
-      if (cachedSnapshot && setsEqual(cachedSnapshot, parsed)) {
-        return cachedSnapshot;
-      }
-      cachedSnapshot = parsed;
-      return parsed;
-    }
-  } catch {
-    // ignore
-  }
-  if (!cachedSnapshot) cachedSnapshot = new Set();
-  return cachedSnapshot;
-}
-
-function setsEqual(a: Set<string>, b: Set<string>): boolean {
-  if (a.size !== b.size) return false;
-  for (const item of a) {
-    if (!b.has(item)) return false;
-  }
-  return true;
-}
-
-const listeners = new Set<() => void>();
-
-function notifyListeners() {
-  cachedSnapshot = null;
-  for (const listener of listeners) {
-    listener();
-  }
-}
-
-function subscribe(callback: () => void) {
-  listeners.add(callback);
-  return () => {
-    listeners.delete(callback);
-  };
-}
-
-function updateSubscriptions(next: Set<string>) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([...next]));
-  cachedSnapshot = null;
-  notifyListeners();
-}
-
-export function useSubscriptions() {
-  const subscriptions = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getSnapshot
-  );
-
-  const isSubscribed = useCallback(
-    (id: string) => subscriptions.has(id),
-    [subscriptions]
-  );
-
-  const toggleSubscription = useCallback((id: string) => {
-    const current = getSnapshot();
-    const next = new Set(current);
-    if (next.has(id)) {
-      next.delete(id);
-    } else {
-      next.add(id);
-    }
-    updateSubscriptions(next);
-  }, []);
-
-  const subscribedCount = subscriptions.size;
-
-  return { subscriptions, isSubscribed, toggleSubscription, subscribedCount };
-}
+import { useState, useEffect } from "react";
 
 export interface Subscriber {
   id: string;
@@ -89,16 +8,35 @@ export interface Subscriber {
   subscribedAt: string;
 }
 
-export function useAuthorSubscribers(_expertId?: string) {
-  const { subscriptions } = useSubscriptions();
-  const subscribers: Subscriber[] = [];
-  for (const id of subscriptions) {
-    subscribers.push({
-      id,
-      name: id,
-      subscribedAt: new Date().toISOString().split("T")[0],
-    });
-  }
+export function useAuthorSubscribers(expertId?: string) {
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+
+  useEffect(() => {
+    if (!expertId || typeof window === "undefined") {
+      return;
+    }
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return;
+    }
+
+    let cancelled = false;
+    fetch(`/api/subscriptions?authorId=${encodeURIComponent(expertId)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => (res.ok ? res.json() : { subscribers: [] }))
+      .then((data) => {
+        if (!cancelled) setSubscribers(data.subscribers ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setSubscribers([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [expertId]);
+
   return { subscribers };
 }
 

@@ -1,41 +1,24 @@
 "use client";
 
-import { useSyncExternalStore, useCallback } from "react";
+import { useSyncExternalStore, useCallback, useEffect } from "react";
 
-const STORAGE_KEY = "expers-viewing-history";
-const MAX_ENTRIES = 50;
+const AUTH_EVENT = "expers-auth-changed";
 
 export interface ViewingHistoryEntry {
   articleId: string;
   viewedAt: string;
 }
 
-let cachedSnapshot: ViewingHistoryEntry[] = [];
-let cachedRaw: string | null = null;
+let history: ViewingHistoryEntry[] = [];
+const emptyServer: ViewingHistoryEntry[] = [];
 
-function getSnapshot(): ViewingHistoryEntry[] {
-  if (typeof window === "undefined") return cachedSnapshot;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw === cachedRaw) return cachedSnapshot;
-    cachedRaw = raw;
-    if (raw) {
-      cachedSnapshot = JSON.parse(raw) as ViewingHistoryEntry[];
-    } else {
-      cachedSnapshot = [];
-    }
-  } catch {
-    cachedSnapshot = [];
-  }
-  return cachedSnapshot;
-}
+let loadedToken: string | null | undefined = undefined;
+let loading = false;
 
 const listeners = new Set<() => void>();
 
-function notifyListeners() {
-  for (const listener of listeners) {
-    listener();
-  }
+function notify() {
+  for (const listener of listeners) listener();
 }
 
 function subscribe(callback: () => void) {
@@ -45,27 +28,122 @@ function subscribe(callback: () => void) {
   };
 }
 
-function updateHistory(next: ViewingHistoryEntry[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  notifyListeners();
+function getSnapshot(): ViewingHistoryEntry[] {
+  return history;
+}
+
+function getServerSnapshot(): ViewingHistoryEntry[] {
+  return emptyServer;
+}
+
+function getToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("token");
+}
+
+function setHistory(next: ViewingHistoryEntry[]) {
+  history = next;
+  notify();
+}
+
+async function load() {
+  if (typeof window === "undefined") return;
+  const token = getToken();
+
+  if (loading) return;
+  if (token === loadedToken) return;
+
+  if (!token) {
+    loadedToken = null;
+    setHistory([]);
+    return;
+  }
+
+  loading = true;
+  try {
+    const res = await fetch("/api/history", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      loadedToken = token;
+      setHistory(data.history ?? []);
+    } else if (res.status === 401) {
+      loadedToken = token;
+      setHistory([]);
+    }
+  } catch {
+    // retry on next auth change
+  } finally {
+    loading = false;
+  }
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener(AUTH_EVENT, () => {
+    loadedToken = undefined;
+    load();
+  });
+}
+
+async function addView(articleId: string) {
+  const token = getToken();
+  if (!token) return;
+
+  const filtered = history.filter((e) => e.articleId !== articleId);
+  setHistory([
+    { articleId, viewedAt: new Date().toISOString() },
+    ...filtered,
+  ]);
+
+  try {
+    await fetch("/api/history", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ articleId }),
+    });
+  } catch {
+    // best-effort tracking
+  }
+}
+
+async function clearHistory() {
+  const token = getToken();
+  if (!token) return;
+  const prev = history;
+  setHistory([]);
+  try {
+    const res = await fetch("/api/history", {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) setHistory(prev);
+  } catch {
+    setHistory(prev);
+  }
 }
 
 export function useViewingHistory() {
-  const history = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const snapshot = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot
+  );
 
-  const addView = useCallback((articleId: string) => {
-    const current = getSnapshot();
-    const filtered = current.filter((e) => e.articleId !== articleId);
-    const entry: ViewingHistoryEntry = {
-      articleId,
-      viewedAt: new Date().toISOString(),
-    };
-    updateHistory([entry, ...filtered].slice(0, MAX_ENTRIES));
+  useEffect(() => {
+    load();
   }, []);
 
-  const clearHistory = useCallback(() => {
-    updateHistory([]);
+  const addViewCb = useCallback((articleId: string) => {
+    addView(articleId);
   }, []);
 
-  return { history, addView, clearHistory };
+  const clearHistoryCb = useCallback(() => {
+    clearHistory();
+  }, []);
+
+  return { history: snapshot, addView: addViewCb, clearHistory: clearHistoryCb };
 }
