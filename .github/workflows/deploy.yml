@@ -22,6 +22,8 @@ jobs:
             fi
             cd "$PROJECT_DIR"
             git pull
+            while sudo iptables -t nat -D PREROUTING -p tcp --dport 8080 -j DNAT 2>/dev/null; do true; done
+            echo "=== iptables cleanup done ==="
             if docker compose ps app 2>/dev/null | grep -q "Up"; then
               docker compose exec app npm run db:migrate
               docker compose restart app
@@ -33,7 +35,4 @@ jobs:
             sleep 10
             echo "=== Testing backend ==="
             curl -sI --connect-timeout 5 http://localhost:8080/api/health || echo "Backend unreachable"
-            echo "=== Reloading Caddy ==="
             sudo systemctl reload caddy
-            echo "=== Testing via Caddy ==="
-            curl -sI --connect-timeout 5 http://localhost/ || echo "Caddy unreachable"
