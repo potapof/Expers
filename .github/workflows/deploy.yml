@@ -25,11 +25,10 @@ jobs:
             if docker compose ps app 2>/dev/null | grep -q "Up"; then
               docker compose exec app npm run db:migrate
               docker compose restart app
-              sleep 10
-              docker compose logs --tail 5 app
             else
               docker compose up -d --build app
               sleep 5
               docker compose exec app npm run db:migrate
-              docker compose logs --tail 5 app
             fi
+            sleep 8
+            sudo systemctl reload caddy
