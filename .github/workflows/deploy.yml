@@ -21,8 +21,6 @@ jobs:
               exit 1
             fi
             cd "$PROJECT_DIR"
-            docker compose down
-            sudo fuser -k 8080/tcp 2>/dev/null || true
             git pull
-            docker compose up -d --build app
-            docker compose exec app npm run db:migrate
+            docker compose exec app npm run db:migrate 2>/dev/null || true
+            docker compose restart app 2>/dev/null || docker compose up -d app
