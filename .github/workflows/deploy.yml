@@ -22,5 +22,13 @@ jobs:
             fi
             cd "$PROJECT_DIR"
             git pull
-            docker compose exec app npm run db:migrate 2>/dev/null || true
-            docker compose restart app 2>/dev/null || docker compose up -d app
+            if docker compose ps app 2>/dev/null | grep -q "Up"; then
+              docker compose exec app npm run db:migrate
+              docker compose restart app
+            else
+              docker compose down --remove-orphans 2>/dev/null || true
+              ss -tlnp | grep 8080 || echo "Port 8080 is free"
+              docker compose up -d --build app
+              sleep 5
+              docker compose exec app npm run db:migrate
+            fi
