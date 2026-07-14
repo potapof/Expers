@@ -21,6 +21,7 @@ jobs:
               exit 1
             fi
             cd "$PROJECT_DIR"
+            docker compose down
             git pull
+            docker compose up -d --build app
             docker compose exec app npm run db:migrate
-            docker compose up -d --force-recreate app
