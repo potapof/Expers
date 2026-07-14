@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createExpert, getExpertByEmail } from "@/lib/models";
-import { hashPassword, generateToken, toSafeExpert } from "@/lib/auth";
+import { verifyPasswordReset, updatePassword } from "@/lib/models";
+import { hashPassword } from "@/lib/auth";
 import { isDatabaseAvailable } from "@/lib/db";
 import { checkRateLimit, resetRateLimit } from "@/lib/rate-limiter";
 
-const registerSchema = z.object({
-  name: z.string().min(1).max(200),
+const resetSchema = z.object({
   email: z.string().email().max(200),
+  code: z.string().length(6),
   password: z.string().min(6).max(100),
 });
 
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
   const dbAvailable = await isDatabaseAvailable();
 
-  const parsed = registerSchema.safeParse(await request.json());
+  const parsed = resetSchema.safeParse(await request.json());
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Некорректные данные", details: parsed.error.flatten() },
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { name, email, password } = parsed.data;
+  const { email, code, password } = parsed.data;
 
   if (!dbAvailable) {
     return NextResponse.json(
@@ -36,34 +36,18 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const existing = await getExpertByEmail(email);
-  if (existing) {
+  const valid = await verifyPasswordReset(email, code);
+  if (!valid) {
     return NextResponse.json(
-      { error: "Пользователь с таким email уже зарегистрирован" },
-      { status: 409 }
+      { error: "Неверный или просроченный код" },
+      { status: 400 }
     );
   }
 
-  const passwordHash = await hashPassword(password);
-  const id = `user-${crypto.randomUUID()}`;
-
-  const expert = await createExpert({
-    id,
-    name,
-    email,
-    passwordHash,
-    role: "reader",
-  });
+  const newHash = await hashPassword(password);
+  await updatePassword(email, newHash);
 
   resetRateLimit(request);
 
-  const token = generateToken(expert);
-
-  return NextResponse.json(
-    {
-      expert: toSafeExpert(expert),
-      token,
-    },
-    { status: 201 }
-  );
+  return NextResponse.json({ ok: true });
 }

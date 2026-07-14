@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ReaderNewArticles } from "@/components/reader-new-articles";
 import { ReaderFavoriteArticles } from "@/components/reader-favorite-articles";
@@ -19,11 +18,11 @@ import { AuthorSubscribers } from "@/components/author-subscribers";
 import { AuthorProfileEditor } from "@/components/author-profile-editor";
 import { AuthorSocialAnalytics } from "@/components/author-social-analytics";
 import { AuthorFinance } from "@/components/author-finance";
+import { AuthorPageWizard } from "@/components/author-page-wizard";
 import {
   BookOpen,
   PenSquare,
   User,
-  LogOut,
   Bell,
   ArrowLeft,
   LayoutDashboard,
@@ -31,9 +30,11 @@ import {
   MessageSquare,
   Users,
   Settings,
-  Lock,
   BarChart3,
   Wallet,
+  Globe,
+  HelpCircle,
+  Mail,
 } from "lucide-react";
 
 type CabinetMode = "reader" | "author";
@@ -45,12 +46,13 @@ type AuthorView =
   | "subscribers"
   | "profile"
   | "social"
-  | "finance";
+  | "finance"
+  | "authorPage";
 
 const STORAGE_KEY = "expers-cabinet-mode";
 
 export function CabinetClient() {
-  const { expert, loading, logout } = useAuth();
+  const { expert, loading } = useAuth();
   const router = useRouter();
   const [mode, setMode] = useState<CabinetMode>(() => {
     if (typeof window !== "undefined") {
@@ -84,9 +86,7 @@ export function CabinetClient() {
     }
   }, [loading, expert, router]);
 
-  const isExpert = expert?.role === "expert";
-  const canUseExpert = isExpert && expert?.hasPaid;
-  const effectiveMode: CabinetMode = canUseExpert ? mode : "reader";
+  const effectiveMode: CabinetMode = mode;
 
   const switchMode = (newMode: CabinetMode) => {
     setMode(newMode);
@@ -107,72 +107,49 @@ export function CabinetClient() {
 
   return (
     <div className="mx-auto px-4 max-w-3xl py-12">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-[#2C3E50]">Личный кабинет</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-500">{expert.name}</span>
-          <Button variant="ghost" size="sm" onClick={logout}>
-            <LogOut className="h-4 w-4 mr-1" />
-            Выйти
-          </Button>
-        </div>
-      </div>
+      <h1 className="text-2xl font-bold text-[#2C3E50] mb-6">Личный кабинет</h1>
 
-      <div className="flex gap-1 rounded-lg bg-gray-100 p-1 mb-8 w-fit">
-        <button
-          type="button"
-          onClick={() => switchMode("reader")}
-          className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-            effectiveMode === "reader"
-              ? "bg-white text-[#2C3E50] shadow-sm"
-              : "text-gray-500 hover:text-[#2C3E50]"
-          }`}
-        >
-          <BookOpen className="h-4 w-4" />Я читатель
-        </button>
-        {isExpert &&
-          (canUseExpert ? (
+      <Card className="mb-6">
+        <CardContent className="py-5">
+          <div className="flex items-start gap-4">
+            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+              <User className="h-6 w-6 text-[#0039CA]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-semibold text-[#2C3E50]">
+                {expert.name}
+              </h2>
+              <div className="flex items-center gap-1.5 mt-0.5 text-sm text-gray-500">
+                <Mail className="h-3.5 w-3.5" />
+                {expert.email}
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-1 rounded-lg bg-gray-100 p-1 mt-4 w-fit">
             <button
               type="button"
-              onClick={() => switchMode("author")}
+              onClick={() => switchMode("reader")}
               className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-                effectiveMode === "author"
+                effectiveMode === "reader"
                   ? "bg-white text-[#2C3E50] shadow-sm"
                   : "text-gray-500 hover:text-[#2C3E50]"
               }`}
             >
-              <PenSquare className="h-4 w-4" />Я автор
+              <BookOpen className="h-4 w-4" />Я читатель
             </button>
-          ) : (
             <button
               type="button"
-              disabled
-              title="Страница автора станет доступна после публикации первой оплаченной статьи"
-              className="flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-gray-300 cursor-not-allowed"
+              onClick={() => switchMode("author")}
+              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${effectiveMode === "author" ? "bg-white text-[#2C3E50] shadow-sm" : "text-gray-500 hover:text-[#2C3E50]"}`}
             >
-              <Lock className="h-4 w-4" />Я автор
+              <PenSquare className="h-4 w-4" />Я автор
             </button>
-          ))}
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {effectiveMode === "reader" && readerView === "main" && (
         <div className="space-y-6">
-          <Card>
-            <CardContent className="py-6">
-              <div className="flex items-center gap-4">
-                <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                  <User className="h-8 w-8 text-[#0039CA]" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-[#2C3E50]">
-                    {expert.name}
-                  </h2>
-                  <p className="text-sm text-gray-500">{expert.email}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           <button
             type="button"
             onClick={() => setReaderView("subscriptions")}
@@ -270,7 +247,7 @@ export function CabinetClient() {
         </div>
       )}
 
-      {isExpert && effectiveMode === "author" && (
+      {effectiveMode === "author" && (
         <div className="space-y-6">
           <div className="flex gap-1 rounded-lg bg-gray-100 p-1 w-fit">
             <button
@@ -357,6 +334,28 @@ export function CabinetClient() {
               <Settings className="h-4 w-4" />
               Профиль
             </button>
+            {expert?.hasPaid ? (
+              <button
+                type="button"
+                onClick={() => setAuthorView("authorPage")}
+                className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${authorView === "authorPage" ? "bg-white text-[#2C3E50] shadow-sm" : "text-gray-500 hover:text-[#2C3E50]"}`}
+              >
+                <Globe className="h-4 w-4" />
+                Страница автора
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed"
+              >
+                <Globe className="h-4 w-4" />
+                Страница автора
+                <span title="Создание страницы автора доступно после публикации первой статьи">
+                  <HelpCircle className="h-3.5 w-3.5 text-gray-300" />
+                </span>
+              </button>
+            )}
           </div>
 
           {authorView === "dashboard" && <AuthorDashboard />}
@@ -366,6 +365,7 @@ export function CabinetClient() {
           {authorView === "social" && <AuthorSocialAnalytics />}
           {authorView === "finance" && <AuthorFinance />}
           {authorView === "profile" && <AuthorProfileEditor />}
+          {authorView === "authorPage" && <AuthorPageWizard />}
         </div>
       )}
     </div>

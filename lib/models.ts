@@ -9,11 +9,52 @@ import {
   subscriptions,
   sectionSubscriptions,
   payments,
+  passwordResets,
 } from "./schema";
 
 export interface SocialLink {
   platform: string;
   url: string;
+}
+
+export interface WorkExperience {
+  company: string;
+  position: string;
+  startDate: string;
+  endDate?: string;
+  description?: string;
+}
+
+export interface Publication {
+  title: string;
+  url?: string;
+  date?: string;
+  description?: string;
+}
+
+export interface Achievement {
+  title: string;
+  date?: string;
+  description?: string;
+}
+
+export interface MediaMention {
+  outlet: string;
+  title: string;
+  url?: string;
+  date?: string;
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface Testimonial {
+  name: string;
+  role?: string;
+  text: string;
+  avatar?: string;
 }
 
 export interface Expert {
@@ -27,6 +68,15 @@ export interface Expert {
   expertise?: string[];
   credentials?: string[];
   socialLinks?: SocialLink[];
+  workExperience?: WorkExperience[];
+  publications?: Publication[];
+  achievements?: Achievement[];
+  mediaMentions?: MediaMention[];
+  faq?: FAQItem[];
+  testimonials?: Testimonial[];
+  callToAction?: string;
+  authorPageSlug?: string;
+  authorPagePublished?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -58,6 +108,15 @@ function rowToExpert(row: typeof experts.$inferSelect): Expert {
     expertise: jsonParse(row.expertise, undefined),
     credentials: jsonParse(row.credentials, undefined),
     socialLinks: jsonParse(row.socialLinks, undefined),
+    workExperience: jsonParse(row.workExperience, undefined),
+    publications: jsonParse(row.publications, undefined),
+    achievements: jsonParse(row.achievements, undefined),
+    mediaMentions: jsonParse(row.mediaMentions, undefined),
+    faq: jsonParse(row.faq, undefined),
+    testimonials: jsonParse(row.testimonials, undefined),
+    callToAction: row.callToAction ?? undefined,
+    authorPageSlug: row.authorPageSlug ?? undefined,
+    authorPagePublished: row.authorPagePublished ?? false,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
@@ -823,9 +882,122 @@ export async function hasConfirmedPayment(userId: string): Promise<boolean> {
   const rows = db
     .select({ count: sql<number>`count(*)` })
     .from(payments)
-    .where(
-      and(eq(payments.userId, userId), eq(payments.status, "CONFIRMED"))
-    )
+    .where(and(eq(payments.userId, userId), eq(payments.status, "CONFIRMED")))
     .all();
   return (rows[0]?.count ?? 0) > 0;
+}
+
+export async function createPasswordReset(email: string): Promise<string> {
+  const id = crypto.randomUUID();
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 15 * 60 * 1000).toISOString();
+  db.insert(passwordResets)
+    .values({
+      id,
+      email,
+      code,
+      expiresAt,
+      used: false,
+      createdAt: now.toISOString(),
+    })
+    .run();
+  return code;
+}
+
+export async function verifyPasswordReset(
+  email: string,
+  code: string
+): Promise<boolean> {
+  const now = new Date().toISOString();
+  const rows = db
+    .select()
+    .from(passwordResets)
+    .where(
+      and(
+        eq(passwordResets.email, email),
+        eq(passwordResets.code, code),
+        eq(passwordResets.used, false)
+      )
+    )
+    .orderBy(desc(passwordResets.createdAt))
+    .limit(1)
+    .all();
+  if (rows.length === 0) return false;
+  if (rows[0].expiresAt < now) return false;
+  db.update(passwordResets)
+    .set({ used: true })
+    .where(eq(passwordResets.id, rows[0].id))
+    .run();
+  return true;
+}
+
+export async function updatePassword(
+  email: string,
+  newPasswordHash: string
+): Promise<void> {
+  db.update(experts)
+    .set({ passwordHash: newPasswordHash, updatedAt: new Date().toISOString() })
+    .where(eq(experts.email, email))
+    .run();
+}
+
+export async function saveAuthorPage(
+  expertId: string,
+  data: {
+    name?: string;
+    bio?: string;
+    avatar?: string;
+    expertise?: { area: string; description?: string }[];
+    credentials?: { title: string; organization?: string; year?: string }[];
+    socialLinks?: { platform: string; url: string }[];
+    workExperience?: WorkExperience[];
+    publications?: Publication[];
+    achievements?: Achievement[];
+    mediaMentions?: MediaMention[];
+    faq?: FAQItem[];
+    testimonials?: Testimonial[];
+    callToAction?: string;
+    authorPageSlug?: string;
+  }
+): Promise<void> {
+  const values: Record<string, unknown> = {
+    updatedAt: new Date().toISOString(),
+    authorPagePublished: true,
+  };
+  if (data.name !== undefined) values.name = data.name;
+  if (data.bio !== undefined) values.bio = data.bio;
+  if (data.avatar !== undefined) values.avatar = data.avatar;
+  if (data.expertise !== undefined)
+    values.expertise = jsonStringify(data.expertise);
+  if (data.credentials !== undefined)
+    values.credentials = jsonStringify(data.credentials);
+  if (data.socialLinks !== undefined)
+    values.socialLinks = jsonStringify(data.socialLinks);
+  if (data.workExperience !== undefined)
+    values.workExperience = jsonStringify(data.workExperience);
+  if (data.publications !== undefined)
+    values.publications = jsonStringify(data.publications);
+  if (data.achievements !== undefined)
+    values.achievements = jsonStringify(data.achievements);
+  if (data.mediaMentions !== undefined)
+    values.mediaMentions = jsonStringify(data.mediaMentions);
+  if (data.faq !== undefined) values.faq = jsonStringify(data.faq);
+  if (data.testimonials !== undefined)
+    values.testimonials = jsonStringify(data.testimonials);
+  if (data.callToAction !== undefined) values.callToAction = data.callToAction;
+  if (data.authorPageSlug !== undefined)
+    values.authorPageSlug = data.authorPageSlug;
+  db.update(experts).set(values).where(eq(experts.id, expertId)).run();
+}
+
+export async function getAuthorPageBySlug(
+  slug: string
+): Promise<Expert | null> {
+  const rows = db
+    .select()
+    .from(experts)
+    .where(eq(experts.authorPageSlug, slug))
+    .all();
+  return rows.length > 0 ? rowToExpert(rows[0]) : null;
 }

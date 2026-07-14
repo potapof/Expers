@@ -11,6 +11,17 @@ export const experts = sqliteTable("experts", {
   expertise: text("expertise"),
   credentials: text("credentials"),
   socialLinks: text("social_links"),
+  workExperience: text("work_experience"),
+  publications: text("publications"),
+  achievements: text("achievements"),
+  mediaMentions: text("media_mentions"),
+  faq: text("faq"),
+  testimonials: text("testimonials"),
+  callToAction: text("call_to_action"),
+  authorPageSlug: text("author_page_slug"),
+  authorPagePublished: integer("author_page_published", {
+    mode: "boolean",
+  }).default(false),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });
@@ -118,6 +129,21 @@ export const sectionSubscriptions = sqliteTable(
   },
   (table) => [
     index("section_subscriptions_pk").on(table.userId, table.sectionId),
+  ]
+);
+
+export const passwordResets = sqliteTable(
+  "password_resets",
+  {
+    id: text("id").primaryKey(),
+    email: text("email").notNull(),
+    code: text("code").notNull(),
+    expiresAt: text("expires_at").notNull(),
+    used: integer("used", { mode: "boolean" }).notNull().default(false),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    index("password_resets_email_idx").on(table.email, table.createdAt),
   ]
 );
 

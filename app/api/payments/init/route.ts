@@ -27,13 +27,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (payload.role !== "expert") {
-    return NextResponse.json(
-      { error: "Публикация доступна только экспертам" },
-      { status: 403 }
-    );
-  }
-
   const parsed = bodySchema.safeParse(await request.json());
   if (!parsed.success) {
     return NextResponse.json({ error: "Некорректные данные" }, { status: 400 });

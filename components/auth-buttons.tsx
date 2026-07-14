@@ -13,6 +13,7 @@ import {
 import { PenSquare, LogIn, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { NotificationCenter } from "@/components/notification-center";
+import { toast } from "sonner";
 
 export function AuthButtons() {
   const { expert, loading, login, register, logout } = useAuth();
@@ -23,13 +24,61 @@ export function AuthButtons() {
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
-  const [regIsExpert, setRegIsExpert] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotCode, setForgotCode] = useState("");
+  const [forgotPassword, setForgotPassword] = useState("");
+  const [forgotStep, setForgotStep] = useState<"email" | "reset">("email");
 
   const isExpert = expert?.role === "expert";
 
   function switchToRegister() {
     setShowLogin(false);
     setShowRegister(true);
+  }
+
+  function switchToForgotPassword() {
+    setShowLogin(false);
+    setForgotEmail(loginEmail);
+    setForgotStep("email");
+    setShowForgotPassword(true);
+  }
+
+  async function handleForgotEmail() {
+    if (!forgotEmail) return;
+    const res = await fetch("/api/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: forgotEmail }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setForgotCode(data.code);
+      setForgotStep("reset");
+      toast.success("Код сброса пароля получен");
+    } else {
+      toast.error(data.error || "Ошибка");
+    }
+  }
+
+  async function handleResetPassword() {
+    const res = await fetch("/api/auth/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: forgotEmail,
+        code: forgotCode,
+        password: forgotPassword,
+      }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      toast.success("Пароль изменён. Войдите с новым паролем.");
+      setShowForgotPassword(false);
+      setShowLogin(true);
+    } else {
+      toast.error(data.error || "Ошибка");
+    }
   }
 
   if (loading) {
@@ -50,17 +99,15 @@ export function AuthButtons() {
             <NotificationCenter />
           </>
         ) : (
-          <Link href="/cabinet/favorites">
-            <Button variant="ghost" size="sm" className="gap-2">
-              <User className="h-4 w-4" />
-              Мой кабинет
-            </Button>
-          </Link>
+          <>
+            <Link href="/cabinet">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <User className="h-4 w-4" />
+                Мой кабинет
+              </Button>
+            </Link>
+          </>
         )}
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <User className="h-4 w-4" />
-          {expert.name}
-        </div>
         <Button variant="ghost" size="sm" onClick={logout} className="gap-2">
           <LogOut className="h-4 w-4" />
           Выйти
@@ -78,6 +125,7 @@ export function AuthButtons() {
             setShowLogin(false);
           }}
           onSwitchToRegister={switchToRegister}
+          onSwitchToForgotPassword={switchToForgotPassword}
         />
         <RegisterDialog
           open={showRegister}
@@ -88,17 +136,23 @@ export function AuthButtons() {
           onEmailChange={setRegEmail}
           password={regPassword}
           onPasswordChange={setRegPassword}
-          isExpert={regIsExpert}
-          onIsExpertChange={setRegIsExpert}
           onSubmit={() => {
-            register(
-              regName,
-              regEmail,
-              regPassword,
-              regIsExpert ? "expert" : "reader"
-            );
+            register(regName, regEmail, regPassword);
             setShowRegister(false);
           }}
+        />
+        <ForgotPasswordDialog
+          open={showForgotPassword}
+          onOpenChange={setShowForgotPassword}
+          email={forgotEmail}
+          onEmailChange={setForgotEmail}
+          code={forgotCode}
+          onCodeChange={setForgotCode}
+          password={forgotPassword}
+          onPasswordChange={setForgotPassword}
+          step={forgotStep}
+          onSendEmail={handleForgotEmail}
+          onReset={handleResetPassword}
         />
       </div>
     );
@@ -128,6 +182,7 @@ export function AuthButtons() {
           setShowLogin(false);
         }}
         onSwitchToRegister={switchToRegister}
+        onSwitchToForgotPassword={switchToForgotPassword}
       />
       <RegisterDialog
         open={showRegister}
@@ -138,17 +193,23 @@ export function AuthButtons() {
         onEmailChange={setRegEmail}
         password={regPassword}
         onPasswordChange={setRegPassword}
-        isExpert={regIsExpert}
-        onIsExpertChange={setRegIsExpert}
         onSubmit={() => {
-          register(
-            regName,
-            regEmail,
-            regPassword,
-            regIsExpert ? "expert" : "reader"
-          );
+          register(regName, regEmail, regPassword);
           setShowRegister(false);
         }}
+      />
+      <ForgotPasswordDialog
+        open={showForgotPassword}
+        onOpenChange={setShowForgotPassword}
+        email={forgotEmail}
+        onEmailChange={setForgotEmail}
+        code={forgotCode}
+        onCodeChange={setForgotCode}
+        password={forgotPassword}
+        onPasswordChange={setForgotPassword}
+        step={forgotStep}
+        onSendEmail={handleForgotEmail}
+        onReset={handleResetPassword}
       />
     </div>
   );
@@ -163,6 +224,7 @@ function LoginDialog({
   onPasswordChange,
   onSubmit,
   onSwitchToRegister,
+  onSwitchToForgotPassword,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -172,6 +234,7 @@ function LoginDialog({
   onPasswordChange: (v: string) => void;
   onSubmit: () => void;
   onSwitchToRegister: () => void;
+  onSwitchToForgotPassword: () => void;
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -206,15 +269,24 @@ function LoginDialog({
               required
             />
           </div>
-          <div className="flex gap-2 justify-end">
-            <Button
+          <div className="flex gap-2 justify-between items-center">
+            <button
               type="button"
-              variant="ghost"
-              onClick={() => onOpenChange(false)}
+              onClick={onSwitchToForgotPassword}
+              className="text-sm text-blue-600 hover:underline cursor-pointer"
             >
-              Отмена
-            </Button>
-            <Button type="submit">Войти</Button>
+              Забыли пароль?
+            </button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => onOpenChange(false)}
+              >
+                Отмена
+              </Button>
+              <Button type="submit">Войти</Button>
+            </div>
           </div>
           <p className="text-center text-sm text-gray-500">
             Нет аккаунта?{" "}
@@ -241,8 +313,6 @@ function RegisterDialog({
   onEmailChange,
   password,
   onPasswordChange,
-  isExpert,
-  onIsExpertChange,
   onSubmit,
 }: {
   open: boolean;
@@ -253,8 +323,6 @@ function RegisterDialog({
   onEmailChange: (v: string) => void;
   password: string;
   onPasswordChange: (v: string) => void;
-  isExpert: boolean;
-  onIsExpertChange: (v: boolean) => void;
   onSubmit: () => void;
 }) {
   return (
@@ -300,21 +368,6 @@ function RegisterDialog({
               minLength={6}
             />
           </div>
-          <label className="flex items-start gap-2 rounded-lg border border-gray-200 p-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isExpert}
-              onChange={(e) => onIsExpertChange(e.target.checked)}
-              className="mt-0.5 h-4 w-4 accent-[#0039CA]"
-            />
-            <span className="text-sm text-gray-600">
-              Я эксперт — хочу публиковать статьи
-              <span className="block text-xs text-gray-400">
-                Без галочки вы регистрируетесь как читатель (избранное,
-                подписки, история).
-              </span>
-            </span>
-          </label>
           <div className="flex gap-2 justify-end">
             <Button
               type="button"
@@ -326,6 +379,116 @@ function RegisterDialog({
             <Button type="submit">Зарегистрироваться</Button>
           </div>
         </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ForgotPasswordDialog({
+  open,
+  onOpenChange,
+  email,
+  onEmailChange,
+  code,
+  onCodeChange,
+  password,
+  onPasswordChange,
+  step,
+  onSendEmail,
+  onReset,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  email: string;
+  onEmailChange: (v: string) => void;
+  code: string;
+  onCodeChange: (v: string) => void;
+  password: string;
+  onPasswordChange: (v: string) => void;
+  step: "email" | "reset";
+  onSendEmail: () => void;
+  onReset: () => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Восстановление пароля</DialogTitle>
+        </DialogHeader>
+        {step === "email" ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSendEmail();
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <label className="text-sm font-medium text-gray-700">Email</label>
+              <Input
+                type="email"
+                placeholder="email@example.com"
+                value={email}
+                onChange={(e) => onEmailChange(e.target.value)}
+                required
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => onOpenChange(false)}
+              >
+                Отмена
+              </Button>
+              <Button type="submit">Отправить код</Button>
+            </div>
+          </form>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              onReset();
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Код сброса
+              </label>
+              <Input
+                placeholder="••••••"
+                value={code}
+                onChange={(e) => onCodeChange(e.target.value)}
+                required
+                maxLength={6}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Новый пароль
+              </label>
+              <Input
+                type="password"
+                placeholder="••••••"
+                value={password}
+                onChange={(e) => onPasswordChange(e.target.value)}
+                required
+                minLength={6}
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => onOpenChange(false)}
+              >
+                Отмена
+              </Button>
+              <Button type="submit">Сменить пароль</Button>
+            </div>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

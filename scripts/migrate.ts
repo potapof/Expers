@@ -28,6 +28,15 @@ sqlite.exec(`
     expertise TEXT,
     credentials TEXT,
     social_links TEXT,
+    work_experience TEXT,
+    publications TEXT,
+    achievements TEXT,
+    media_mentions TEXT,
+    faq TEXT,
+    testimonials TEXT,
+    call_to_action TEXT,
+    author_page_slug TEXT,
+    author_page_published INTEGER DEFAULT 0,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
   );
@@ -102,6 +111,15 @@ sqlite.exec(`
     created_at TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS password_resets (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    code TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    used INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+  );
+
   CREATE TABLE IF NOT EXISTS payments (
     order_id TEXT PRIMARY KEY,
     payment_id TEXT NOT NULL,
@@ -129,6 +147,7 @@ sqlite.exec(`
   CREATE INDEX IF NOT EXISTS subscriptions_author_idx ON subscriptions(author_id);
   CREATE INDEX IF NOT EXISTS section_subscriptions_pk ON section_subscriptions(user_id, section_id);
   CREATE INDEX IF NOT EXISTS payments_user_idx ON payments(user_id, created_at);
+  CREATE INDEX IF NOT EXISTS password_resets_email_idx ON password_resets(email, created_at);
 `);
 
 console.log("  ✓ Индексы созданы");

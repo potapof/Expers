@@ -18,6 +18,36 @@ interface Expert {
   email: string;
   role?: "reader" | "expert";
   hasPaid?: boolean;
+  avatar?: string;
+  bio?: string;
+  expertise?: string[];
+  credentials?: string[];
+  socialLinks?: { platform: string; url: string }[];
+  workExperience?: {
+    company: string;
+    position: string;
+    startDate: string;
+    endDate?: string;
+    description?: string;
+  }[];
+  publications?: {
+    title: string;
+    url?: string;
+    date?: string;
+    description?: string;
+  }[];
+  achievements?: { title: string; date?: string; description?: string }[];
+  mediaMentions?: {
+    outlet: string;
+    title: string;
+    url?: string;
+    date?: string;
+  }[];
+  faq?: { question: string; answer: string }[];
+  testimonials?: { name: string; role?: string; text: string }[];
+  callToAction?: string;
+  authorPageSlug?: string;
+  authorPagePublished?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -26,12 +56,7 @@ interface AuthContextType {
   expert: Expert | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (
-    name: string,
-    email: string,
-    password: string,
-    role?: "reader" | "expert"
-  ) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -102,7 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setExpert(data.expert);
         emitAuthChanged();
         toast.success("Вы вошли в систему", { id });
-        router.push(data.expert?.role === "reader" ? "/" : "/cabinet");
+        router.push("/cabinet");
       } catch {
         toast.error("Ошибка соединения", { id });
       }
@@ -111,18 +136,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const register = useCallback(
-    async (
-      name: string,
-      email: string,
-      password: string,
-      role: "reader" | "expert" = "reader"
-    ) => {
+    async (name: string, email: string, password: string) => {
       const id = toast.loading("Регистрация...");
       try {
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password, role }),
+          body: JSON.stringify({ name, email, password }),
         });
 
         const data = await res.json();
@@ -136,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setExpert(data.expert);
         emitAuthChanged();
         toast.success("Регистрация завершена", { id });
-        router.push(data.expert?.role === "reader" ? "/" : "/cabinet");
+        router.push("/cabinet");
       } catch {
         toast.error("Ошибка соединения", { id });
       }

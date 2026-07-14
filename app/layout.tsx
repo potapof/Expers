@@ -34,10 +34,7 @@ export default function RootLayout({
         <AuthProvider>
           <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white">
             <div className="mx-auto px-4 h-14 max-w-7xl flex items-center justify-between">
-              <Link
-                href="/"
-                className="flex items-center gap-2"
-              >
+              <Link href="/" className="flex items-center gap-2">
                 <Image
                   src="/logo.svg"
                   alt={appName}
