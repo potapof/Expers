@@ -30,5 +30,10 @@ jobs:
               sleep 5
               docker compose exec app npm run db:migrate
             fi
-            sleep 8
+            sleep 10
+            echo "=== Testing backend ==="
+            curl -sI --connect-timeout 5 http://localhost:8080/api/health || echo "Backend unreachable"
+            echo "=== Reloading Caddy ==="
             sudo systemctl reload caddy
+            echo "=== Testing via Caddy ==="
+            curl -sI --connect-timeout 5 http://localhost/ || echo "Caddy unreachable"
