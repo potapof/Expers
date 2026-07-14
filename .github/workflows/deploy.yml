@@ -26,9 +26,12 @@ jobs:
             fi
             cd "$PROJECT_DIR"
             git pull
-            docker compose down
-            sleep 3
+            docker compose down --remove-orphans
+            docker rm -f $(docker ps -aq) 2>/dev/null || true
+            sudo fuser -k 8080/tcp 2>/dev/null || true
+            sleep 2
+            ss -tlnp | grep 8080 || echo "Port 8080 is free"
             docker compose up -d --build app
-            sleep 8
+            sleep 10
             docker compose exec app npm run db:migrate
             sudo systemctl reload caddy
