@@ -15,7 +15,12 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            cd /home/debuan/Expers
+            PROJECT_DIR=$(find "$HOME" -maxdepth 3 -name "docker-compose.yml" 2>/dev/null | head -1 | xargs dirname)
+            if [ -z "$PROJECT_DIR" ]; then
+              echo "Project directory not found"
+              exit 1
+            fi
+            cd "$PROJECT_DIR"
             git pull
             docker compose exec app npm run db:migrate
             docker compose up -d --force-recreate app
