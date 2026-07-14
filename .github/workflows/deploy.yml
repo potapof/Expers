@@ -25,10 +25,11 @@ jobs:
             if docker compose ps app 2>/dev/null | grep -q "Up"; then
               docker compose exec app npm run db:migrate
               docker compose restart app
+              sleep 10
+              docker compose logs --tail 5 app
             else
-              docker compose down --remove-orphans 2>/dev/null || true
-              ss -tlnp | grep 8080 || echo "Port 8080 is free"
               docker compose up -d --build app
               sleep 5
               docker compose exec app npm run db:migrate
+              docker compose logs --tail 5 app
             fi
