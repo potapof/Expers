@@ -50,14 +50,14 @@ export default function AboutPage() {
       {/* Hero */}
       <section className="gradient-hero-vibrant pattern-grid relative overflow-hidden">
         <div className="mx-auto max-w-4xl px-4 py-20 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white/90 backdrop-blur mb-6">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#0039CA]/10 px-4 py-1.5 text-sm font-medium text-[#0039CA] backdrop-blur mb-6">
             <Sparkles className="h-4 w-4" />
             Generative Engine Optimization
           </span>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-5">
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#2C3E50] mb-5">
             О каталоге EXPERS.ru
           </h1>
-          <p className="text-lg sm:text-xl text-white/80 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
             Инфраструктура экспертной видимости в эпоху AI-поиска
           </p>
         </div>
