@@ -55,7 +55,7 @@ export default function RootLayout({
                   Главная
                 </Link>
                 <Link
-                  href="#"
+                  href="/about"
                   className="text-sm text-gray-500 hover:text-[#2C3E50] transition-colors"
                 >
                   О Каталоге
