@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ReaderNewArticles } from "@/components/reader-new-articles";
 import { ReaderFavoriteArticles } from "@/components/reader-favorite-articles";
 import { ReaderMyComments } from "@/components/reader-my-comments";
-import { ReaderFollowedAuthors } from "@/components/reader-followed-authors";
 import { ReaderFollowedArticles } from "@/components/reader-followed-articles";
 import { ReaderManageSubscriptions } from "@/components/reader-manage-subscriptions";
 import { ReaderViewingHistory } from "@/components/reader-viewing-history";
@@ -170,16 +169,6 @@ export function CabinetClient() {
             </div>
             <span className="text-xs text-gray-300">→</span>
           </button>
-
-          <div>
-            <h2 className="mb-1 text-lg font-semibold text-[#2C3E50]">
-              Подписанные авторы
-            </h2>
-            <p className="mb-4 text-sm text-gray-400">
-              Авторы, на которых вы подписаны
-            </p>
-            <ReaderFollowedAuthors />
-          </div>
 
           <ReaderFollowedArticles />
 
