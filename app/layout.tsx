@@ -67,7 +67,7 @@ export default function RootLayout({
                   Услуги
                 </Link>
                 <Link
-                  href="#"
+                  href="/contacts"
                   className="text-sm text-gray-500 hover:text-[#2C3E50] transition-colors"
                 >
                   Контакты
