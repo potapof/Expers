@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Bell, BellOff } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-context";
 
 const STORAGE_KEY = "expers-section-subscriptions";
 
@@ -13,6 +14,7 @@ export function SubscribeSectionButton({
   sectionId: string;
   sectionName: string;
 }) {
+  const { expert } = useAuth();
   const [hydrated, setHydrated] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
 
@@ -32,6 +34,26 @@ export function SubscribeSectionButton({
 
   if (!hydrated) {
     return <span className="inline-block w-5 h-5 shrink-0" />;
+  }
+
+  if (!expert) {
+    return (
+      <span
+        role="button"
+        tabIndex={-1}
+        aria-disabled="true"
+        onClick={(e) => {
+          e.stopPropagation();
+          toast("Подписки доступны после входа", {
+            description: "Войдите или зарегистрируйтесь, чтобы подписаться",
+          });
+        }}
+        className="shrink-0 rounded p-1 text-gray-200 cursor-not-allowed"
+        title="Войдите, чтобы подписаться"
+      >
+        <BellOff className="h-3.5 w-3.5" />
+      </span>
+    );
   }
 
   const handleClick = (e: React.MouseEvent) => {

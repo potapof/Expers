@@ -3,6 +3,7 @@
 import { useSubscriptions } from "@/lib/use-subscriptions";
 import { Bell, BellOff } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-context";
 
 export function SubscribeButton({
   expertId,
@@ -11,8 +12,27 @@ export function SubscribeButton({
   expertId: string;
   expertName: string;
 }) {
+  const { expert } = useAuth();
   const { isSubscribed, toggleSubscription } = useSubscriptions();
   const subscribed = isSubscribed(expertId);
+
+  if (!expert) {
+    return (
+      <button
+        type="button"
+        onClick={() =>
+          toast("Подписки доступны после входа", {
+            description: "Войдите или зарегистрируйтесь, чтобы подписаться",
+          })
+        }
+        className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium border border-gray-200 text-gray-300 cursor-not-allowed"
+        title="Войдите, чтобы подписаться"
+      >
+        <BellOff className="h-4 w-4" />
+        Подписаться
+      </button>
+    );
+  }
 
   const handleClick = () => {
     toggleSubscription(expertId);

@@ -135,6 +135,31 @@ sqlite.exec(`
 
 console.log("  ✓ Таблицы созданы");
 
+const expertColumns = [
+  ["work_experience", "TEXT"],
+  ["publications", "TEXT"],
+  ["achievements", "TEXT"],
+  ["media_mentions", "TEXT"],
+  ["faq", "TEXT"],
+  ["testimonials", "TEXT"],
+  ["call_to_action", "TEXT"],
+  ["author_page_slug", "TEXT"],
+  ["author_page_published", "INTEGER DEFAULT 0"],
+];
+
+const existingColumns = new Set(
+  (
+    sqlite.prepare("PRAGMA table_info(experts)").all() as { name: string }[]
+  ).map((c) => c.name)
+);
+
+for (const [name, type] of expertColumns) {
+  if (!existingColumns.has(name)) {
+    sqlite.exec(`ALTER TABLE experts ADD COLUMN ${name} ${type};`);
+    console.log(`  ✓ Колонка experts.${name} добавлена`);
+  }
+}
+
 sqlite.exec(`
   CREATE INDEX IF NOT EXISTS articles_status_idx ON articles(status);
   CREATE INDEX IF NOT EXISTS articles_expert_idx ON articles(expert_id);

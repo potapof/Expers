@@ -343,7 +343,12 @@ export function ReaderManageSubscriptions() {
                     role="button"
                     tabIndex={0}
                     onClick={() => toggleSectionExpand(industry.id)}
-                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleSectionExpand(industry.id); } }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        toggleSectionExpand(industry.id);
+                      }
+                    }}
                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer"
                   >
                     {expandedSections.has(industry.id) ? (
@@ -389,13 +394,18 @@ export function ReaderManageSubscriptions() {
                     <div className="ml-5 border-l border-gray-100 pl-3 space-y-0.5">
                       {industry.subsections.map((subsection) => (
                         <div key={subsection.id}>
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => toggleSectionExpand(subsection.id)}
-                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleSectionExpand(subsection.id); } }}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-gray-50 transition-colors cursor-pointer"
-                  >
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => toggleSectionExpand(subsection.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                toggleSectionExpand(subsection.id);
+                              }
+                            }}
+                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                          >
                             {expandedSections.has(subsection.id) ? (
                               <ChevronDown className="h-3.5 w-3.5 text-gray-400 shrink-0" />
                             ) : (
@@ -433,8 +443,8 @@ export function ReaderManageSubscriptions() {
                                   Подписаться
                                 </>
                               )}
-                    </button>
-                  </div>
+                            </button>
+                          </div>
                           {expandedSections.has(subsection.id) && (
                             <div className="ml-5 border-l border-gray-100 pl-3 space-y-0.5">
                               {subsection.categories.map((category) => (
