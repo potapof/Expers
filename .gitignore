@@ -47,4 +47,5 @@ opencode_logs.tar.gz
 src_cli_logs.tar.gz
 app-screen.png
 data/
+public/uploads/
 deploy_key*

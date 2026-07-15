@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ import {
   BookOpen,
   FileText,
   Globe,
+  Upload,
 } from "lucide-react";
 
 interface SocialLink {
@@ -162,6 +163,8 @@ export function AuthorProfileEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const storageKey = expert ? `${STORAGE_KEY_PREFIX}${expert.id}` : null;
 
@@ -240,6 +243,50 @@ export function AuthorProfileEditor() {
     if (!profile) return;
     const updated = { ...profile, [key]: value };
     setProfile(updated);
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Максимальный размер файла — 5 МБ");
+      return;
+    }
+
+    const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!allowed.includes(file.type)) {
+      toast.error("Допустимы только JPEG, PNG, WebP и GIF");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload/avatar", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        toast.error(data.error || "Ошибка загрузки");
+        return;
+      }
+
+      const data = await res.json();
+      updateField("avatar", data.url);
+      toast.success("Аватар загружен");
+    } catch {
+      toast.error("Ошибка соединения");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   const addExpertise = () => {
@@ -414,22 +461,60 @@ export function AuthorProfileEditor() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#0039CA] text-white text-xl font-bold">
-              {profile.name?.charAt(0) || "?"}
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#0039CA] text-white text-xl font-bold overflow-hidden">
+              {profile.avatar ? (
+                <img
+                  src={profile.avatar}
+                  alt="Аватар"
+                  className="h-full w-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
+              ) : (
+                profile.name?.charAt(0) || "?"
+              )}
             </div>
-            <div className="flex-1">
-              <label className="text-xs font-medium text-gray-500 mb-1 block">
-                URL аватара
-              </label>
-              <Input
-                placeholder="https://example.com/avatar.jpg"
-                value={profile.avatar || ""}
-                onChange={(e) => updateField("avatar", e.target.value)}
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                Укажите ссылку на изображение или оставьте пустым для аватара по
-                умолчанию
-              </p>
+            <div className="flex-1 space-y-3">
+              <div className="flex items-center gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  <Upload className="h-4 w-4 mr-1" />
+                  {uploading ? "Загрузка..." : "Загрузить"}
+                </Button>
+                {profile.avatar && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => updateField("avatar", "")}
+                    className="text-red-400 hover:text-red-600"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Удалить
+                  </Button>
+                )}
+              </div>
+              <div>
+                <Input
+                  placeholder="https://example.com/avatar.jpg"
+                  value={profile.avatar || ""}
+                  onChange={(e) => updateField("avatar", e.target.value)}
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Загрузите файл или укажите ссылку на изображение
+                </p>
+              </div>
             </div>
           </div>
 
