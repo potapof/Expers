@@ -61,7 +61,7 @@ export default function RootLayout({
                   О Каталоге
                 </Link>
                 <Link
-                  href="#"
+                  href="/services"
                   className="text-sm text-gray-500 hover:text-[#2C3E50] transition-colors"
                 >
                   Услуги
