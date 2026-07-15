@@ -339,10 +339,12 @@ export function ReaderManageSubscriptions() {
             <div className="space-y-1 rounded-xl border border-gray-100 bg-white p-3">
               {filteredIndustries.map((industry) => (
                 <div key={industry.id}>
-                  <button
-                    type="button"
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => toggleSectionExpand(industry.id)}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-gray-50 transition-colors"
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleSectionExpand(industry.id); } }}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer"
                   >
                     {expandedSections.has(industry.id) ? (
                       <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
@@ -382,16 +384,18 @@ export function ReaderManageSubscriptions() {
                         </>
                       )}
                     </button>
-                  </button>
+                  </div>
                   {expandedSections.has(industry.id) && (
                     <div className="ml-5 border-l border-gray-100 pl-3 space-y-0.5">
                       {industry.subsections.map((subsection) => (
                         <div key={subsection.id}>
-                          <button
-                            type="button"
-                            onClick={() => toggleSectionExpand(subsection.id)}
-                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-gray-50 transition-colors"
-                          >
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => toggleSectionExpand(subsection.id)}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleSectionExpand(subsection.id); } }}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                  >
                             {expandedSections.has(subsection.id) ? (
                               <ChevronDown className="h-3.5 w-3.5 text-gray-400 shrink-0" />
                             ) : (
@@ -429,8 +433,8 @@ export function ReaderManageSubscriptions() {
                                   Подписаться
                                 </>
                               )}
-                            </button>
-                          </button>
+                    </button>
+                  </div>
                           {expandedSections.has(subsection.id) && (
                             <div className="ml-5 border-l border-gray-100 pl-3 space-y-0.5">
                               {subsection.categories.map((category) => (
