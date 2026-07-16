@@ -13,6 +13,9 @@ import {
   ArrowRight,
   PenSquare,
   MessageSquare,
+  Phone,
+  Clock,
+  FileText,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -163,7 +166,7 @@ export default function ContactsPage() {
           <h2 className="text-2xl font-bold tracking-tight text-[#2C3E50] text-center mb-8">
             Как с нами связаться
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="card-hover rounded-2xl border border-gray-100 bg-white p-6 text-center">
               <div className="flex justify-center mb-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0039CA]/10">
@@ -171,11 +174,13 @@ export default function ContactsPage() {
                 </div>
               </div>
               <h3 className="font-semibold text-[#2C3E50] mb-1.5">Адрес</h3>
-              <p className="text-sm text-gray-500">Россия, г. Москва</p>
+              <p className="text-sm text-gray-500">
+                111141, г. Москва, пр-кт Зелёный, д. 3а, стр. 1
+              </p>
             </div>
 
             <a
-              href="mailto:info@expers.ru"
+              href="mailto:info@fonai.ru"
               className="card-hover rounded-2xl border border-gray-100 bg-white p-6 text-center block"
             >
               <div className="flex justify-center mb-4">
@@ -185,9 +190,36 @@ export default function ContactsPage() {
               </div>
               <h3 className="font-semibold text-[#2C3E50] mb-1.5">Email</h3>
               <p className="text-sm text-[#0039CA] font-medium">
-                info@expers.ru
+                info@fonai.ru
               </p>
             </a>
+
+            <a
+              href="tel:+74953243088"
+              className="card-hover rounded-2xl border border-gray-100 bg-white p-6 text-center block"
+            >
+              <div className="flex justify-center mb-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0039CA]/10">
+                  <Phone className="h-6 w-6 text-[#0039CA]" />
+                </div>
+              </div>
+              <h3 className="font-semibold text-[#2C3E50] mb-1.5">Телефон</h3>
+              <p className="text-sm text-[#0039CA] font-medium">
+                +7 (495) 324-30-88
+              </p>
+            </a>
+
+            <div className="card-hover rounded-2xl border border-gray-100 bg-white p-6 text-center">
+              <div className="flex justify-center mb-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0039CA]/10">
+                  <Clock className="h-6 w-6 text-[#0039CA]" />
+                </div>
+              </div>
+              <h3 className="font-semibold text-[#2C3E50] mb-1.5">
+                Режим работы
+              </h3>
+              <p className="text-sm text-gray-500">пн–пт 10:00–18:00 (МСК)</p>
+            </div>
           </div>
 
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -218,6 +250,62 @@ export default function ContactsPage() {
                 email, и мы обсудим детали.
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* Реквизиты */}
+        <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <FileText className="h-5 w-5 text-[#0039CA]" />
+              <h2 className="text-xl font-bold tracking-tight text-[#2C3E50]">
+                Реквизиты
+              </h2>
+            </div>
+            <dl className="grid gap-y-2.5 gap-x-6 sm:grid-cols-[240px_1fr] text-sm text-gray-600">
+              <dt className="font-medium text-[#2C3E50]">Наименование</dt>
+              <dd>ООО «ФОНИИ»</dd>
+              <dt className="font-medium text-[#2C3E50]">
+                Юридический / фактический адрес
+              </dt>
+              <dd>111141, г. Москва, пр-кт Зелёный, д. 3а, стр. 1</dd>
+              <dt className="font-medium text-[#2C3E50]">ИНН / КПП</dt>
+              <dd>7720943604 / 772001001</dd>
+              <dt className="font-medium text-[#2C3E50]">ОГРН</dt>
+              <dd>1257700013141</dd>
+              <dt className="font-medium text-[#2C3E50]">ОКВЭД</dt>
+              <dd>62.01</dd>
+              <dt className="font-medium text-[#2C3E50]">Расчётный счёт</dt>
+              <dd>40702810738710001105</dd>
+              <dt className="font-medium text-[#2C3E50]">Банк</dt>
+              <dd>ПАО Сбербанк</dd>
+              <dt className="font-medium text-[#2C3E50]">Корр. счёт</dt>
+              <dd>30101810400000000225</dd>
+              <dt className="font-medium text-[#2C3E50]">БИК</dt>
+              <dd>044525225</dd>
+              <dt className="font-medium text-[#2C3E50]">
+                Генеральный директор
+              </dt>
+              <dd>
+                Потапов Алексей Станиславович, действует на основании Устава
+              </dd>
+              <dt className="font-medium text-[#2C3E50]">Сайт / email</dt>
+              <dd>www.fonai.ru / info@fonai.ru</dd>
+            </dl>
+            <p className="text-xs text-gray-400 mt-6">
+              Документы:{" "}
+              <Link href="/offer" className="text-[#0039CA] hover:underline">
+                Публичная оферта
+              </Link>
+              {" · "}
+              <Link href="/privacy" className="text-[#0039CA] hover:underline">
+                Политика обработки персональных данных
+              </Link>
+              {" · "}
+              <Link href="/refund" className="text-[#0039CA] hover:underline">
+                Условия возврата
+              </Link>
+            </p>
           </div>
         </section>
 

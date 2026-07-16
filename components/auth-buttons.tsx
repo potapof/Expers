@@ -325,6 +325,8 @@ function RegisterDialog({
   onPasswordChange: (v: string) => void;
   onSubmit: () => void;
 }) {
+  const [consent, setConsent] = useState(false);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -368,6 +370,33 @@ function RegisterDialog({
               minLength={6}
             />
           </div>
+          <label className="flex items-start gap-2.5 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              required
+              className="mt-0.5 h-4 w-4 accent-[#0039CA]"
+            />
+            <span className="text-xs text-gray-500 leading-relaxed">
+              Я даю{" "}
+              <Link
+                href="/privacy"
+                target="_blank"
+                className="text-[#0039CA] hover:underline"
+              >
+                согласие на обработку персональных данных
+              </Link>{" "}
+              и принимаю условия{" "}
+              <Link
+                href="/offer"
+                target="_blank"
+                className="text-[#0039CA] hover:underline"
+              >
+                публичной оферты
+              </Link>
+            </span>
+          </label>
           <div className="flex gap-2 justify-end">
             <Button
               type="button"
@@ -376,7 +405,9 @@ function RegisterDialog({
             >
               Отмена
             </Button>
-            <Button type="submit">Зарегистрироваться</Button>
+            <Button type="submit" disabled={!consent}>
+              Зарегистрироваться
+            </Button>
           </div>
         </form>
       </DialogContent>

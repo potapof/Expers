@@ -2320,6 +2320,31 @@ function Step12Publish({
             правилам каталога Expers и не нарушает авторских прав третьих лиц.
           </p>
         </div>
+
+        <div className="mt-3 rounded-lg bg-gray-50 border border-gray-200 p-4">
+          <p className="text-xs text-gray-500 leading-relaxed">
+            Стоимость публикации — 5 000 ₽ (НДС не облагается, АУСН). Оплата
+            производится банковской картой через сервис Т-Банка. Нажимая
+            «Опубликовать статью» и оплачивая, вы приобретаете бессрочное право
+            публикации и принимаете условия{" "}
+            <a
+              href="/offer"
+              target="_blank"
+              className="text-[#0039CA] hover:underline"
+            >
+              публичной оферты
+            </a>{" "}
+            и{" "}
+            <a
+              href="/refund"
+              target="_blank"
+              className="text-[#0039CA] hover:underline"
+            >
+              условия возврата
+            </a>
+            . Исполнитель: ООО «ФОНИИ», ИНН 7720943604.
+          </p>
+        </div>
       </div>
 
       <div className="flex justify-center">

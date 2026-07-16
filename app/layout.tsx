@@ -80,8 +80,68 @@ export default function RootLayout({
           </header>
           <main className="flex-1">{children}</main>
           <footer className="border-t border-gray-200 bg-gray-50">
-            <div className="mx-auto px-4 py-8 max-w-7xl text-center text-xs text-gray-400">
-              © {new Date().getFullYear()} {appName}. Все права защищены.
+            <div className="mx-auto max-w-7xl px-4 py-8">
+              <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-5">
+                <Link
+                  href="/offer"
+                  className="text-xs text-gray-500 hover:text-[#0039CA] transition-colors"
+                >
+                  Публичная оферта
+                </Link>
+                <Link
+                  href="/privacy"
+                  className="text-xs text-gray-500 hover:text-[#0039CA] transition-colors"
+                >
+                  Политика конфиденциальности
+                </Link>
+                <Link
+                  href="/refund"
+                  className="text-xs text-gray-500 hover:text-[#0039CA] transition-colors"
+                >
+                  Условия возврата
+                </Link>
+                <Link
+                  href="/contacts"
+                  className="text-xs text-gray-500 hover:text-[#0039CA] transition-colors"
+                >
+                  Контакты
+                </Link>
+              </div>
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <Image
+                  src="/payments/mir.svg"
+                  alt="МИР"
+                  width={56}
+                  height={20}
+                  className="h-5 w-auto opacity-70"
+                />
+                <Image
+                  src="/payments/visa.svg"
+                  alt="Visa"
+                  width={48}
+                  height={20}
+                  className="h-4 w-auto opacity-70"
+                />
+                <Image
+                  src="/payments/mastercard.svg"
+                  alt="Mastercard"
+                  width={36}
+                  height={24}
+                  className="h-6 w-auto opacity-70"
+                />
+                <Image
+                  src="/payments/tbank.svg"
+                  alt="Т-Банк"
+                  width={72}
+                  height={20}
+                  className="h-5 w-auto opacity-70"
+                />
+              </div>
+              <p className="text-center text-xs text-gray-400 leading-relaxed">
+                ООО «ФОНИИ» · ИНН 7720943604 · ОГРН 1257700013141
+                <br />© {new Date().getFullYear()} {appName}. Все права
+                защищены.
+              </p>
             </div>
           </footer>
           <Toaster richColors position="top-right" />
