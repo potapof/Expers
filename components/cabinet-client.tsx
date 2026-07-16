@@ -141,14 +141,17 @@ export function CabinetClient() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col gap-1 shrink-0">
+            <div className="flex flex-col shrink-0 border-l border-gray-100 pl-5 ml-2">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-300 mb-2">
+                Управление
+              </p>
               <button
                 type="button"
                 onClick={() => {
                   switchMode("author");
                   setAuthorView("finance");
                 }}
-                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors w-full text-left ${authorView === "finance" && effectiveMode === "author" ? "bg-[#0039CA]/10 text-[#0039CA]" : "text-gray-500 hover:text-[#2C3E50] hover:bg-gray-50"}`}
+                className={`flex items-center gap-2 py-1.5 text-xs font-medium transition-colors -ml-5 pl-5 border-l-2 ${authorView === "finance" && effectiveMode === "author" ? "border-[#0039CA] text-[#0039CA]" : "border-transparent text-gray-500 hover:text-[#2C3E50] hover:border-gray-200"}`}
               >
                 <Wallet className="h-3.5 w-3.5" />
                 Платежи
@@ -159,7 +162,7 @@ export function CabinetClient() {
                   switchMode("author");
                   setAuthorView("profile");
                 }}
-                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors w-full text-left ${authorView === "profile" && effectiveMode === "author" ? "bg-[#0039CA]/10 text-[#0039CA]" : "text-gray-500 hover:text-[#2C3E50] hover:bg-gray-50"}`}
+                className={`flex items-center gap-2 py-1.5 text-xs font-medium transition-colors -ml-5 pl-5 border-l-2 ${authorView === "profile" && effectiveMode === "author" ? "border-[#0039CA] text-[#0039CA]" : "border-transparent text-gray-500 hover:text-[#2C3E50] hover:border-gray-200"}`}
               >
                 <Settings className="h-3.5 w-3.5" />
                 Профиль
@@ -171,7 +174,7 @@ export function CabinetClient() {
                     switchMode("author");
                     setAuthorView("authorPage");
                   }}
-                  className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors w-full text-left ${authorView === "authorPage" && effectiveMode === "author" ? "bg-[#0039CA]/10 text-[#0039CA]" : "text-gray-500 hover:text-[#2C3E50] hover:bg-gray-50"}`}
+                  className={`flex items-center gap-2 py-1.5 text-xs font-medium transition-colors -ml-5 pl-5 border-l-2 ${authorView === "authorPage" && effectiveMode === "author" ? "border-[#0039CA] text-[#0039CA]" : "border-transparent text-gray-500 hover:text-[#2C3E50] hover:border-gray-200"}`}
                 >
                   <Globe className="h-3.5 w-3.5" />
                   Страница автора
@@ -180,12 +183,12 @@ export function CabinetClient() {
                 <button
                   type="button"
                   disabled
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-gray-300 cursor-not-allowed w-full text-left"
+                  className="flex items-center gap-2 py-1.5 text-xs font-medium text-gray-300 cursor-not-allowed -ml-5 pl-5 border-l-2 border-transparent"
                   title="Создание страницы автора доступно после публикации первой статьи"
                 >
                   <Globe className="h-3.5 w-3.5" />
                   Страница автора
-                  <HelpCircle className="h-3.5 w-3.5 text-gray-300 ml-auto" />
+                  <HelpCircle className="h-3 w-3 text-gray-300" />
                 </button>
               )}
             </div>
@@ -284,11 +287,11 @@ export function CabinetClient() {
 
       {effectiveMode === "author" && (
         <div className="space-y-6">
-          <div className="flex gap-1 rounded-lg bg-gray-100 p-1 w-fit">
+          <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
             <button
               type="button"
               onClick={() => setAuthorView("dashboard")}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              className={`flex flex-1 justify-center items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 authorView === "dashboard"
                   ? "bg-white text-[#2C3E50] shadow-sm"
                   : "text-gray-500 hover:text-[#2C3E50]"
@@ -300,7 +303,7 @@ export function CabinetClient() {
             <button
               type="button"
               onClick={() => setAuthorView("articles")}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              className={`flex flex-1 justify-center items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 authorView === "articles"
                   ? "bg-white text-[#2C3E50] shadow-sm"
                   : "text-gray-500 hover:text-[#2C3E50]"
@@ -312,7 +315,7 @@ export function CabinetClient() {
             <button
               type="button"
               onClick={() => setAuthorView("comments")}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              className={`flex flex-1 justify-center items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 authorView === "comments"
                   ? "bg-white text-[#2C3E50] shadow-sm"
                   : "text-gray-500 hover:text-[#2C3E50]"
@@ -324,7 +327,7 @@ export function CabinetClient() {
             <button
               type="button"
               onClick={() => setAuthorView("subscribers")}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              className={`flex flex-1 justify-center items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 authorView === "subscribers"
                   ? "bg-white text-[#2C3E50] shadow-sm"
                   : "text-gray-500 hover:text-[#2C3E50]"
@@ -336,7 +339,7 @@ export function CabinetClient() {
             <button
               type="button"
               onClick={() => setAuthorView("social")}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              className={`flex flex-1 justify-center items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 authorView === "social"
                   ? "bg-white text-[#2C3E50] shadow-sm"
                   : "text-gray-500 hover:text-[#2C3E50]"
