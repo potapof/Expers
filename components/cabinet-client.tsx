@@ -110,39 +110,85 @@ export function CabinetClient() {
 
       <Card className="mb-6">
         <CardContent className="py-5">
-          <div className="flex items-start gap-4">
-            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
-              <User className="h-6 w-6 text-[#0039CA]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-lg font-semibold text-[#2C3E50]">
-                {expert.name}
-              </h2>
-              <div className="flex items-center gap-1.5 mt-0.5 text-sm text-gray-500">
-                <Mail className="h-3.5 w-3.5" />
-                {expert.email}
+          <div className="flex items-start gap-4 justify-between">
+            <div className="flex items-start gap-4">
+              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                <User className="h-6 w-6 text-[#0039CA]" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-[#2C3E50]">
+                  {expert.name}
+                </h2>
+                <div className="flex items-center gap-1.5 mt-0.5 text-sm text-gray-500">
+                  <Mail className="h-3.5 w-3.5" />
+                  {expert.email}
+                </div>
+                <div className="flex gap-1 rounded-lg bg-gray-100 p-1 mt-3 w-fit">
+                  <button
+                    type="button"
+                    onClick={() => switchMode("reader")}
+                    className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${effectiveMode === "reader" ? "bg-white text-[#2C3E50] shadow-sm" : "text-gray-500 hover:text-[#2C3E50]"}`}
+                  >
+                    <BookOpen className="h-3.5 w-3.5" />Я читатель
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => switchMode("author")}
+                    className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${effectiveMode === "author" ? "bg-white text-[#2C3E50] shadow-sm" : "text-gray-500 hover:text-[#2C3E50]"}`}
+                  >
+                    <PenSquare className="h-3.5 w-3.5" />Я автор
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex gap-1 rounded-lg bg-gray-100 p-1 mt-4 w-fit">
-            <button
-              type="button"
-              onClick={() => switchMode("reader")}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-                effectiveMode === "reader"
-                  ? "bg-white text-[#2C3E50] shadow-sm"
-                  : "text-gray-500 hover:text-[#2C3E50]"
-              }`}
-            >
-              <BookOpen className="h-4 w-4" />Я читатель
-            </button>
-            <button
-              type="button"
-              onClick={() => switchMode("author")}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${effectiveMode === "author" ? "bg-white text-[#2C3E50] shadow-sm" : "text-gray-500 hover:text-[#2C3E50]"}`}
-            >
-              <PenSquare className="h-4 w-4" />Я автор
-            </button>
+            <div className="flex flex-col gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  switchMode("author");
+                  setAuthorView("finance");
+                }}
+                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors w-full text-left ${authorView === "finance" && effectiveMode === "author" ? "bg-[#0039CA]/10 text-[#0039CA]" : "text-gray-500 hover:text-[#2C3E50] hover:bg-gray-50"}`}
+              >
+                <Wallet className="h-3.5 w-3.5" />
+                Платежи
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  switchMode("author");
+                  setAuthorView("profile");
+                }}
+                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors w-full text-left ${authorView === "profile" && effectiveMode === "author" ? "bg-[#0039CA]/10 text-[#0039CA]" : "text-gray-500 hover:text-[#2C3E50] hover:bg-gray-50"}`}
+              >
+                <Settings className="h-3.5 w-3.5" />
+                Профиль
+              </button>
+              {expert?.hasPaid ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    switchMode("author");
+                    setAuthorView("authorPage");
+                  }}
+                  className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors w-full text-left ${authorView === "authorPage" && effectiveMode === "author" ? "bg-[#0039CA]/10 text-[#0039CA]" : "text-gray-500 hover:text-[#2C3E50] hover:bg-gray-50"}`}
+                >
+                  <Globe className="h-3.5 w-3.5" />
+                  Страница автора
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-gray-300 cursor-not-allowed w-full text-left"
+                  title="Создание страницы автора доступно после публикации первой статьи"
+                >
+                  <Globe className="h-3.5 w-3.5" />
+                  Страница автора
+                  <HelpCircle className="h-3.5 w-3.5 text-gray-300 ml-auto" />
+                </button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -299,52 +345,6 @@ export function CabinetClient() {
               <BarChart3 className="h-4 w-4" />
               Аналитика
             </button>
-            <button
-              type="button"
-              onClick={() => setAuthorView("finance")}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-                authorView === "finance"
-                  ? "bg-white text-[#2C3E50] shadow-sm"
-                  : "text-gray-500 hover:text-[#2C3E50]"
-              }`}
-            >
-              <Wallet className="h-4 w-4" />
-              Платежи
-            </button>
-            <button
-              type="button"
-              onClick={() => setAuthorView("profile")}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-                authorView === "profile"
-                  ? "bg-white text-[#2C3E50] shadow-sm"
-                  : "text-gray-500 hover:text-[#2C3E50]"
-              }`}
-            >
-              <Settings className="h-4 w-4" />
-              Профиль
-            </button>
-            {expert?.hasPaid ? (
-              <button
-                type="button"
-                onClick={() => setAuthorView("authorPage")}
-                className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${authorView === "authorPage" ? "bg-white text-[#2C3E50] shadow-sm" : "text-gray-500 hover:text-[#2C3E50]"}`}
-              >
-                <Globe className="h-4 w-4" />
-                Страница автора
-              </button>
-            ) : (
-              <button
-                type="button"
-                disabled
-                className="flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed"
-              >
-                <Globe className="h-4 w-4" />
-                Страница автора
-                <span title="Создание страницы автора доступно после публикации первой статьи">
-                  <HelpCircle className="h-3.5 w-3.5 text-gray-300" />
-                </span>
-              </button>
-            )}
           </div>
 
           {authorView === "dashboard" && <AuthorDashboard />}
