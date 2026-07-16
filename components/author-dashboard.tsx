@@ -16,15 +16,21 @@ import {
 } from "lucide-react";
 import type { Article } from "@/lib/models";
 
-type Period = "7d" | "30d" | "90d" | "1y" | "all";
+type Period = "7d" | "30d" | "90d" | "180d" | "360d";
 
-const PERIODS: { value: Period; label: string; days: number | null }[] = [
-  { value: "7d", label: "7 дней", days: 7 },
-  { value: "30d", label: "30 дней", days: 30 },
-  { value: "90d", label: "90 дней", days: 90 },
-  { value: "1y", label: "Год", days: 365 },
-  { value: "all", label: "Всё время", days: null },
+const PERIODS: { value: Period; label: string; days: number }[] = [
+  { value: "7d", label: "7 дн", days: 7 },
+  { value: "30d", label: "30 дн", days: 30 },
+  { value: "90d", label: "90 дн", days: 90 },
+  { value: "180d", label: "6 мес", days: 180 },
+  { value: "360d", label: "12 мес", days: 360 },
 ];
+
+function getAggregationLabel(period: Period): string {
+  if (period === "7d" || period === "30d") return "по дням";
+  if (period === "90d") return "по неделям";
+  return "по месяцам";
+}
 
 const ARTICLES_KEY = "expers-articles";
 const COMMENTS_KEY = "expers-comments";
@@ -146,15 +152,11 @@ function generateDailyViews(
   return result;
 }
 
-function getPeriodDateRange(days: number | null): { start: Date; end: Date } {
+function getPeriodDateRange(days: number): { start: Date; end: Date } {
   const end = new Date();
   end.setUTCHours(23, 59, 59, 999);
   const start = new Date(end);
-  if (days === null) {
-    start.setUTCFullYear(start.getUTCFullYear() - 10);
-  } else {
-    start.setUTCDate(start.getUTCDate() - days);
-  }
+  start.setUTCDate(start.getUTCDate() - days);
   start.setUTCHours(0, 0, 0, 0);
   return { start, end };
 }
@@ -182,21 +184,21 @@ function getChangePercent(current: number, previous: number): number {
   return Math.round(((current - previous) / previous) * 100);
 }
 
-function getDateRangeLabel(days: number | null): string {
-  if (days === null) return "за всё время";
+function getDateRangeLabel(days: number): string {
   if (days === 7) return "за последние 7 дней";
   if (days === 30) return "за последние 30 дней";
   if (days === 90) return "за последние 90 дней";
-  if (days === 365) return "за последний год";
+  if (days === 180) return "за последние 6 месяцев";
+  if (days === 360) return "за последние 12 месяцев";
   return `за последние ${days} дней`;
 }
 
-function getPrevDateRangeLabel(days: number | null): string {
-  if (days === null) return "за предыдущий период";
+function getPrevDateRangeLabel(days: number): string {
   if (days === 7) return "за предыдущие 7 дней";
   if (days === 30) return "за предыдущие 30 дней";
   if (days === 90) return "за предыдущие 90 дней";
-  if (days === 365) return "за предыдущий год";
+  if (days === 180) return "за предыдущие 6 месяцев";
+  if (days === 360) return "за предыдущие 12 месяцев";
   return "за предыдущий период";
 }
 
@@ -278,13 +280,14 @@ function ViewsChart({
     const info = PERIODS.find((p) => p.value === period)!;
 
     if (period === "7d" || period === "30d") {
-      return dailyViews.slice(-info.days!);
+      return dailyViews.slice(-info.days);
     }
 
     if (period === "90d") {
       const weekly: { date: string; views: number }[] = [];
-      for (let i = 0; i < dailyViews.length; i += 7) {
-        const chunk = dailyViews.slice(i, i + 7);
+      const target = dailyViews.slice(-90);
+      for (let i = 0; i < target.length; i += 7) {
+        const chunk = target.slice(i, i + 7);
         const date = chunk[0]?.date ?? "";
         const views = chunk.reduce((s, d) => s + d.views, 0);
         weekly.push({ date, views });
@@ -292,20 +295,17 @@ function ViewsChart({
       return weekly;
     }
 
-    if (period === "1y" || period === "all") {
-      const monthly: { date: string; views: number }[] = [];
-      const monthMap = new Map<string, number>();
-      for (const dv of dailyViews) {
-        const monthKey = dv.date.slice(0, 7);
-        monthMap.set(monthKey, (monthMap.get(monthKey) || 0) + dv.views);
-      }
-      for (const [date, views] of monthMap) {
-        monthly.push({ date, views });
-      }
-      return monthly;
+    const monthly: { date: string; views: number }[] = [];
+    const target = dailyViews.slice(-info.days);
+    const monthMap = new Map<string, number>();
+    for (const dv of target) {
+      const monthKey = dv.date.slice(0, 7);
+      monthMap.set(monthKey, (monthMap.get(monthKey) || 0) + dv.views);
     }
-
-    return dailyViews;
+    for (const [date, views] of monthMap) {
+      monthly.push({ date, views });
+    }
+    return monthly;
   }, [dailyViews, period]);
 
   const maxViews = Math.max(...chartData.map((d) => d.views), 1);
@@ -420,11 +420,11 @@ export function AuthorDashboard() {
       periodConfig.days
     );
 
-    const prevPeriodDays = periodConfig.days ?? 3650;
+    const prevPeriodDays = periodConfig.days;
     const prevEnd = new Date(curStart.getTime() - 86400000);
     const prevStart = new Date(prevEnd.getTime() - prevPeriodDays * 86400000);
 
-    const allDays = periodConfig.days ?? 3650;
+    const allDays = periodConfig.days;
     const dailyViews = generateDailyViews(articles, allDays + prevPeriodDays);
 
     const currentViews = computeViewsForRange(dailyViews, curStart, curEnd);
@@ -603,9 +603,14 @@ export function AuthorDashboard() {
 
       <div className="rounded-xl border border-gray-100 bg-white p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-[#2C3E50]">
-            График просмотров
-          </h3>
+          <div>
+            <h3 className="text-sm font-semibold text-[#2C3E50]">
+              График просмотров
+            </h3>
+            <p className="text-xs text-gray-400">
+              {getAggregationLabel(period)}
+            </p>
+          </div>
           <div className="flex items-center gap-3 text-xs text-gray-400">
             <span className="flex items-center gap-1">
               <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#0039CA]" />
