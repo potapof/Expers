@@ -1058,7 +1058,7 @@ function Step5CrossLinks({
       <StepLabel
         step={5}
         title="Кросс-функциональные ссылки"
-        description="Добавьте 5-8 ссылок на связанные статьи из каталога"
+        description="Добавьте 2-8 ссылок на связанные статьи из каталога"
       />
       {links.length > 0 && (
         <div className="mb-6 space-y-2">
@@ -1125,7 +1125,7 @@ function Step5CrossLinks({
         <p className="text-xs text-red-500 mt-2">{errors.crossLinks}</p>
       )}
       <p className="text-xs text-gray-400 mt-3">
-        Добавлено {links.length} из 5-8 ссылок
+        Добавлено {links.length} из 2-8 ссылок
       </p>
     </div>
   );
