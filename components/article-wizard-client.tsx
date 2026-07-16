@@ -469,7 +469,7 @@ export function ArticleWizardClient() {
     );
   }
 
-  if (!expert || expert.role !== "expert") {
+  if (!expert) {
     return (
       <div className="mx-auto px-4 max-w-3xl py-20 text-center">
         <div className="flex justify-center mb-6">
@@ -478,12 +478,10 @@ export function ArticleWizardClient() {
           </div>
         </div>
         <h1 className="text-2xl font-bold text-[#2C3E50] mb-3">
-          {expert ? "Только для экспертов" : "Войдите в систему"}
+          Войдите в систему
         </h1>
         <p className="text-gray-500 mb-6">
-          {expert
-            ? "Публикация статей доступна только аккаунтам экспертов. Зарегистрируйтесь как эксперт, чтобы публиковать материалы."
-            : "Чтобы опубликовать статью, необходимо войти или зарегистрироваться"}
+          Чтобы опубликовать статью, необходимо войти или зарегистрироваться
         </p>
         <Button onClick={() => router.push("/")}>На главную</Button>
       </div>
