@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { RotateCcw, Mail, Phone, CheckCircle2, XCircle } from "lucide-react";
+import {
+  RotateCcw,
+  Mail,
+  Phone,
+  AlertTriangle,
+  ShieldAlert,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Условия возврата — EXPERS.ru",
   description:
-    "Условия и порядок возврата денежных средств за неиспользованные права публикации в каталоге EXPERS.ru.",
+    "Условия и порядок возврата денежных средств за приобретённые права публикации в каталоге EXPERS.ru.",
 };
 
 export default function RefundPage() {
@@ -22,8 +28,7 @@ export default function RefundPage() {
             Условия возврата
           </h1>
           <p className="text-gray-500 text-sm max-w-xl mx-auto">
-            Порядок возврата денежных средств за неиспользованные права
-            публикации. Неотъемлемая часть{" "}
+            Неотъемлемая часть{" "}
             <Link href="/offer" className="text-[#0039CA] hover:underline">
               публичной оферты
             </Link>
@@ -33,21 +38,44 @@ export default function RefundPage() {
       </section>
 
       <div className="mx-auto max-w-3xl px-4 py-12 space-y-10">
+        <div className="rounded-2xl border-l-4 border-amber-400 bg-amber-50/60 px-6 py-5">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+            <div className="text-sm leading-relaxed text-gray-700">
+              <p className="font-semibold text-[#2C3E50] mb-1">
+                Что именно вы покупаете
+              </p>
+              <p>
+                На EXPERS.ru продаётся <strong>право публикации</strong> —
+                имущественное право разместить одну экспертную статью в
+                каталоге. Сделка совершается в момент оплаты: вы приобретаете
+                право, которое принадлежит вам бессрочно. Размещение статьи —
+                это реализация уже приобретённого права, а не услуга,
+                оказываемая после оплаты. Если вы не опубликовали статью — право
+                остаётся у вас навсегда. Оно приобретено.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <section>
           <h2 className="text-lg font-bold text-[#2C3E50] mb-4">
             Когда возврат возможен
           </h2>
           <div className="space-y-3">
             {[
-              "Право публикации не использовано: статья ещё не размещена в каталоге. Вы можете отказаться от договора в любой момент до размещения статьи (ст. 32 Закона РФ «О защите прав потребителей», ст. 782 ГК РФ).",
+              "Вы приобрели право публикации, но не направили статью на редакционную проверку — и с даты оплаты прошло не более 10 календарных дней.",
               "Произошло двойное или ошибочное списание денежных средств.",
-              "Исполнитель отказал в размещении статьи, и вы не хотите использовать право публикации для другой статьи.",
             ].map((text, i) => (
               <div
                 key={i}
                 className="flex gap-3 rounded-xl border border-gray-100 bg-white px-5 py-4"
               >
-                <CheckCircle2 className="h-5 w-5 text-[#1ABC9C] shrink-0 mt-0.5" />
+                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1ABC9C]/10 mt-0.5">
+                  <span className="text-[10px] font-bold text-[#1ABC9C]">
+                    {i + 1}
+                  </span>
+                </div>
                 <p className="text-sm leading-relaxed text-gray-600">{text}</p>
               </div>
             ))}
@@ -58,14 +86,20 @@ export default function RefundPage() {
           <h2 className="text-lg font-bold text-[#2C3E50] mb-4">
             Когда возврат невозможен
           </h2>
-          <div className="flex gap-3 rounded-xl border border-gray-100 bg-white px-5 py-4">
-            <XCircle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
-            <p className="text-sm leading-relaxed text-gray-600">
-              Право публикации использовано: статья прошла редакционную проверку
-              и размещена в каталоге. С этого момента услуга считается оказанной
-              в полном объёме, и денежные средства за соответствующее право
-              публикации возврату не подлежат (п. 6.2 оферты).
-            </p>
+          <div className="space-y-3">
+            {[
+              "С даты оплаты прошло более 10 календарных дней. Право публикации приобретено, сделка совершена.",
+              "Вы направили статью на редакционную проверку. С этого момента право публикации считается принятым вами в полном объёме — вне зависимости от результата проверки.",
+              "Статья размещена в каталоге. Право публикации использовано.",
+            ].map((text, i) => (
+              <div
+                key={i}
+                className="flex gap-3 rounded-xl border border-gray-100 bg-white px-5 py-4"
+              >
+                <ShieldAlert className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
+                <p className="text-sm leading-relaxed text-gray-600">{text}</p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -77,7 +111,7 @@ export default function RefundPage() {
             {[
               {
                 n: 1,
-                text: "Направьте заявление на email info@fonai.ru (или позвоните +7 (495) 324-30-88). Укажите: email вашего аккаунта на EXPERS.ru, дату и сумму платежа, причину возврата.",
+                text: "Направьте заявление на email info@fonai.ru (или позвоните +7 (495) 324-30-88). Укажите: email вашего аккаунта на EXPERS.ru, дату и сумму платежа.",
               },
               {
                 n: 2,
@@ -85,7 +119,7 @@ export default function RefundPage() {
               },
               {
                 n: 3,
-                text: "Возврат производится на ту же банковскую карту, с которой была произведена оплата, через сервис Т-Банка. Срок зачисления средств зависит от банка-эмитента карты (обычно от 1 до 30 дней).",
+                text: "При удовлетворении заявления возврат производится на ту же банковскую карту, с которой была произведена оплата, через сервис Т-Банка. Срок зачисления средств зависит от банка-эмитента карты (обычно от 1 до 30 дней).",
               },
             ].map((step, i, arr) => (
               <div key={step.n} className="flex gap-4">
