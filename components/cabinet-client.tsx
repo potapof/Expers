@@ -34,7 +34,6 @@ import {
   Globe,
   HelpCircle,
   Mail,
-  CreditCard,
 } from "lucide-react";
 
 type CabinetMode = "reader" | "author";
@@ -192,17 +191,6 @@ export function CabinetClient() {
                   <HelpCircle className="h-3 w-3 text-gray-300" />
                 </button>
               )}
-              <button
-                type="button"
-                onClick={() => {
-                  switchMode("author");
-                  setAuthorView("finance");
-                }}
-                className="mt-3 flex items-center justify-center gap-1.5 rounded-lg bg-[#0039CA] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#002b8e]"
-              >
-                <CreditCard className="h-3.5 w-3.5" />
-                Оплатить
-              </button>
             </div>
           </div>
         </CardContent>
