@@ -51,6 +51,7 @@ import {
   PenSquare,
   ImageIcon,
 } from "lucide-react";
+import { TbankPaymentDialog } from "./tbank-payment-dialog";
 import {
   getIndustryById,
   getCategory,
@@ -239,6 +240,12 @@ export function ArticleWizardClient() {
   const [data, setData] = useState<WizardData>(defaultData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [publishing, setPublishing] = useState(false);
+  const [createdArticleId, setCreatedArticleId] = useState<string | null>(null);
+  const [payment, setPayment] = useState<{
+    paymentUrl: string;
+    orderId: string;
+  } | null>(null);
+  const [payDialogOpen, setPayDialogOpen] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -390,6 +397,7 @@ export function ArticleWizardClient() {
     try {
       const token = localStorage.getItem("token");
 
+      let articleId = createdArticleId;
       const body = {
         title: data.title,
         description: data.introduction,
@@ -416,48 +424,82 @@ export function ArticleWizardClient() {
         ...(data.slug ? { slug: data.slug } : {}),
       };
 
-      const res = await fetch("/api/articles", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(body),
-      });
-
-      const result = await res.json();
-
-      if (res.ok) {
-        const articleId = result.article?.id;
-        const payRes = await fetch("/api/payments/init", {
+      if (!articleId) {
+        const res = await fetch("/api/articles", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-          body: JSON.stringify({ articleId }),
+          body: JSON.stringify(body),
         });
-        const payData = await payRes.json();
-        if (payRes.ok && payData.paymentUrl) {
-          localStorage.removeItem(STORAGE_KEY);
-          toast.success("Переходим к оплате публикации (5 000 ₽)...", { id });
-          window.location.href = payData.paymentUrl;
+
+        const result = await res.json();
+
+        if (res.ok) {
+          articleId = result.article?.id;
+          const articleStatus = result.article?.status;
+
+          if (articleStatus === "pending_review") {
+            localStorage.removeItem(STORAGE_KEY);
+            toast.success(
+              "Статья отправлена на модерацию. После проверки модератором она будет опубликована в каталоге.",
+              { id, duration: 6000 }
+            );
+            window.location.href = "/cabinet";
+            return;
+          }
+
+          setCreatedArticleId(articleId);
+        } else if (res.status === 503) {
+          toast.error(
+            "База данных временно недоступна. Черновик сохранён — попробуйте позже.",
+            { id }
+          );
+          return;
         } else {
-          toast.error(payData.error || "Не удалось начать оплату", { id });
+          toast.error(result.error || "Ошибка создания статьи", { id });
+          return;
         }
-      } else if (res.status === 503) {
-        toast.error(
-          "База данных временно недоступна. Черновик сохранён — попробуйте позже.",
-          { id }
-        );
+      }
+
+      const payRes = await fetch("/api/payments/init", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ articleId }),
+      });
+      const payData = await payRes.json();
+      if (payRes.ok && payData.paymentUrl) {
+        toast.dismiss(id);
+        setPayment({ paymentUrl: payData.paymentUrl, orderId: payData.orderId });
+        setPayDialogOpen(true);
       } else {
-        toast.error(result.error || "Ошибка создания статьи", { id });
+        toast.error(payData.error || "Не удалось начать оплату", { id });
       }
     } catch {
       toast.error("Ошибка соединения", { id });
     } finally {
       setPublishing(false);
     }
+  }
+
+  function handlePaymentConfirmed() {
+    localStorage.removeItem(STORAGE_KEY);
+    setPayDialogOpen(false);
+    toast.success(
+      "Оплата получена! Статья отправлена на модерацию. После проверки она будет опубликована."
+    );
+    setTimeout(() => {
+      window.location.href = "/cabinet";
+    }, 800);
+  }
+
+  function handlePaymentRejected(message: string) {
+    setPayDialogOpen(false);
+    toast.error(message || "Платёж не прошёл. Попробуйте снова или другую карту.");
   }
 
   if (authLoading) {
@@ -586,6 +628,15 @@ export function ArticleWizardClient() {
           </Button>
         )}
       </div>
+
+      <TbankPaymentDialog
+        open={payDialogOpen}
+        paymentUrl={payment?.paymentUrl || ""}
+        orderId={payment?.orderId || ""}
+        onOpenChange={setPayDialogOpen}
+        onConfirmed={handlePaymentConfirmed}
+        onRejected={handlePaymentRejected}
+      />
     </div>
   );
 }
@@ -2312,6 +2363,14 @@ function Step12Publish({
           />
         </div>
 
+        <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 mb-3">
+          <p className="text-sm text-blue-800">
+            После нажатия «Опубликовать» статья будет отправлена на модерацию и
+            получит статус «На модерации». После проверки модератором она будет
+            опубликована в каталоге. Статус можно отслеживать в личном кабинете.
+          </p>
+        </div>
+
         <div className="rounded-lg bg-amber-50 border border-amber-200 p-4">
           <p className="text-sm text-amber-800">
             Нажимая «Опубликовать», вы подтверждаете, что статья соответствует
@@ -2321,10 +2380,10 @@ function Step12Publish({
 
         <div className="mt-3 rounded-lg bg-gray-50 border border-gray-200 p-4">
           <p className="text-xs text-gray-500 leading-relaxed">
-            Стоимость публикации — 5 000 ₽ (НДС не облагается, АУСН). Оплата
-            производится банковской картой через сервис Т-Банка. Нажимая
-            «Опубликовать статью» и оплачивая, вы приобретаете бессрочное право
-            публикации и принимаете условия{" "}
+            Стоимость права публикации — 5 000 ₽ (НДС не облагается, АУСН),
+            если оно ещё не приобретено. Оплата производится банковской картой
+            через сервис Т-Банка. После оплаты статья отправляется на
+            модерацию. Приобретая право публикации, вы принимаете условия{" "}
             <a
               href="/offer"
               target="_blank"

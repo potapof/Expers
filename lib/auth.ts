@@ -42,14 +42,14 @@ export function verifyToken(token: string): {
   id: string;
   email: string;
   name: string;
-  role: "reader" | "expert";
+  role: "reader" | "expert" | "admin";
 } | null {
   try {
     const decoded = jwt.verify(token, getJwtSecret()) as {
       id: string;
       email: string;
       name: string;
-      role?: "reader" | "expert";
+      role?: "reader" | "expert" | "admin";
     };
     return {
       id: decoded.id,

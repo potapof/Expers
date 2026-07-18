@@ -103,3 +103,66 @@ export const mockArticles: Article[] = [
     updatedAt: "2026-06-18T00:00:00Z",
   },
 ];
+
+export const mockDashboardStats = {
+  totalArticles: 2,
+  pendingReview: 0,
+  publishedToday: 0,
+  totalExperts: 2,
+  payingExperts: 0,
+  revenueMonth: 0,
+};
+
+export const mockPublicationsByDay: Array<{ date: string; count: number }> = [];
+
+export const mockRevenueByMonth: Array<{ month: string; total: number }> = [];
+
+export const mockRegistrationsByMonth: Array<{ month: string; count: number }> =
+  [];
+
+export const mockExpertRows: Array<{
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  articleCount: number;
+  hasPaid: boolean;
+  createdAt: string;
+  updatedAt: string;
+}> = [
+  {
+    id: "expert-mock-1",
+    name: "Алексей Смирнов",
+    email: "alexey@example.com",
+    role: "expert",
+    articleCount: 1,
+    hasPaid: false,
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-01-01T00:00:00Z",
+  },
+  {
+    id: "expert-mock-2",
+    name: "Елена Козлова",
+    email: "elena@example.com",
+    role: "expert",
+    articleCount: 1,
+    hasPaid: false,
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-01-01T00:00:00Z",
+  },
+];
+
+export const mockCommentsWithArticle = {
+  comments: [] as Array<{
+    id: string;
+    articleId: string;
+    parentId?: string;
+    authorId: string;
+    authorName: string;
+    text: string;
+    createdAt: string;
+    isAuthorReply?: boolean;
+    articleTitle: string;
+  }>,
+  total: 0,
+};

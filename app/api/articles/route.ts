@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { isDatabaseAvailable } from "@/lib/db";
-import { createArticle, getPublishedArticles, isSlugTaken } from "@/lib/models";
+import {
+  createArticle,
+  getPublishedArticles,
+  getArticlesByExpert,
+  isSlugTaken,
+  hasConfirmedPayment,
+} from "@/lib/models";
 import { mockArticles } from "@/lib/mock-data";
 import { verifyToken } from "@/lib/auth";
 
@@ -68,7 +74,32 @@ const articleSchema = z.object({
     .default([]),
 });
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const mine = request.nextUrl.searchParams.get("mine") === "true";
+
+  if (mine) {
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Неавторизован" }, { status: 401 });
+    }
+    const payload = verifyToken(authHeader.slice(7));
+    if (!payload) {
+      return NextResponse.json(
+        { error: "Недействительный токен" },
+        { status: 401 }
+      );
+    }
+    if (!(await isDatabaseAvailable())) {
+      return NextResponse.json({ articles: [] });
+    }
+    try {
+      const articles = await getArticlesByExpert(payload.id);
+      return NextResponse.json({ articles });
+    } catch {
+      return NextResponse.json({ articles: [] });
+    }
+  }
+
   const dbAvailable = await isDatabaseAvailable();
 
   if (dbAvailable) {
@@ -123,12 +154,21 @@ export async function POST(request: NextRequest) {
   const wordCount = articleFields.content.split(/\s+/).filter(Boolean).length;
   const readTime = `${Math.max(1, Math.round(wordCount / 150))} мин`;
 
+  let hasPaid = false;
+  if (dbAvailable) {
+    try {
+      hasPaid = await hasConfirmedPayment(payload.id);
+    } catch {
+      hasPaid = false;
+    }
+  }
+
   const articleData = {
     id,
     authorId: payload.id,
     authorName: payload.name,
     readTime,
-    status: "pending_payment" as const,
+    status: hasPaid ? ("pending_review" as const) : ("pending_payment" as const),
     expertId: payload.id,
     ...(slug ? { slug } : {}),
     ...articleFields,

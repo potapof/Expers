@@ -16,7 +16,7 @@ interface Expert {
   id: string;
   name: string;
   email: string;
-  role?: "reader" | "expert";
+  role?: "reader" | "expert" | "admin";
   hasPaid?: boolean;
   avatar?: string;
   bio?: string;

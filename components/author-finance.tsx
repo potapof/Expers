@@ -1,8 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { CreditCard, CheckCircle2, Clock, XCircle, Wallet } from "lucide-react";
 import { usePayments, type PaymentStatus } from "@/lib/use-finance";
+import { TbankPaymentDialog } from "./tbank-payment-dialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const PUBLICATION_PRICE = 5000;
 
@@ -58,8 +62,82 @@ const STATUS_META: Record<
 };
 
 export function AuthorFinance() {
-  const { payments, loading, totalPaid, publishedCount, pendingCount } =
+  const { payments, loading, totalPaid, publishedCount, pendingCount, refresh } =
     usePayments();
+  const [payDialog, setPayDialog] = useState<{
+    paymentUrl: string;
+    orderId: string;
+  } | null>(null);
+  const [payingArticleId, setPayingArticleId] = useState<string | null>(null);
+  const [isBuyingRight, setIsBuyingRight] = useState(false);
+
+  async function handlePay(articleId: string) {
+    setPayingArticleId(articleId);
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch("/api/payments/init", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ articleId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPayDialog({ paymentUrl: data.paymentUrl, orderId: data.orderId });
+      } else {
+        const err = await res.json();
+        toast.error(err.error || "Ошибка инициализации платежа");
+      }
+    } catch {
+      toast.error("Ошибка соединения");
+    } finally {
+      setPayingArticleId(null);
+    }
+  }
+
+  function handlePaymentConfirmed() {
+    setPayDialog(null);
+    toast.success("Оплата получена! Статья отправлена на модерацию.");
+    refresh();
+  }
+
+  function handlePaymentRejected(message: string) {
+    setPayDialog(null);
+    toast.error(message || "Платёж не прошёл.");
+    refresh();
+  }
+
+  async function handleBuyRight() {
+    setIsBuyingRight(true);
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch("/api/payments/buy-right", {
+        method: "POST",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPayDialog({ paymentUrl: data.paymentUrl, orderId: data.orderId });
+      } else {
+        const err = await res.json();
+        toast.error(err.error || "Ошибка инициализации платежа");
+      }
+    } catch {
+      toast.error("Ошибка соединения");
+    } finally {
+      setIsBuyingRight(false);
+    }
+  }
+
+  function handleRightConfirmed() {
+    setPayDialog(null);
+    toast.success("Право публикации приобретено! Теперь вы можете публиковать статьи.");
+    refresh();
+  }
 
   return (
     <div className="space-y-6">
@@ -73,6 +151,29 @@ export function AuthorFinance() {
           платежей.
         </p>
       </div>
+
+      {totalPaid === 0 && (
+        <div className="rounded-xl border-2 border-dashed border-[#0039CA]/20 bg-gradient-to-r from-[#0039CA]/5 to-transparent p-6 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-[#2C3E50]">
+              Право публикации ещё не приобретено
+            </p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Оплатите {PUBLICATION_PRICE.toLocaleString("ru-RU")} ₽, чтобы
+              открыть доступ к GEO-визарду и публикации статей. Право действует
+              бессрочно.
+            </p>
+          </div>
+          <Button
+            onClick={handleBuyRight}
+            disabled={isBuyingRight}
+            className="bg-[#0039CA] hover:bg-[#002b8e] text-white shrink-0"
+          >
+            <CreditCard className="h-4 w-4 mr-1.5" />
+            {isBuyingRight ? "Загрузка..." : `Купить за ${PUBLICATION_PRICE.toLocaleString("ru-RU")} ₽`}
+          </Button>
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-gray-200 bg-white p-5">
@@ -177,12 +278,34 @@ export function AuthorFinance() {
                     {meta.icon}
                     {meta.label}
                   </span>
+                  {p.status === "NEW" && (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      disabled={payingArticleId === p.articleId}
+                      onClick={() => handlePay(p.articleId)}
+                      className="h-8 text-xs shrink-0"
+                    >
+                      {payingArticleId === p.articleId
+                        ? "Загрузка..."
+                        : "Оплатить"}
+                    </Button>
+                  )}
                 </li>
               );
             })}
           </ul>
         )}
       </div>
+
+      <TbankPaymentDialog
+        open={!!payDialog}
+        paymentUrl={payDialog?.paymentUrl || ""}
+        orderId={payDialog?.orderId || ""}
+        onOpenChange={(open) => { if (!open) setPayDialog(null); }}
+        onConfirmed={payDialog?.orderId.startsWith("right-") ? handleRightConfirmed : handlePaymentConfirmed}
+        onRejected={handlePaymentRejected}
+      />
     </div>
   );
 }

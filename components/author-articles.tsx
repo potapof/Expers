@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -18,10 +18,16 @@ import {
   GlobeOff,
   Calendar,
   FileText,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type ArticleStatus = "draft" | "published" | "archived" | "pending_payment";
+type ArticleStatus =
+  | "draft"
+  | "published"
+  | "archived"
+  | "pending_payment"
+  | "pending_review";
 
 const ARTICLES_KEY = "expers-articles";
 const PUBLISHED_KEY = "expers-published";
@@ -233,6 +239,7 @@ const STATUS_LABELS: Record<ArticleStatus, string> = {
   published: "Опубликовано",
   archived: "Архивировано",
   pending_payment: "Ожидает оплаты",
+  pending_review: "На модерации",
 };
 
 const STATUS_COLORS: Record<ArticleStatus, string> = {
@@ -240,6 +247,7 @@ const STATUS_COLORS: Record<ArticleStatus, string> = {
   published: "bg-green-100 text-green-700",
   archived: "bg-amber-100 text-amber-700",
   pending_payment: "bg-orange-100 text-orange-700",
+  pending_review: "bg-blue-100 text-blue-700",
 };
 
 interface ArticleCardProps {
@@ -356,7 +364,14 @@ function ArticleCard({
           </Button>
         )}
 
-        {article.status !== "archived" && (
+        {article.status === "pending_review" && (
+          <span className="inline-flex items-center h-8 px-2 text-xs text-blue-600">
+            <ShieldCheck className="h-3.5 w-3.5 mr-1" />
+            Ожидает проверки модератором
+          </span>
+        )}
+
+        {article.status !== "archived" && article.status !== "pending_review" && (
           <Button
             variant="ghost"
             size="sm"
@@ -408,6 +423,31 @@ export function AuthorArticles() {
     return stored;
   });
 
+  useEffect(() => {
+    if (!expert) return;
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    fetch("/api/articles?mine=true", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data?.articles) return;
+        const serverArticles: Article[] = data.articles;
+        if (serverArticles.length === 0) return;
+
+        setArticles((prev) => {
+          const serverIds = new Set(serverArticles.map((a) => a.id));
+          const localOnly = prev.filter((a) => !serverIds.has(a.id));
+          const merged = [...serverArticles, ...localOnly];
+          saveStorageArticles(expert.id, merged);
+          return merged;
+        });
+      })
+      .catch(() => {});
+  }, [expert]);
+
   const persistArticles = useCallback(
     (updated: Article[]) => {
       if (!expert) return;
@@ -429,6 +469,7 @@ export function AuthorArticles() {
       published: 0,
       archived: 0,
       pending_payment: 0,
+      pending_review: 0,
     };
     for (const a of articles) {
       if (a.status in counts) counts[a.status]++;
@@ -584,6 +625,10 @@ export function AuthorArticles() {
   const filters: { value: ArticleStatus | "all"; label: string }[] = [
     { value: "all", label: `Все (${statusCounts.all})` },
     { value: "draft", label: `Черновики (${statusCounts.draft})` },
+    {
+      value: "pending_review",
+      label: `На модерации (${statusCounts.pending_review})`,
+    },
     { value: "published", label: `Опубликовано (${statusCounts.published})` },
     { value: "archived", label: `Архив (${statusCounts.archived})` },
   ];
@@ -614,6 +659,23 @@ export function AuthorArticles() {
           Создать статью
         </Button>
       </div>
+
+      {statusCounts.pending_review > 0 && (
+        <div className="flex items-start gap-3 rounded-lg bg-blue-50 border border-blue-200 p-4 animate-in fade-in slide-in-from-top-2 duration-300">
+          <ShieldCheck className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-blue-800">
+              {statusCounts.pending_review === 1
+                ? "Ваша статья на модерации"
+                : `Статей на модерации: ${statusCounts.pending_review}`}
+            </p>
+            <p className="text-xs text-blue-600 mt-0.5">
+              После проверки модератором статья будет опубликована в каталоге.
+              Вы увидите изменение статуса в этом разделе.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="flex gap-1 rounded-lg bg-gray-100 p-1 overflow-x-auto">
         {filters.map((f) => (

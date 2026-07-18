@@ -62,7 +62,7 @@ export interface Expert {
   name: string;
   email: string;
   passwordHash: string;
-  role?: "reader" | "expert";
+  role?: "reader" | "expert" | "admin";
   avatar?: string;
   bio?: string;
   expertise?: string[];
@@ -102,7 +102,7 @@ function rowToExpert(row: typeof experts.$inferSelect): Expert {
     name: row.name,
     email: row.email,
     passwordHash: row.passwordHash,
-    role: (row.role as "reader" | "expert") ?? "reader",
+    role: (row.role as "reader" | "expert" | "admin") ?? "reader",
     avatar: row.avatar ?? undefined,
     bio: row.bio ?? undefined,
     expertise: jsonParse(row.expertise, undefined),
@@ -218,7 +218,12 @@ export interface Article {
   methodology: string;
   sources: { title: string; url: string }[];
   readTime: string;
-  status: "draft" | "published" | "archived" | "pending_payment";
+  status:
+    | "draft"
+    | "published"
+    | "archived"
+    | "pending_payment"
+    | "pending_review";
   expertId: string;
   createdAt: string;
   updatedAt: string;
@@ -1000,4 +1005,354 @@ export async function getAuthorPageBySlug(
     .where(eq(experts.authorPageSlug, slug))
     .all();
   return rows.length > 0 ? rowToExpert(rows[0]) : null;
+}
+
+export async function getArticlesCount(): Promise<number> {
+  const rows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(articles)
+    .all();
+  return rows[0]?.count ?? 0;
+}
+
+export async function getArticlesCountByStatus(
+  status: Article["status"]
+): Promise<number> {
+  const rows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(articles)
+    .where(eq(articles.status, status))
+    .all();
+  return rows[0]?.count ?? 0;
+}
+
+export async function getArticlesPublishedToday(): Promise<number> {
+  const today = new Date().toISOString().split("T")[0];
+  const rows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(articles)
+    .where(
+      and(
+        eq(articles.status, "published"),
+        sql`${articles.createdAt} >= ${today}`
+      )
+    )
+    .all();
+  return rows[0]?.count ?? 0;
+}
+
+export async function getExpertsCount(): Promise<number> {
+  const rows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(experts)
+    .all();
+  return rows[0]?.count ?? 0;
+}
+
+export async function getPayingExpertsCount(): Promise<number> {
+  const rows = db
+    .select({ count: sql<number>`count(DISTINCT user_id)` })
+    .from(payments)
+    .where(eq(payments.status, "CONFIRMED"))
+    .all();
+  return rows[0]?.count ?? 0;
+}
+
+export async function getRevenueCurrentMonth(): Promise<number> {
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    .toISOString()
+    .split("T")[0];
+  const rows = db
+    .select({ total: sql<number>`COALESCE(SUM(amount), 0)` })
+    .from(payments)
+    .where(
+      and(
+        eq(payments.status, "CONFIRMED"),
+        sql`${payments.createdAt} >= ${startOfMonth}`
+      )
+    )
+    .all();
+  return rows[0]?.total ?? 0;
+}
+
+export interface DailyPublication {
+  date: string;
+  count: number;
+}
+
+export async function getPublicationsByDay(
+  days: number
+): Promise<DailyPublication[]> {
+  const since = new Date();
+  since.setUTCDate(since.getUTCDate() - days);
+  const sinceStr = since.toISOString().split("T")[0];
+  const rows = db
+    .select({
+      date: sql<string>`substr(${articles.createdAt}, 1, 10)`,
+      count: sql<number>`count(*)`,
+    })
+    .from(articles)
+    .where(
+      and(
+        eq(articles.status, "published"),
+        sql`${articles.createdAt} >= ${sinceStr}`
+      )
+    )
+    .groupBy(sql`substr(${articles.createdAt}, 1, 10)`)
+    .orderBy(asc(sql`substr(${articles.createdAt}, 1, 10)`))
+    .all();
+  return rows;
+}
+
+export interface MonthlyRevenue {
+  month: string;
+  total: number;
+}
+
+export async function getRevenueByMonth(): Promise<MonthlyRevenue[]> {
+  const rows = db
+    .select({
+      month: sql<string>`substr(${payments.createdAt}, 1, 7)`,
+      total: sql<number>`SUM(amount)`,
+    })
+    .from(payments)
+    .where(eq(payments.status, "CONFIRMED"))
+    .groupBy(sql`substr(${payments.createdAt}, 1, 7)`)
+    .orderBy(asc(sql`substr(${payments.createdAt}, 1, 7)`))
+    .all();
+  return rows.map((r) => ({ month: r.month, total: Number(r.total) }));
+}
+
+export async function getRecentArticles(limit: number): Promise<Article[]> {
+  const rows = db
+    .select()
+    .from(articles)
+    .orderBy(desc(articles.createdAt))
+    .limit(limit)
+    .all();
+  return rows.map(rowToArticle);
+}
+
+export interface ArticlesFilter {
+  status?: string;
+  industryId?: string;
+  expertId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  sort?: string;
+  order?: "asc" | "desc";
+  page?: number;
+  pageSize?: number;
+}
+
+export async function getArticlesFiltered(
+  filter: ArticlesFilter
+): Promise<{ articles: Article[]; total: number }> {
+  const conditions: ReturnType<typeof sql>[] = [];
+
+  if (filter.status) conditions.push(eq(articles.status, filter.status));
+  if (filter.industryId)
+    conditions.push(eq(articles.industryId, filter.industryId));
+  if (filter.expertId) conditions.push(eq(articles.expertId, filter.expertId));
+  if (filter.dateFrom)
+    conditions.push(sql`${articles.createdAt} >= ${filter.dateFrom}`);
+  if (filter.dateTo)
+    conditions.push(sql`${articles.createdAt} <= ${filter.dateTo}`);
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const countRows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(articles)
+    .where(whereClause)
+    .all();
+  const total = countRows[0]?.count ?? 0;
+
+  const page = filter.page ?? 1;
+  const pageSize = filter.pageSize ?? 20;
+  const offset = (page - 1) * pageSize;
+  const sortCol = filter.sort ?? "created_at";
+  const sortDir = filter.order === "asc" ? asc : desc;
+
+  const rows = db
+    .select()
+    .from(articles)
+    .where(whereClause)
+    .orderBy(sortDir(sql.identifier(sortCol)))
+    .limit(pageSize)
+    .offset(offset)
+    .all();
+
+  return { articles: rows.map(rowToArticle), total };
+}
+
+export interface ExpertRow {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  articleCount: number;
+  hasPaid: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function getExpertsWithStats(): Promise<ExpertRow[]> {
+  const rows = db.all<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    article_count: number;
+    has_paid: number;
+    created_at: string;
+    updated_at: string;
+  }>(
+    `SELECT
+      e.id, e.name, e.email, e.role, e.created_at, e.updated_at,
+      COALESCE(a.cnt, 0) as article_count,
+      CASE WHEN p.user_id IS NOT NULL THEN 1 ELSE 0 END as has_paid
+    FROM experts e
+    LEFT JOIN (
+      SELECT expert_id, count(*) as cnt FROM articles GROUP BY expert_id
+    ) a ON a.expert_id = e.id
+    LEFT JOIN (
+      SELECT DISTINCT user_id FROM payments WHERE status = 'CONFIRMED'
+    ) p ON p.user_id = e.id
+    ORDER BY e.created_at DESC`
+  );
+
+  return rows.map((r) => ({
+    id: r.id,
+    name: r.name,
+    email: r.email,
+    role: r.role,
+    articleCount: r.article_count,
+    hasPaid: r.has_paid === 1,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  }));
+}
+
+export interface RegistrationStat {
+  month: string;
+  count: number;
+}
+
+export async function getRegistrationsByMonth(): Promise<RegistrationStat[]> {
+  const rows = db
+    .select({
+      month: sql<string>`substr(${experts.createdAt}, 1, 7)`,
+      count: sql<number>`count(*)`,
+    })
+    .from(experts)
+    .groupBy(sql`substr(${experts.createdAt}, 1, 7)`)
+    .orderBy(asc(sql`substr(${experts.createdAt}, 1, 7)`))
+    .all();
+  return rows;
+}
+
+export async function getCommentsWithArticle(
+  search?: string,
+  page?: number,
+  pageSize?: number
+): Promise<{
+  comments: Array<Comment & { articleTitle: string }>;
+  total: number;
+}> {
+  const limit = pageSize ?? 20;
+  const offset = ((page ?? 1) - 1) * limit;
+
+  let conditions = [sql`1=1`];
+  if (search) {
+    conditions.push(sql`${comments.text} LIKE ${`%${search}%`}`);
+  }
+  const whereClause = and(...conditions);
+
+  const countRows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(comments)
+    .where(whereClause)
+    .all();
+  const total = countRows[0]?.count ?? 0;
+
+  const rows = db
+    .select({
+      id: comments.id,
+      articleId: comments.articleId,
+      parentId: comments.parentId,
+      authorId: comments.authorId,
+      authorName: comments.authorName,
+      text: comments.text,
+      isAuthorReply: comments.isAuthorReply,
+      createdAt: comments.createdAt,
+      articleTitle: articles.title,
+    })
+    .from(comments)
+    .leftJoin(articles, eq(comments.articleId, articles.id))
+    .where(whereClause)
+    .orderBy(desc(comments.createdAt))
+    .limit(limit)
+    .offset(offset)
+    .all();
+
+  return {
+    comments: rows.map((r) => ({
+      id: r.id,
+      articleId: r.articleId,
+      parentId: r.parentId ?? undefined,
+      authorId: r.authorId,
+      authorName: r.authorName,
+      text: r.text,
+      createdAt: r.createdAt,
+      isAuthorReply:
+        r.isAuthorReply === true || (r.isAuthorReply as unknown as number) === 1
+          ? true
+          : undefined,
+      articleTitle: r.articleTitle ?? "",
+    })),
+    total,
+  };
+}
+
+export async function deleteCommentById(id: string): Promise<void> {
+  db.delete(comments).where(eq(comments.id, id)).run();
+}
+
+export async function getModerationQueue(): Promise<Article[]> {
+  const rows = db
+    .select()
+    .from(articles)
+    .where(eq(articles.status, "pending_review"))
+    .orderBy(desc(articles.createdAt))
+    .all();
+  return rows.map(rowToArticle);
+}
+
+export async function approveArticle(id: string): Promise<void> {
+  db.update(articles)
+    .set({ status: "published", updatedAt: new Date().toISOString() })
+    .where(eq(articles.id, id))
+    .run();
+}
+
+export async function rejectArticle(id: string, reason: string): Promise<void> {
+  db.update(articles)
+    .set({
+      status: "draft",
+      updatedAt: new Date().toISOString(),
+      description: reason,
+    })
+    .where(eq(articles.id, id))
+    .run();
+}
+
+export async function getModerationCount(): Promise<number> {
+  const rows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(articles)
+    .where(eq(articles.status, "pending_review"))
+    .all();
+  return rows[0]?.count ?? 0;
 }

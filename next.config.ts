@@ -6,6 +6,11 @@ const basePath =
 const nextConfig: NextConfig = {
   output: process.env.OUTPUT_MODE === "export" ? "export" : undefined,
 
+  env: {
+    NEXT_PUBLIC_TBANK_TERMINAL_KEY:
+      process.env.NEXT_PUBLIC_TBANK_TERMINAL_KEY || "",
+  },
+
   ...(basePath && {
     basePath,
     assetPrefix: basePath,

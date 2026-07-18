@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PenSquare, LogIn, LogOut, User } from "lucide-react";
+import { PenSquare, LogIn, LogOut, User, Shield } from "lucide-react";
 import Link from "next/link";
 import { NotificationCenter } from "@/components/notification-center";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ export function AuthButtons() {
   const [forgotStep, setForgotStep] = useState<"email" | "reset">("email");
 
   const isExpert = expert?.role === "expert";
+  const isAdmin = expert?.role === "admin";
 
   function switchToRegister() {
     setShowLogin(false);
@@ -107,6 +108,14 @@ export function AuthButtons() {
               </Button>
             </Link>
           </>
+        )}
+        {isAdmin && (
+          <Link href="/admin">
+            <Button variant="ghost" size="sm" className="gap-2">
+              <Shield className="h-4 w-4" />
+              Администрирование
+            </Button>
+          </Link>
         )}
         <Button variant="ghost" size="sm" onClick={logout} className="gap-2">
           <LogOut className="h-4 w-4" />

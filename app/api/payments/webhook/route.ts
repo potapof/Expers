@@ -46,13 +46,17 @@ export async function POST(request: NextRequest) {
     if (success && status === "CONFIRMED") {
       if (payment.status !== "CONFIRMED") {
         await updatePaymentStatus(orderId, "CONFIRMED", paymentId);
-        await setArticleStatus(payment.articleId, "published");
+        if (payment.articleId !== "publication-right") {
+          await setArticleStatus(payment.articleId, "pending_review");
+        }
       }
     } else if (status === "REJECTED" || status === "CANCELED") {
       await updatePaymentStatus(orderId, status as PaymentStatus, paymentId);
     } else if (status === "REFUNDED") {
       await updatePaymentStatus(orderId, "REFUNDED", paymentId);
-      await setArticleStatus(payment.articleId, "archived");
+      if (payment.articleId !== "publication-right") {
+        await setArticleStatus(payment.articleId, "archived");
+      }
     }
   } catch {
     return new NextResponse("ERROR", { status: 500 });

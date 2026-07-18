@@ -708,6 +708,16 @@ function ArticleContentBlock({ content }: { content: string }) {
             </h2>
           );
         }
+        if (para.startsWith("### ")) {
+          return (
+            <h3
+              key={index}
+              className="text-lg font-semibold text-[#2C3E50] mt-6 mb-3"
+            >
+              {para.replace("### ", "")}
+            </h3>
+          );
+        }
         if (para.startsWith("- ")) {
           return (
             <ul
@@ -719,7 +729,7 @@ function ArticleContentBlock({ content }: { content: string }) {
                   const parts = line.replace("- ", "").split(" — ");
                   return (
                     <li key={li} className="text-sm">
-                      <span className="font-medium">{parts[0]}</span>
+                      <FormatBold text={parts[0]} />
                       {parts[1] ? ` — ${parts[1]}` : ""}
                     </li>
                   );
@@ -741,7 +751,7 @@ function ArticleContentBlock({ content }: { content: string }) {
                   const parts = text.split(" — ");
                   return (
                     <li key={li} className="text-sm">
-                      <span className="font-medium">{parts[0]}</span>
+                      <FormatBold text={parts[0]} />
                       {parts[1] ? ` — ${parts[1]}` : ""}
                     </li>
                   );
@@ -756,11 +766,29 @@ function ArticleContentBlock({ content }: { content: string }) {
             key={index}
             className="text-base text-gray-700 leading-relaxed mb-4"
           >
-            {para}
+            <FormatBold text={para} />
           </p>
         );
       })}
     </div>
+  );
+}
+
+function FormatBold({ text }: { text: string }) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.startsWith("**") && part.endsWith("**")) {
+          return (
+            <strong key={i} className="font-semibold text-[#2C3E50]">
+              {part.slice(2, -2)}
+            </strong>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
   );
 }
 

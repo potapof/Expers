@@ -1,9 +1,25 @@
 import crypto from "crypto";
+import fs from "fs";
 
 export const PUBLICATION_PRICE_KOPECKS = 500000; // 5000 ₽
 
 const TBANK_API_URL =
   process.env.TBANK_API_URL || "https://securepay.tinkoff.ru/v2";
+
+function getPassword(): string | undefined {
+  const fromEnv = process.env.TBANK_PASSWORD;
+  if (fromEnv && fromEnv.length === 16) return fromEnv;
+  const filePath = process.env.TBANK_PASSWORD_FILE;
+  if (filePath) {
+    try {
+      const raw = fs.readFileSync(filePath, "utf8").trim();
+      if (raw) return raw;
+    } catch {
+      // file not found
+    }
+  }
+  return fromEnv || undefined;
+}
 
 function isTestMode(): boolean {
   return process.env.TBANK_TEST_MODE === "true";
@@ -12,7 +28,7 @@ function isTestMode(): boolean {
 export function isPaymentConfigured(): boolean {
   if (isTestMode()) return true;
   const key = process.env.TBANK_TERMINAL_KEY;
-  const password = process.env.TBANK_PASSWORD;
+  const password = getPassword();
   return !!(key && password);
 }
 
@@ -27,7 +43,7 @@ export function ensureProductionConfig(): string[] {
   if (!process.env.TBANK_TERMINAL_KEY) {
     warnings.push("TBANK_TERMINAL_KEY не задан");
   }
-  if (!process.env.TBANK_PASSWORD) {
+  if (!getPassword()) {
     warnings.push("TBANK_PASSWORD не задан");
   }
   if (!process.env.APP_BASE_URL) {
@@ -89,7 +105,7 @@ export async function initPayment(
   }
 
   const terminalKey = process.env.TBANK_TERMINAL_KEY;
-  const password = process.env.TBANK_PASSWORD;
+  const password = getPassword();
   if (!terminalKey || !password) {
     return {
       ok: false,
@@ -102,16 +118,16 @@ export async function initPayment(
     Amount: input.amount,
     OrderId: input.orderId,
     Description: input.description,
+    SuccessURL: input.successUrl,
+    FailURL: input.failUrl,
+    NotificationURL: input.notificationUrl,
+    PayType: "O",
   };
   const token = buildToken(signedFields, password);
 
   const body = {
     ...signedFields,
     Token: token,
-    NotificationURL: input.notificationUrl,
-    SuccessURL: input.successUrl,
-    FailURL: input.failUrl,
-    PayType: "O",
   };
 
   try {
@@ -140,7 +156,7 @@ export async function initPayment(
 export function verifyNotificationToken(
   body: Record<string, unknown>
 ): boolean {
-  const password = process.env.TBANK_PASSWORD;
+  const password = getPassword();
   if (!password) {
     console.error("T-Bank webhook: TBANK_PASSWORD не задан");
     return false;
@@ -157,4 +173,51 @@ export function verifyNotificationToken(
   }
   const expected = buildToken(params, password);
   return expected === provided;
+}
+
+export interface PaymentStateResult {
+  ok: boolean;
+  status?: string;
+  error?: string;
+}
+
+export async function getPaymentState(
+  paymentId: string
+): Promise<PaymentStateResult> {
+  if (isTestMode()) {
+    return { ok: true, status: "CONFIRMED" };
+  }
+
+  const terminalKey = process.env.TBANK_TERMINAL_KEY;
+  const password = getPassword();
+  if (!terminalKey || !password) {
+    return {
+      ok: false,
+      error: "Платёжный сервис не настроен (отсутствуют ключи терминала)",
+    };
+  }
+
+  const signedFields: Record<string, Scalar> = {
+    TerminalKey: terminalKey,
+    PaymentId: paymentId,
+  };
+  const token = buildToken(signedFields, password);
+
+  try {
+    const res = await fetch(`${TBANK_API_URL}/GetState`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...signedFields, Token: token }),
+    });
+    const data = await res.json();
+    if (data.Success && data.Status) {
+      return { ok: true, status: String(data.Status) };
+    }
+    return {
+      ok: false,
+      error: data.Message || data.Details || "Ошибка получения статуса платежа",
+    };
+  } catch {
+    return { ok: false, error: "Не удалось связаться с платёжным сервисом" };
+  }
 }
