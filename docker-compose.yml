@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     working_dir: /app
-    command: sh -c "npm run db:migrate && npm run dev:docker"
+    command: sh -c ". /app/scripts/setup-certs.sh; npm run db:migrate; npm run dev:docker"
     env_file:
       - .env.docker
     environment:
@@ -14,6 +14,7 @@ services:
       - .:/app
       - /app/node_modules
       - /app/.next
+      - ./certs:/certs:ro
       - app_data:/app/data
     ports:
       - "8080:8080"
