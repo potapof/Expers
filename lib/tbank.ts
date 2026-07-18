@@ -7,8 +7,6 @@ const TBANK_API_URL =
   process.env.TBANK_API_URL || "https://securepay.tinkoff.ru/v2";
 
 function getPassword(): string | undefined {
-  const fromEnv = process.env.TBANK_PASSWORD;
-  if (fromEnv && fromEnv.length === 16) return fromEnv;
   const filePath = process.env.TBANK_PASSWORD_FILE;
   if (filePath) {
     try {
@@ -18,7 +16,7 @@ function getPassword(): string | undefined {
       // file not found
     }
   }
-  return fromEnv || undefined;
+  return process.env.TBANK_PASSWORD || undefined;
 }
 
 function isTestMode(): boolean {

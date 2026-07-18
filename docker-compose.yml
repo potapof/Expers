@@ -9,7 +9,7 @@ services:
       - .env.docker
     environment:
       - NODE_ENV=development
-      - 'TBANK_PASSWORD=mhG42$b%mV1JnzY6'
+      - 'TBANK_PASSWORD_FILE=tbank-password.txt'
     volumes:
       - .:/app
       - /app/node_modules
