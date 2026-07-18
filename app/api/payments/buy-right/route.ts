@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isDatabaseAvailable } from "@/lib/db";
 import { createPayment } from "@/lib/models";
 import { verifyToken } from "@/lib/auth";
+import { resolveBaseUrl } from "@/lib/base-url";
 import {
   initPayment,
   isPaymentConfigured,
@@ -35,8 +36,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const baseUrl =
-    process.env.APP_BASE_URL || request.nextUrl.origin.replace(/\/$/, "");
+  const baseUrl = resolveBaseUrl(request);
 
   const orderId = `right-${payload.id.slice(-12)}-${Date.now().toString(36)}`;
 

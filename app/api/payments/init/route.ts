@@ -3,6 +3,7 @@ import { z } from "zod";
 import { isDatabaseAvailable } from "@/lib/db";
 import { getArticleById, createPayment } from "@/lib/models";
 import { verifyToken } from "@/lib/auth";
+import { resolveBaseUrl } from "@/lib/base-url";
 import {
   initPayment,
   isPaymentConfigured,
@@ -73,8 +74,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const baseUrl =
-    process.env.APP_BASE_URL || request.nextUrl.origin.replace(/\/$/, "");
+  const baseUrl = resolveBaseUrl(request);
 
   if (
     process.env.TBANK_TEST_MODE !== "true" &&
