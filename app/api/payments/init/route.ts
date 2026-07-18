@@ -95,6 +95,8 @@ export async function POST(request: NextRequest) {
     notificationUrl: `${baseUrl}/api/payments/webhook`,
     successUrl: `${baseUrl}/payment/done`,
     failUrl: `${baseUrl}/payment/fail`,
+    customerEmail: payload.email,
+    receiptItemName: "Публикация статьи на Expers",
   });
 
   if (!result.ok || !result.paymentUrl) {

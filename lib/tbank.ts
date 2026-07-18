@@ -80,6 +80,8 @@ export interface InitPaymentInput {
   notificationUrl: string;
   successUrl: string;
   failUrl: string;
+  customerEmail?: string;
+  receiptItemName?: string;
 }
 
 export interface InitPaymentResult {
@@ -123,8 +125,29 @@ export async function initPayment(
   };
   const token = buildToken(signedFields, password);
 
+  const receipt = input.customerEmail
+    ? {
+        Receipt: {
+          Email: input.customerEmail,
+          Taxation: "usn_income",
+          Items: [
+            {
+              Name: (input.receiptItemName || input.description).slice(0, 128),
+              Price: input.amount,
+              Quantity: 1,
+              Amount: input.amount,
+              Tax: "none",
+              PaymentMethod: "full_payment",
+              PaymentObject: "service",
+            },
+          ],
+        },
+      }
+    : {};
+
   const body = {
     ...signedFields,
+    ...receipt,
     Token: token,
   };
 
@@ -177,6 +200,47 @@ export interface PaymentStateResult {
   ok: boolean;
   status?: string;
   error?: string;
+}
+
+export async function cancelPayment(
+  paymentId: string
+): Promise<PaymentStateResult> {
+  if (isTestMode()) {
+    return { ok: true, status: "CANCELED" };
+  }
+
+  const terminalKey = process.env.TBANK_TERMINAL_KEY;
+  const password = getPassword();
+  if (!terminalKey || !password) {
+    return {
+      ok: false,
+      error: "Платёжный сервис не настроен (отсутствуют ключи терминала)",
+    };
+  }
+
+  const signedFields: Record<string, Scalar> = {
+    TerminalKey: terminalKey,
+    PaymentId: paymentId,
+  };
+  const token = buildToken(signedFields, password);
+
+  try {
+    const res = await fetch(`${TBANK_API_URL}/Cancel`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...signedFields, Token: token }),
+    });
+    const data = await res.json();
+    if (data.Success) {
+      return { ok: true, status: String(data.Status || "CANCELED") };
+    }
+    return {
+      ok: false,
+      error: data.Message || data.Details || "Ошибка отмены платежа",
+    };
+  } catch {
+    return { ok: false, error: "Не удалось связаться с платёжным сервисом" };
+  }
 }
 
 export async function getPaymentState(
