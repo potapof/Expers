@@ -135,7 +135,7 @@ export function AuthorFinance() {
 
   function handleRightConfirmed() {
     setPayDialog(null);
-    toast.success("Право публикации приобретено! Теперь вы можете публиковать статьи.");
+    toast.success("Оплата получена! Публикация оплачена.");
     refresh();
   }
 
@@ -152,28 +152,28 @@ export function AuthorFinance() {
         </p>
       </div>
 
-      {totalPaid === 0 && (
-        <div className="rounded-xl border-2 border-dashed border-[#0039CA]/20 bg-gradient-to-r from-[#0039CA]/5 to-transparent p-6 flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold text-[#2C3E50]">
-              Право публикации ещё не приобретено
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Оплатите {PUBLICATION_PRICE.toLocaleString("ru-RU")} ₽, чтобы
-              открыть доступ к GEO-визарду и публикации статей. Право действует
-              бессрочно.
-            </p>
-          </div>
-          <Button
-            onClick={handleBuyRight}
-            disabled={isBuyingRight}
-            className="bg-[#0039CA] hover:bg-[#002b8e] text-white shrink-0"
-          >
-            <CreditCard className="h-4 w-4 mr-1.5" />
-            {isBuyingRight ? "Загрузка..." : `Купить за ${PUBLICATION_PRICE.toLocaleString("ru-RU")} ₽`}
-          </Button>
+      <div className="rounded-xl border-2 border-dashed border-[#0039CA]/20 bg-gradient-to-r from-[#0039CA]/5 to-transparent p-6 flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold text-[#2C3E50]">
+            {totalPaid === 0
+              ? "Право публикации ещё не приобретено"
+              : "Оплата публикации"}
+          </p>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {totalPaid === 0
+              ? `Оплатите ${PUBLICATION_PRICE.toLocaleString("ru-RU")} ₽, чтобы открыть доступ к GEO-визарду и публикации статей.`
+              : `Оплатите ${PUBLICATION_PRICE.toLocaleString("ru-RU")} ₽ за публикацию. Количество оплат не ограничено.`}
+          </p>
         </div>
-      )}
+        <Button
+          onClick={handleBuyRight}
+          disabled={isBuyingRight}
+          className="bg-[#0039CA] hover:bg-[#002b8e] text-white shrink-0"
+        >
+          <CreditCard className="h-4 w-4 mr-1.5" />
+          {isBuyingRight ? "Загрузка..." : `Купить за ${PUBLICATION_PRICE.toLocaleString("ru-RU")} ₽`}
+        </Button>
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-gray-200 bg-white p-5">
