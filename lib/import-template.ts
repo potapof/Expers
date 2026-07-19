@@ -665,9 +665,10 @@ text-only
     title: "GEO-блоки",
     wizardStepLabel: "Шаги 8–10: GEO-блоки",
     prompt: `## Задание
-Создай GEO-блоки: FAQ (3-5), чеклист (5-7), TL;DR, Key Facts (3-5),
-Definition, Featured Snippet, Problem→Solution→Result, HowTo (3-5),
-методология, источники (3-7).
+Создай GEO-блоки: FAQ (3-5), чеклист (5-7), TL;DR (до 30 символов — короткий заголовок),
+Key Facts (3-5), Definition (до 30 символов), Featured Snippet,
+Problem→Solution→Result (каждое до 30 символов), HowTo (3-5),
+методология (любая длина), источники (3-7).
 
 ## Формат вывода
 ### faq
