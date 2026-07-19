@@ -74,7 +74,7 @@ export function buildContentFromSections(sections: ArticleSection[]): string {
       const parts: string[] = [];
       if (s.title) parts.push(`## ${s.title}`);
       if (s.description) parts.push(s.description);
-      const textContent = s.text.replace(/<[^>]*>/g, "");
+      const textContent = s.text.replace(/<br\s*\/?>/gi, "\n");
       if (textContent.trim()) parts.push(textContent.trim());
       if (s.design === "table" && s.tableData.headers.length > 0) {
         parts.push(`| ${s.tableData.headers.join(" | ")} |`);

@@ -243,6 +243,14 @@ function cn(...classes: (string | false | undefined | null)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
+function sectionTextToHtml(text: string): string {
+  if (text.includes("<p") || text.includes("<br")) return text;
+  return text
+    .split(/\n{2,}/)
+    .map((p) => `<p>${p.trim()}</p>`)
+    .join("");
+}
+
 export function ArticleWizardClient() {
   const { expert, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -2170,7 +2178,9 @@ function Step11Preview({
                     {section.design === "text-only" && section.text && (
                       <div
                         className="text-sm text-gray-700 leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: section.text }}
+                        dangerouslySetInnerHTML={{
+                          __html: sectionTextToHtml(section.text),
+                        }}
                       />
                     )}
 
@@ -2221,7 +2231,9 @@ function Step11Preview({
                         {section.text && (
                           <div
                             className="text-sm text-gray-700 leading-relaxed flex-1"
-                            dangerouslySetInnerHTML={{ __html: section.text }}
+                            dangerouslySetInnerHTML={{
+                              __html: sectionTextToHtml(section.text),
+                            }}
                           />
                         )}
                         {section.design === "image-right" && (
