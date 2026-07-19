@@ -302,3 +302,36 @@ function parseSources(raw: string): { title: string; url: string }[] {
     })
     .filter((s) => s.title);
 }
+
+export function parseAllIterations(
+  fullChat: string
+): Map<number, Record<string, string>> {
+  const result = new Map<number, Record<string, string>>();
+  const sections = fullChat.split(/(?=##\s*Итерация\s+\d+)/i);
+
+  for (const section of sections) {
+    const match = section.match(/##\s*Итерация\s+(\d+)/i);
+    if (!match) continue;
+    const iterNum = Number(match[1]);
+
+    const fields: Record<string, string> = {};
+    const blocks = section.split(/^###\s+/m).slice(1);
+
+    for (const block of blocks) {
+      const newlineIdx = block.indexOf("\n");
+      if (newlineIdx === -1) {
+        fields[block.trim().toLowerCase()] = "";
+        continue;
+      }
+      const key = block.slice(0, newlineIdx).trim();
+      const value = block.slice(newlineIdx + 1).trim();
+      fields[key.toLowerCase()] = value;
+    }
+
+    if (Object.keys(fields).length > 0) {
+      result.set(iterNum, fields);
+    }
+  }
+
+  return result;
+}

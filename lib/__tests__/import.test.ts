@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { parseIterationMarkdown, buildArticleData } from "../import-parser";
+import {
+  parseIterationMarkdown,
+  parseAllIterations,
+  buildArticleData,
+} from "../import-parser";
 import { iterationSchemas, importArticleSchema } from "../import-validation";
 import { TEMPLATE_ITERATIONS } from "../import-template";
 
@@ -250,6 +254,157 @@ test`;
 
     const result = iterationSchemas[5].safeParse(data);
     expect(result.success).toBe(false);
+  });
+});
+
+describe("parseAllIterations", () => {
+  it("should parse full chat with 8 iterations", () => {
+    const chat = `## Итерация 1: Заголовок и введение
+
+### title
+Тестовый заголовок
+
+### introduction
+Введение длиной более сорока слов чтобы пройти валидацию схемы
+
+### slug
+test-slug
+
+## Итерация 2: Секция 1
+
+### sectionTitle
+Секция один
+### sectionDesign
+image-right
+### imageUrl
+https://pixinlink.ru/800x400/test
+### sectionText
+${"A".repeat(5000)}
+
+## Итерация 3: Секция 2
+
+### sectionTitle
+Секция два
+### sectionDesign
+text-only
+### sectionText
+${"B".repeat(5000)}
+
+## Итерация 4: Секция 3
+
+### sectionTitle
+Секция три
+### sectionDesign
+image-left
+### imageUrl
+https://pixinlink.ru/800x400/test
+### sectionText
+${"C".repeat(5000)}
+
+## Итерация 5: Таблица
+
+### sectionTitle
+Таблица
+### sectionDesign
+table
+### sectionText
+${"D".repeat(600)}
+### sectionTable
+| A | B |
+|---|---|
+| 1 | 2 |
+
+## Итерация 6: Инструменты
+
+### sectionTitle
+Инструменты
+### sectionDesign
+image-right
+### imageUrl
+https://pixinlink.ru/800x400/tools
+### sectionText
+${"E".repeat(5000)}
+
+## Итерация 7: Выводы
+
+### sectionTitle
+Выводы
+### sectionDesign
+text-only
+### sectionText
+${"F".repeat(5000)}
+
+## Итерация 8: GEO-блоки
+
+### faq
+Вопрос\nОтвет
+### todo
+Пункт 1\nПункт 2
+### tldr
+Краткое содержание статьи длиной более двадцати
+### keyFacts
+Факт 1\nФакт 2
+### definition
+Определение длиной более двадцати символов
+### featuredSnippetQuestion
+Вопрос для сниппета?
+### featuredSnippetAnswer
+Развёрнутый ответ для сниппета здесь
+### problemSolutionProblem
+Проблема длиной более двадцати символов
+### problemSolutionSolution
+Решение длиной более двадцати символов
+### problemSolutionResult
+Результат длиной более двадцати символов
+### howTo
+Шаг 1\nОписание\n---\nШаг 2\nОписание
+### methodology
+Методология длиной более двадцати
+### sources
+Источник — https://example.com`;
+
+    const result = parseAllIterations(chat);
+
+    expect(result.size).toBe(8);
+    expect(result.get(1)?.["title"]).toBe("Тестовый заголовок");
+    expect(result.get(2)?.["sectiontitle"]).toBe("Секция один");
+    expect(result.get(8)?.["tldr"]).toBe(
+      "Краткое содержание статьи длиной более двадцати"
+    );
+  });
+
+  it("should handle chat text mixed with AI messages", () => {
+    const chat = `**Проверьте итерацию 1. Если всё верно, напишите «Продолжить»**
+
+## Итерация 1: Заголовок и введение
+
+### title
+Заголовок
+### introduction
+Введение которое точно длиннее сорока слов чтобы пройти валидацию
+### slug
+test
+
+**Проверьте итерацию 2. Если всё верно, напишите «Продолжить»**
+
+## Итерация 2: Секция 1
+
+### sectionTitle
+Секция
+### sectionDesign
+image-right
+### imageUrl
+https://pixinlink.ru/800x400/test
+### sectionText
+${"A".repeat(5000)}`;
+
+    const result = parseAllIterations(chat);
+    expect(result.size).toBe(2);
+  });
+
+  it("should return empty map for no iterations", () => {
+    const result = parseAllIterations("Просто текст без маркеров");
+    expect(result.size).toBe(0);
   });
 });
 
