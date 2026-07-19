@@ -19,7 +19,9 @@ export function PaymentDoneContent() {
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
         <CheckCircle className="h-8 w-8 text-green-600" />
       </div>
-      <h1 className="text-xl font-semibold text-gray-900">Оплата прошла успешно</h1>
+      <h1 className="text-xl font-semibold text-gray-900">
+        Оплата прошла успешно
+      </h1>
       <p className="text-sm text-gray-500">
         Сейчас вы будете перенаправлены в личный кабинет...
       </p>

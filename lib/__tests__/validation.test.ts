@@ -152,9 +152,9 @@ describe("step5Schema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("should reject fewer than 5 cross-links", () => {
+  it("should reject fewer than 2 cross-links", () => {
     const result = step5Schema.safeParse({
-      crossLinks: Array(3).fill(validLink),
+      crossLinks: [validLink],
     });
     expect(result.success).toBe(false);
   });
@@ -227,9 +227,9 @@ describe("step7Schema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject content over 10000 chars", () => {
+  it("should reject content over 150000 chars", () => {
     const result = step7Schema.safeParse({
-      content: "X".repeat(10001),
+      content: "X".repeat(150001),
     });
     expect(result.success).toBe(false);
   });

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { isDatabaseAvailable } from "@/lib/db";
 import { getArticleById, createPayment } from "@/lib/models";
 import { verifyToken } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limiter";
 import { resolveBaseUrl } from "@/lib/base-url";
 import {
   initPayment,
@@ -32,6 +33,9 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: "Некорректные данные" }, { status: 400 });
   }
+
+  const rateLimit = checkRateLimit(request);
+  if (rateLimit) return rateLimit;
 
   if (!isPaymentConfigured()) {
     return NextResponse.json(
@@ -86,7 +90,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const orderId = `ord-${article.id.slice(-20)}-${Date.now().toString(36)}`;
+  const orderId = `ord-${article.id.slice(-12)}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 
   const result = await initPayment({
     orderId,

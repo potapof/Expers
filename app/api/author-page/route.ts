@@ -124,7 +124,11 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  await saveAuthorPage(payload.id, parsed.data);
-
-  return NextResponse.json({ ok: true });
+  try {
+    await saveAuthorPage(payload.id, parsed.data);
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("Ошибка сохранения страницы автора:", err);
+    return NextResponse.json({ error: "Ошибка сохранения" }, { status: 500 });
+  }
 }

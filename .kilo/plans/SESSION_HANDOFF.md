@@ -172,36 +172,36 @@ UPDATE experts SET role = 'admin' WHERE email = 'info@expers.ru';
 
 ### Реализованные файлы
 
-| Файл | Назначение |
-|---|---|
-| `lib/admin.ts` | `isAdmin()`, `verifyAdmin()` — middleware проверки роли admin |
-| `lib/models.ts` | Расширен тип `role` → `"admin"`, добавлены 20+ admin-функций (агрегации, фильтры, модерация) |
-| `lib/auth.ts` | Тип `verifyToken` расширен до `"admin"` |
-| `lib/auth-context.tsx` | Тип `role` расширен до `"admin"` |
-| `lib/mock-data.ts` | Добавлены mock-данные для статического fallback админки |
-| `app/admin/layout.tsx` | Сайдбар (Дашборд/Статьи/Эксперты/Комментарии/Модерация) + «На сайт» |
-| `app/admin/page.tsx` + `components/admin-dashboard.tsx` | 6 карточек метрик, 2 SVG-графика, таблица последних 10 статей |
-| `app/admin/articles/page.tsx` + `components/admin-articles.tsx` | Таблица с фильтрами/сортировкой/пагинацией, график публикаций, экспорт CSV |
-| `app/admin/experts/page.tsx` + `components/admin-experts.tsx` | Таблица экспертов, SVG-график регистраций по месяцам, конверсия |
-| `app/admin/comments/page.tsx` + `components/admin-comments.tsx` | Таблица с поиском, пагинация, удаление AJAX |
-| `app/admin/moderation/page.tsx` + `components/admin-moderation.tsx` | Очередь pending_review, одобрение/отклонение, оптимистичный UI |
-| `components/auth-buttons.tsx` | Кнопка «Администрирование» (Shield) в хедере для admin |
-| `components/author-articles.tsx` | Добавлен статус `pending_review` |
-| `components/ui/skeleton.tsx`, `components/ui/textarea.tsx` | Добавлены через shadcn |
+| Файл                                                                | Назначение                                                                                   |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `lib/admin.ts`                                                      | `isAdmin()`, `verifyAdmin()` — middleware проверки роли admin                                |
+| `lib/models.ts`                                                     | Расширен тип `role` → `"admin"`, добавлены 20+ admin-функций (агрегации, фильтры, модерация) |
+| `lib/auth.ts`                                                       | Тип `verifyToken` расширен до `"admin"`                                                      |
+| `lib/auth-context.tsx`                                              | Тип `role` расширен до `"admin"`                                                             |
+| `lib/mock-data.ts`                                                  | Добавлены mock-данные для статического fallback админки                                      |
+| `app/admin/layout.tsx`                                              | Сайдбар (Дашборд/Статьи/Эксперты/Комментарии/Модерация) + «На сайт»                          |
+| `app/admin/page.tsx` + `components/admin-dashboard.tsx`             | 6 карточек метрик, 2 SVG-графика, таблица последних 10 статей                                |
+| `app/admin/articles/page.tsx` + `components/admin-articles.tsx`     | Таблица с фильтрами/сортировкой/пагинацией, график публикаций, экспорт CSV                   |
+| `app/admin/experts/page.tsx` + `components/admin-experts.tsx`       | Таблица экспертов, SVG-график регистраций по месяцам, конверсия                              |
+| `app/admin/comments/page.tsx` + `components/admin-comments.tsx`     | Таблица с поиском, пагинация, удаление AJAX                                                  |
+| `app/admin/moderation/page.tsx` + `components/admin-moderation.tsx` | Очередь pending_review, одобрение/отклонение, оптимистичный UI                               |
+| `components/auth-buttons.tsx`                                       | Кнопка «Администрирование» (Shield) в хедере для admin                                       |
+| `components/author-articles.tsx`                                    | Добавлен статус `pending_review`                                                             |
+| `components/ui/skeleton.tsx`, `components/ui/textarea.tsx`          | Добавлены через shadcn                                                                       |
 
 ### API-эндпоинты
 
-| Маршрут | Метод | Статус |
-|---|---|---|
-| `/api/admin/dashboard` | GET | ✓ |
-| `/api/admin/articles` | GET | ✓ |
-| `/api/admin/articles/stats` | GET | ✓ |
-| `/api/admin/experts` | GET | ✓ |
-| `/api/admin/experts/stats` | GET | ✓ |
-| `/api/admin/comments` | GET + DELETE | ✓ |
-| `/api/admin/moderation/queue` | GET | ✓ |
-| `/api/admin/moderation/approve` | POST | ✓ |
-| `/api/admin/moderation/reject` | POST | ✓ |
+| Маршрут                         | Метод        | Статус |
+| ------------------------------- | ------------ | ------ |
+| `/api/admin/dashboard`          | GET          | ✓      |
+| `/api/admin/articles`           | GET          | ✓      |
+| `/api/admin/articles/stats`     | GET          | ✓      |
+| `/api/admin/experts`            | GET          | ✓      |
+| `/api/admin/experts/stats`      | GET          | ✓      |
+| `/api/admin/comments`           | GET + DELETE | ✓      |
+| `/api/admin/moderation/queue`   | GET          | ✓      |
+| `/api/admin/moderation/approve` | POST         | ✓      |
+| `/api/admin/moderation/reject`  | POST         | ✓      |
 
 ### Проверка
 
@@ -214,6 +214,7 @@ UPDATE experts SET role = 'admin' WHERE email = 'info@expers.ru';
 ### Следующие шаги
 
 После первого деплоя назначить админа через SQL:
+
 ```sql
 UPDATE experts SET role = 'admin' WHERE email = 'info@expers.ru';
 ```

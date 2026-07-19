@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink } from "lucide-react";
 
-const INTEGRATION_SCRIPT_URL = "https://integrationjs.t-static.ru/integration.js";
+const INTEGRATION_SCRIPT_URL =
+  "https://integrationjs.t-static.ru/integration.js";
 
 interface IframeIntegrationInstance {
   connect: (el: HTMLIFrameElement) => Promise<void>;
@@ -115,9 +116,15 @@ export function TbankPaymentDialog({
 
       try {
         const integration = await getIntegration(terminalKey);
-        if (cancelled || connectedRef.current || mountKey !== mountKeyRef.current) return;
+        if (
+          cancelled ||
+          connectedRef.current ||
+          mountKey !== mountKeyRef.current
+        )
+          return;
         const instance = await integration.iframe.create(`pay-${orderId}`);
-        if (cancelled || !iframeRef.current || mountKey !== mountKeyRef.current) return;
+        if (cancelled || !iframeRef.current || mountKey !== mountKeyRef.current)
+          return;
         await instance.connect(iframeRef.current);
         connectedRef.current = true;
       } catch {

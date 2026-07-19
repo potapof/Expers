@@ -19,15 +19,15 @@ import {
   Calendar,
   FileText,
   ShieldCheck,
+  Upload,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type ArticleStatus =
-  | "draft"
-  | "published"
-  | "archived"
-  | "pending_payment"
-  | "pending_review";
+  "draft" | "published" | "archived" | "pending_payment" | "pending_review";
+
+const CABINET_IMPORT_PATH = "/cabinet/import";
 
 const ARTICLES_KEY = "expers-articles";
 const PUBLISHED_KEY = "expers-published";
@@ -76,8 +76,7 @@ function syncFromPublished(expertId: string, expertName: string): void {
       if (!id || existingIds.has(id)) continue;
 
       const full = (item as Record<string, unknown>)._full as
-        | Record<string, unknown>
-        | undefined;
+        Record<string, unknown> | undefined;
 
       const now = new Date().toISOString();
       const article: Article = {
@@ -371,17 +370,18 @@ function ArticleCard({
           </span>
         )}
 
-        {article.status !== "archived" && article.status !== "pending_review" && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onArchive(article.id)}
-            className="h-8 px-2 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-          >
-            <Archive className="h-3.5 w-3.5 mr-1" />
-            Архивировать
-          </Button>
-        )}
+        {article.status !== "archived" &&
+          article.status !== "pending_review" && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onArchive(article.id)}
+              className="h-8 px-2 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+            >
+              <Archive className="h-3.5 w-3.5 mr-1" />
+              Архивировать
+            </Button>
+          )}
 
         <Button
           variant="ghost"
@@ -651,13 +651,32 @@ export function AuthorArticles() {
                 : "статей"}
           </p>
         </div>
-        <Button
-          onClick={handleCreate}
-          className="bg-[#0039CA] hover:bg-[#2C3E50] text-white text-sm h-9 px-4"
-        >
-          <Plus className="h-4 w-4 mr-1.5" />
-          Создать статью
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => router.push(CABINET_IMPORT_PATH)}
+            variant="outline"
+            className="text-sm h-9 px-4"
+          >
+            <Upload className="h-4 w-4 mr-1.5" />
+            Импорт
+          </Button>
+          <Button
+            disabled
+            variant="outline"
+            className="text-sm h-9 px-4 opacity-50 cursor-not-allowed"
+            title="AI-импорт планируется в следующих версиях"
+          >
+            <Sparkles className="h-4 w-4 mr-1.5" />
+            AI
+          </Button>
+          <Button
+            onClick={handleCreate}
+            className="bg-[#0039CA] hover:bg-[#2C3E50] text-white text-sm h-9 px-4"
+          >
+            <Plus className="h-4 w-4 mr-1.5" />
+            Создать статью
+          </Button>
+        </div>
       </div>
 
       {statusCounts.pending_review > 0 && (
@@ -710,13 +729,32 @@ export function AuthorArticles() {
               : "Измените фильтр или создайте новую статью"}
           </p>
           {statusFilter === "all" && (
-            <Button
-              onClick={handleCreate}
-              className="bg-[#0039CA] hover:bg-[#2C3E50] text-white text-sm"
-            >
-              <Plus className="h-4 w-4 mr-1.5" />
-              Создать первую статью
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => router.push(CABINET_IMPORT_PATH)}
+                variant="outline"
+                className="text-sm"
+              >
+                <Upload className="h-4 w-4 mr-1.5" />
+                Импорт
+              </Button>
+              <Button
+                disabled
+                variant="outline"
+                className="text-sm opacity-50 cursor-not-allowed"
+                title="AI-импорт планируется в следующих версиях"
+              >
+                <Sparkles className="h-4 w-4 mr-1.5" />
+                AI
+              </Button>
+              <Button
+                onClick={handleCreate}
+                className="bg-[#0039CA] hover:bg-[#2C3E50] text-white text-sm"
+              >
+                <Plus className="h-4 w-4 mr-1.5" />
+                Создать первую статью
+              </Button>
+            </div>
           )}
         </div>
       ) : (

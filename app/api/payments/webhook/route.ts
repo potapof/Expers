@@ -3,6 +3,7 @@ import { isDatabaseAvailable } from "@/lib/db";
 import {
   getPaymentByOrderId,
   updatePaymentStatus,
+  updatePaymentStatusAtomic,
   setArticleStatus,
   type PaymentStatus,
 } from "@/lib/models";
@@ -44,21 +45,30 @@ export async function POST(request: NextRequest) {
 
   try {
     if (success && status === "CONFIRMED") {
-      if (payment.status !== "CONFIRMED") {
-        await updatePaymentStatus(orderId, "CONFIRMED", paymentId);
-        if (payment.articleId !== "publication-right") {
-          await setArticleStatus(payment.articleId, "pending_review");
-        }
+      const updated = await updatePaymentStatusAtomic(
+        orderId,
+        "CONFIRMED",
+        payment.status as PaymentStatus,
+        paymentId
+      );
+      if (updated && payment.articleId !== "publication-right") {
+        await setArticleStatus(payment.articleId, "pending_review");
       }
     } else if (status === "REJECTED" || status === "CANCELED") {
       await updatePaymentStatus(orderId, status as PaymentStatus, paymentId);
     } else if (status === "REFUNDED") {
-      await updatePaymentStatus(orderId, "REFUNDED", paymentId);
-      if (payment.articleId !== "publication-right") {
+      const updatedRefund = await updatePaymentStatusAtomic(
+        orderId,
+        "REFUNDED",
+        payment.status as PaymentStatus,
+        paymentId
+      );
+      if (updatedRefund && payment.articleId !== "publication-right") {
         await setArticleStatus(payment.articleId, "archived");
       }
     }
-  } catch {
+  } catch (err) {
+    console.error("Webhook обработка ошибки:", err);
     return new NextResponse("ERROR", { status: 500 });
   }
 

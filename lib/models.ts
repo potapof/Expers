@@ -219,11 +219,7 @@ export interface Article {
   sources: { title: string; url: string }[];
   readTime: string;
   status:
-    | "draft"
-    | "published"
-    | "archived"
-    | "pending_payment"
-    | "pending_review";
+    "draft" | "published" | "archived" | "pending_payment" | "pending_review";
   expertId: string;
   createdAt: string;
   updatedAt: string;
@@ -387,7 +383,19 @@ export async function updateArticle(
   return rowToArticle(rows[0]);
 }
 
-export async function deleteArticle(id: string): Promise<void> {
+export async function deleteArticle(
+  id: string,
+  callerId?: string
+): Promise<void> {
+  if (callerId) {
+    const article = await getArticleById(id);
+    if (!article) {
+      throw new Error("Not found: article does not exist");
+    }
+    if (article.expertId !== callerId) {
+      throw new Error("Forbidden: article does not belong to caller");
+    }
+  }
   db.delete(articles).where(eq(articles.id, id)).run();
 }
 
@@ -773,11 +781,7 @@ export async function setSections(
 }
 
 export type PaymentStatus =
-  | "NEW"
-  | "CONFIRMED"
-  | "REJECTED"
-  | "CANCELED"
-  | "REFUNDED";
+  "NEW" | "CONFIRMED" | "REJECTED" | "CANCELED" | "REFUNDED";
 
 export interface Payment {
   orderId: string;
@@ -796,7 +800,8 @@ export async function createPayment(
 ): Promise<Payment> {
   const now = new Date().toISOString();
   const payment: Payment = { ...data, createdAt: now, updatedAt: now };
-  db.insert(payments)
+  const result = db
+    .insert(payments)
     .values({
       orderId: payment.orderId,
       paymentId: payment.paymentId,
@@ -809,6 +814,9 @@ export async function createPayment(
       updatedAt: now,
     })
     .run();
+  if (result.changes === 0) {
+    throw new Error("Failed to insert payment record");
+  }
   return payment;
 }
 
@@ -868,6 +876,29 @@ export async function updatePaymentStatus(
     values.paymentId = paymentId;
   }
   db.update(payments).set(values).where(eq(payments.orderId, orderId)).run();
+}
+
+export async function updatePaymentStatusAtomic(
+  orderId: string,
+  newStatus: PaymentStatus,
+  expectedStatus: PaymentStatus,
+  paymentId?: string
+): Promise<boolean> {
+  const values: Record<string, unknown> = {
+    status: newStatus,
+    updatedAt: new Date().toISOString(),
+  };
+  if (paymentId) {
+    values.paymentId = paymentId;
+  }
+  const result = db
+    .update(payments)
+    .set(values)
+    .where(
+      and(eq(payments.orderId, orderId), eq(payments.status, expectedStatus))
+    )
+    .run();
+  return result.changes > 0;
 }
 
 export async function setArticleStatus(
@@ -1027,14 +1058,19 @@ export async function getArticlesCountByStatus(
 }
 
 export async function getArticlesPublishedToday(): Promise<number> {
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date();
+  const todayStr = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
+  )
+    .toISOString()
+    .split("T")[0];
   const rows = db
     .select({ count: sql<number>`count(*)` })
     .from(articles)
     .where(
       and(
         eq(articles.status, "published"),
-        sql`${articles.createdAt} >= ${today}`
+        sql`${articles.createdAt} >= ${todayStr}`
       )
     )
     .all();
@@ -1060,7 +1096,9 @@ export async function getPayingExpertsCount(): Promise<number> {
 
 export async function getRevenueCurrentMonth(): Promise<number> {
   const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+  const startOfMonth = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)
+  )
     .toISOString()
     .split("T")[0];
   const rows = db
@@ -1172,7 +1210,16 @@ export async function getArticlesFiltered(
   const page = filter.page ?? 1;
   const pageSize = filter.pageSize ?? 20;
   const offset = (page - 1) * pageSize;
-  const sortCol = filter.sort ?? "created_at";
+  const ALLOWED_SORT = new Set([
+    "created_at",
+    "updated_at",
+    "title",
+    "status",
+    "read_time",
+  ]);
+  const sortCol = ALLOWED_SORT.has(filter.sort ?? "")
+    ? filter.sort!
+    : "created_at";
   const sortDir = filter.order === "asc" ? asc : desc;
 
   const rows = db
@@ -1338,11 +1385,16 @@ export async function approveArticle(id: string): Promise<void> {
 }
 
 export async function rejectArticle(id: string, reason: string): Promise<void> {
+  const article = await getArticleById(id);
+  const rejectionNote = article
+    ? `[Отклонено: ${reason}] ${article.description}`
+    : `[Отклонено: ${reason}]`;
+
   db.update(articles)
     .set({
       status: "draft",
       updatedAt: new Date().toISOString(),
-      description: reason,
+      description: rejectionNote,
     })
     .where(eq(articles.id, id))
     .run();

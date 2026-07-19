@@ -34,7 +34,7 @@ export function generateToken(expert: Expert): string {
       role: expert.role ?? "expert",
     },
     getJwtSecret(),
-    { expiresIn: "7d" }
+    { algorithm: "HS256", expiresIn: "7d" }
   );
 }
 
@@ -45,7 +45,9 @@ export function verifyToken(token: string): {
   role: "reader" | "expert" | "admin";
 } | null {
   try {
-    const decoded = jwt.verify(token, getJwtSecret()) as {
+    const decoded = jwt.verify(token, getJwtSecret(), {
+      algorithms: ["HS256"],
+    }) as {
       id: string;
       email: string;
       name: string;

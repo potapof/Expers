@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 import { isDatabaseAvailable } from "@/lib/db";
 import {
   getArticlesByExpert,
@@ -10,6 +9,9 @@ import {
 } from "@/lib/models";
 import { verifyToken } from "@/lib/auth";
 import { articleUrl } from "@/lib/routes";
+
+const NOTIFICATION_WINDOW_MS = 7 * 24 * 3600 * 1000;
+const MAX_RECENT_ARTICLES = 200;
 
 interface DerivedNotification {
   id: string;
@@ -68,7 +70,13 @@ export async function GET(request: NextRequest) {
 
     if (follows.length > 0 || sections.length > 0) {
       const published = await getPublishedArticles();
-      for (const art of published) {
+      const recent = published
+        .filter((art) => {
+          const age = Date.now() - new Date(art.createdAt).getTime();
+          return age < NOTIFICATION_WINDOW_MS;
+        })
+        .slice(0, MAX_RECENT_ARTICLES);
+      for (const art of recent) {
         if (art.authorId === userId) continue;
 
         if (follows.includes(art.authorId)) {

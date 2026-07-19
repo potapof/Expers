@@ -34,16 +34,15 @@ export async function POST(request: NextRequest) {
   }
 
   const expert = await getExpertByEmail(email);
-  if (!expert) {
-    return NextResponse.json(
-      { error: "Пользователь с таким email не найден" },
-      { status: 404 }
-    );
-  }
 
-  const code = await createPasswordReset(email);
+  if (expert) {
+    await createPasswordReset(email);
+  }
 
   resetRateLimit(request);
 
-  return NextResponse.json({ code });
+  return NextResponse.json({
+    ok: true,
+    message: "Если указанный email зарегистрирован, инструкция отправлена",
+  });
 }

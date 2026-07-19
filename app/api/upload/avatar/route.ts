@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFileSync, mkdirSync } from "fs";
 import { join } from "path";
 import { verifyToken } from "@/lib/auth";
+import { isDatabaseAvailable } from "@/lib/db";
+import { updateExpert } from "@/lib/models";
+import { checkRateLimit } from "@/lib/rate-limiter";
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -20,6 +23,9 @@ export async function POST(request: NextRequest) {
       { status: 401 }
     );
   }
+
+  const rateLimit = checkRateLimit(request);
+  if (rateLimit) return rateLimit;
 
   let formData: FormData;
   try {
@@ -56,5 +62,15 @@ export async function POST(request: NextRequest) {
   writeFileSync(join(uploadDir, filename), buffer);
 
   const url = `/uploads/avatars/${filename}`;
+
+  const dbAvailable = await isDatabaseAvailable();
+  if (dbAvailable) {
+    try {
+      await updateExpert(payload.id, { avatar: url });
+    } catch (err) {
+      console.error("Failed to persist avatar URL:", err);
+    }
+  }
+
   return NextResponse.json({ url });
 }

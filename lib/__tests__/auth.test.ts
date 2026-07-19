@@ -85,7 +85,7 @@ describe("generateToken", () => {
         role: "expert",
       },
       "test-secret-for-unit-tests",
-      { expiresIn: "7d" }
+      { algorithm: "HS256", expiresIn: "7d" }
     );
     expect(result).toBe("jwt-token");
   });
@@ -106,7 +106,8 @@ describe("verifyToken", () => {
 
     expect(mockVerify).toHaveBeenCalledWith(
       "valid-token",
-      "test-secret-for-unit-tests"
+      "test-secret-for-unit-tests",
+      { algorithms: ["HS256"] }
     );
     expect(result).toEqual({ ...payload, role: "expert" });
   });

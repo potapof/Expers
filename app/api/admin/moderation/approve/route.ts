@@ -30,10 +30,8 @@ export async function POST(request: NextRequest) {
   try {
     await approveArticle(parsed.data.articleId);
     return NextResponse.json({ success: true });
-  } catch (e) {
-    return NextResponse.json(
-      { error: "Ошибка одобрения", details: String(e) },
-      { status: 500 }
-    );
+  } catch (err) {
+    console.error("Approve moderation error:", err);
+    return NextResponse.json({ error: "Ошибка одобрения" }, { status: 500 });
   }
 }

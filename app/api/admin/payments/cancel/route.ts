@@ -32,30 +32,38 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const payment = await getPaymentByOrderId(parsed.data.orderId);
-  if (!payment) {
-    return NextResponse.json({ error: "Платёж не найден" }, { status: 404 });
-  }
-  if (!payment.paymentId) {
+  try {
+    const payment = await getPaymentByOrderId(parsed.data.orderId);
+    if (!payment) {
+      return NextResponse.json({ error: "Платёж не найден" }, { status: 404 });
+    }
+    if (!payment.paymentId) {
+      return NextResponse.json(
+        { error: "У платежа нет PaymentId" },
+        { status: 400 }
+      );
+    }
+
+    const result = await cancelPayment(payment.paymentId);
+    if (!result.ok) {
+      return NextResponse.json(
+        { error: result.error || "Ошибка отмены" },
+        { status: 502 }
+      );
+    }
+
+    const newStatus = payment.status === "CONFIRMED" ? "REFUNDED" : "CANCELED";
+    await updatePaymentStatus(parsed.data.orderId, newStatus);
+    if (payment.articleId !== "publication-right" && newStatus === "REFUNDED") {
+      await setArticleStatus(payment.articleId, "archived");
+    }
+
+    return NextResponse.json({ success: true, tbankStatus: result.status });
+  } catch (err) {
+    console.error("Payment cancel error:", err);
     return NextResponse.json(
-      { error: "У платежа нет PaymentId" },
-      { status: 400 }
+      { error: "Ошибка обработки отмены" },
+      { status: 500 }
     );
   }
-
-  const result = await cancelPayment(payment.paymentId);
-  if (!result.ok) {
-    return NextResponse.json(
-      { error: result.error || "Ошибка отмены" },
-      { status: 502 }
-    );
-  }
-
-  const newStatus = payment.status === "CONFIRMED" ? "REFUNDED" : "CANCELED";
-  await updatePaymentStatus(parsed.data.orderId, newStatus);
-  if (payment.articleId !== "publication-right" && newStatus === "REFUNDED") {
-    await setArticleStatus(payment.articleId, "archived");
-  }
-
-  return NextResponse.json({ success: true, tbankStatus: result.status });
 }

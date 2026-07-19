@@ -18,9 +18,9 @@ export async function GET(request: NextRequest) {
   try {
     const registrationsByMonth = await getRegistrationsByMonth();
     return NextResponse.json({ registrationsByMonth });
-  } catch (e) {
+  } catch {
     return NextResponse.json(
-      { error: "Ошибка получения данных", details: String(e) },
+      { error: "Ошибка получения данных" },
       { status: 500 }
     );
   }

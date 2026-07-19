@@ -15,9 +15,10 @@ export async function GET(request: NextRequest) {
   try {
     const experts = await getExpertsWithStats();
     return NextResponse.json({ experts });
-  } catch (e) {
+  } catch (err) {
+    console.error("Admin experts error:", err);
     return NextResponse.json(
-      { error: "Ошибка получения данных", details: String(e) },
+      { error: "Ошибка получения данных" },
       { status: 500 }
     );
   }

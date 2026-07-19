@@ -57,7 +57,7 @@ export const step7Schema = z.object({
   content: z
     .string()
     .min(100, "Текст должен быть не менее 100 символов")
-    .max(10000, "Текст должен быть не более 10 000 символов"),
+    .max(150000, "Текст должен быть не более 150 000 символов"),
 });
 
 export const step8Schema = z.object({

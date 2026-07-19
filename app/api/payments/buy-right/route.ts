@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
   const baseUrl = resolveBaseUrl(request);
 
-  const orderId = `right-${payload.id.slice(-12)}-${Date.now().toString(36)}`;
+  const orderId = `right-${payload.id.slice(-12)}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 
   const result = await initPayment({
     orderId,

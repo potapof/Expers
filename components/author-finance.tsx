@@ -62,8 +62,14 @@ const STATUS_META: Record<
 };
 
 export function AuthorFinance() {
-  const { payments, loading, totalPaid, publishedCount, pendingCount, refresh } =
-    usePayments();
+  const {
+    payments,
+    loading,
+    totalPaid,
+    publishedCount,
+    pendingCount,
+    refresh,
+  } = usePayments();
   const [payDialog, setPayDialog] = useState<{
     paymentUrl: string;
     orderId: string;
@@ -171,7 +177,9 @@ export function AuthorFinance() {
           className="bg-[#0039CA] hover:bg-[#002b8e] text-white shrink-0"
         >
           <CreditCard className="h-4 w-4 mr-1.5" />
-          {isBuyingRight ? "Загрузка..." : `Купить за ${PUBLICATION_PRICE.toLocaleString("ru-RU")} ₽`}
+          {isBuyingRight
+            ? "Загрузка..."
+            : `Купить за ${PUBLICATION_PRICE.toLocaleString("ru-RU")} ₽`}
         </Button>
       </div>
 
@@ -302,8 +310,14 @@ export function AuthorFinance() {
         open={!!payDialog}
         paymentUrl={payDialog?.paymentUrl || ""}
         orderId={payDialog?.orderId || ""}
-        onOpenChange={(open) => { if (!open) setPayDialog(null); }}
-        onConfirmed={payDialog?.orderId.startsWith("right-") ? handleRightConfirmed : handlePaymentConfirmed}
+        onOpenChange={(open) => {
+          if (!open) setPayDialog(null);
+        }}
+        onConfirmed={
+          payDialog?.orderId.startsWith("right-")
+            ? handleRightConfirmed
+            : handlePaymentConfirmed
+        }
         onRejected={handlePaymentRejected}
       />
     </div>

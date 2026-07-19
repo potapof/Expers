@@ -17,9 +17,9 @@ export async function GET(request: NextRequest) {
   try {
     const publicationsByDay = await getPublicationsByDay(days);
     return NextResponse.json({ publicationsByDay });
-  } catch (e) {
+  } catch {
     return NextResponse.json(
-      { error: "Ошибка получения данных", details: String(e) },
+      { error: "Ошибка получения данных" },
       { status: 500 }
     );
   }

@@ -30,8 +30,12 @@ export async function GET(request: NextRequest) {
       ? await getCommentsByArticle(articleId)
       : await getCommentsByAuthor(authorId as string);
     return NextResponse.json({ comments });
-  } catch {
-    return NextResponse.json({ comments: [] });
+  } catch (err) {
+    console.error("Failed to get comments:", err);
+    return NextResponse.json(
+      { error: "Ошибка получения комментариев" },
+      { status: 500 }
+    );
   }
 }
 

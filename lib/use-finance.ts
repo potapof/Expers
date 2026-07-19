@@ -3,11 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 export type PaymentStatus =
-  | "NEW"
-  | "CONFIRMED"
-  | "REJECTED"
-  | "CANCELED"
-  | "REFUNDED";
+  "NEW" | "CONFIRMED" | "REJECTED" | "CANCELED" | "REFUNDED";
 
 export interface PaymentRecord {
   orderId: string;

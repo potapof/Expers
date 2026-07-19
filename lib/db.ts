@@ -15,29 +15,43 @@ const globalForDb = globalThis as unknown as {
 
 function initDb() {
   if (globalForDb._initLock) {
+    let waited = 0;
     while (!globalForDb._drizzle && !globalForDb._sqlite) {
-      // spin-wait for concurrent inits (Next.js parallel page builds)
+      const waitStart = Date.now();
+      while (Date.now() - waitStart < 100) {
+        if (globalForDb._drizzle || globalForDb._sqlite) break;
+      }
+      waited += 100;
+      if (waited > 30000) {
+        globalForDb._initLock = false;
+        throw new Error("DB init timeout after 30s");
+      }
     }
     return;
   }
   globalForDb._initLock = true;
 
-  mkdirSync(dirname(DB_PATH), { recursive: true });
-  const sqlite = new Database(DB_PATH);
+  try {
+    mkdirSync(dirname(DB_PATH), { recursive: true });
+    const sqlite = new Database(DB_PATH);
 
-  sqlite.pragma("journal_mode = WAL");
-  sqlite.pragma("busy_timeout = 5000");
-  sqlite.pragma("foreign_keys = ON");
-  sqlite.pragma("cache_size = -64000");
-  sqlite.pragma("synchronous = NORMAL");
-  sqlite.pragma("mmap_size = 268435456");
-  sqlite.pragma("temp_store = MEMORY");
-  sqlite.pragma("wal_autocheckpoint = 1000");
+    sqlite.pragma("journal_mode = WAL");
+    sqlite.pragma("busy_timeout = 5000");
+    sqlite.pragma("foreign_keys = ON");
+    sqlite.pragma("cache_size = -64000");
+    sqlite.pragma("synchronous = NORMAL");
+    sqlite.pragma("mmap_size = 268435456");
+    sqlite.pragma("temp_store = MEMORY");
+    sqlite.pragma("wal_autocheckpoint = 1000");
 
-  const drz = drizzle(sqlite, { schema });
+    const drz = drizzle(sqlite, { schema });
 
-  globalForDb._sqlite = sqlite;
-  globalForDb._drizzle = drz;
+    globalForDb._sqlite = sqlite;
+    globalForDb._drizzle = drz;
+  } catch (err) {
+    console.error("Failed to initialize database:", err);
+    globalForDb._initLock = false;
+  }
 }
 
 export const db = new Proxy({} as ReturnType<typeof drizzle>, {

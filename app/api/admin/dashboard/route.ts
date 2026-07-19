@@ -66,9 +66,10 @@ export async function GET(request: NextRequest) {
       revenueByMonth,
       recentArticles,
     });
-  } catch (e) {
+  } catch (err) {
+    console.error("Dashboard error:", err);
     return NextResponse.json(
-      { error: "Ошибка получения данных", details: String(e) },
+      { error: "Ошибка получения данных" },
       { status: 500 }
     );
   }

@@ -7,6 +7,7 @@ import {
   getArticlesByExpert,
   isSlugTaken,
   hasConfirmedPayment,
+  getExpertById,
 } from "@/lib/models";
 import { mockArticles } from "@/lib/mock-data";
 import { verifyToken } from "@/lib/auth";
@@ -14,7 +15,7 @@ import { verifyToken } from "@/lib/auth";
 const articleSchema = z.object({
   title: z.string().min(10).max(200),
   description: z.string().min(40).max(600),
-  content: z.string().min(100).max(10000),
+  content: z.string().min(100).max(150000),
   slug: z
     .string()
     .min(2)
@@ -95,8 +96,12 @@ export async function GET(request: NextRequest) {
     try {
       const articles = await getArticlesByExpert(payload.id);
       return NextResponse.json({ articles });
-    } catch {
-      return NextResponse.json({ articles: [] });
+    } catch (err) {
+      console.error("Failed to get articles by expert:", err);
+      return NextResponse.json(
+        { error: "Ошибка получения статей" },
+        { status: 500 }
+      );
     }
   }
 
@@ -106,7 +111,8 @@ export async function GET(request: NextRequest) {
     try {
       const articles = await getPublishedArticles();
       return NextResponse.json({ articles });
-    } catch {
+    } catch (err) {
+      console.error("Failed to get published articles:", err);
       return NextResponse.json({ articles: mockArticles });
     }
   }
@@ -154,6 +160,16 @@ export async function POST(request: NextRequest) {
   const wordCount = articleFields.content.split(/\s+/).filter(Boolean).length;
   const readTime = `${Math.max(1, Math.round(wordCount / 150))} мин`;
 
+  let authorName = payload.name;
+  if (dbAvailable) {
+    try {
+      const expert = await getExpertById(payload.id);
+      if (expert) authorName = expert.name;
+    } catch {
+      // fall back to token name
+    }
+  }
+
   let hasPaid = false;
   if (dbAvailable) {
     try {
@@ -166,9 +182,11 @@ export async function POST(request: NextRequest) {
   const articleData = {
     id,
     authorId: payload.id,
-    authorName: payload.name,
+    authorName,
     readTime,
-    status: hasPaid ? ("pending_review" as const) : ("pending_payment" as const),
+    status: hasPaid
+      ? ("pending_review" as const)
+      : ("pending_payment" as const),
     expertId: payload.id,
     ...(slug ? { slug } : {}),
     ...articleFields,

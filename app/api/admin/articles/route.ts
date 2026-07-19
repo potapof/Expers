@@ -34,9 +34,9 @@ export async function GET(request: NextRequest) {
   try {
     const result = await getArticlesFiltered(filter);
     return NextResponse.json(result);
-  } catch (e) {
+  } catch {
     return NextResponse.json(
-      { error: "Ошибка получения данных", details: String(e) },
+      { error: "Ошибка получения данных" },
       { status: 500 }
     );
   }

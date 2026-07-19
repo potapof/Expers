@@ -31,10 +31,7 @@ export async function POST(request: NextRequest) {
   try {
     await rejectArticle(parsed.data.articleId, parsed.data.reason);
     return NextResponse.json({ success: true });
-  } catch (e) {
-    return NextResponse.json(
-      { error: "Ошибка отклонения", details: String(e) },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json({ error: "Ошибка отклонения" }, { status: 500 });
   }
 }

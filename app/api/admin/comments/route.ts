@@ -20,9 +20,9 @@ export async function GET(request: NextRequest) {
   try {
     const result = await getCommentsWithArticle(search, page, pageSize);
     return NextResponse.json(result);
-  } catch (e) {
+  } catch {
     return NextResponse.json(
-      { error: "Ошибка получения данных", details: String(e) },
+      { error: "Ошибка получения данных" },
       { status: 500 }
     );
   }
@@ -47,10 +47,7 @@ export async function DELETE(request: NextRequest) {
   try {
     await deleteCommentById(id);
     return NextResponse.json({ success: true });
-  } catch (e) {
-    return NextResponse.json(
-      { error: "Ошибка удаления", details: String(e) },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json({ error: "Ошибка удаления" }, { status: 500 });
   }
 }

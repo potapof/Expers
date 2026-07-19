@@ -17,9 +17,10 @@ export async function GET(request: NextRequest) {
       getModerationCount(),
     ]);
     return NextResponse.json({ articles, pendingCount });
-  } catch (e) {
+  } catch (err) {
+    console.error("Moderation queue error:", err);
     return NextResponse.json(
-      { error: "Ошибка получения данных", details: String(e) },
+      { error: "Ошибка получения данных" },
       { status: 500 }
     );
   }

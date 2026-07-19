@@ -10,8 +10,7 @@ import { verifyToken } from "@/lib/auth";
 import { updateCommentSchema } from "@/lib/validation/comments";
 
 type AuthResult =
-  | { ok: false; response: NextResponse }
-  | { ok: true; comment: Comment };
+  { ok: false; response: NextResponse } | { ok: true; comment: Comment };
 
 async function authorize(
   request: NextRequest,

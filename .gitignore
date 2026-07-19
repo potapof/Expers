@@ -49,3 +49,7 @@ app-screen.png
 data/
 public/uploads/
 deploy_key*
+
+# secrets — never commit
+tbank-password.txt
+.env.docker

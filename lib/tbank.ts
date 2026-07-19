@@ -6,17 +6,27 @@ export const PUBLICATION_PRICE_KOPECKS = 500000; // 5000 ₽
 const TBANK_API_URL =
   process.env.TBANK_API_URL || "https://securepay.tinkoff.ru/v2";
 
+let _cachedPassword: string | null | undefined = undefined;
+
 function getPassword(): string | undefined {
+  if (_cachedPassword !== undefined) {
+    return _cachedPassword ?? undefined;
+  }
   const filePath = process.env.TBANK_PASSWORD_FILE;
   if (filePath) {
     try {
       const raw = fs.readFileSync(filePath, "utf8").trim();
-      if (raw) return raw;
+      if (raw) {
+        _cachedPassword = raw;
+        return raw;
+      }
     } catch {
       // file not found
     }
   }
-  return process.env.TBANK_PASSWORD || undefined;
+  const envPass = process.env.TBANK_PASSWORD || undefined;
+  _cachedPassword = envPass ?? null;
+  return envPass;
 }
 
 function isTestMode(): boolean {
@@ -156,6 +166,7 @@ export async function initPayment(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(15_000),
     });
     const data = await res.json();
     if (data.Success && data.PaymentId && data.PaymentURL) {
@@ -229,6 +240,7 @@ export async function cancelPayment(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...signedFields, Token: token }),
+      signal: AbortSignal.timeout(15_000),
     });
     const data = await res.json();
     if (data.Success) {
@@ -270,6 +282,7 @@ export async function getPaymentState(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...signedFields, Token: token }),
+      signal: AbortSignal.timeout(15_000),
     });
     const data = await res.json();
     if (data.Success && data.Status) {

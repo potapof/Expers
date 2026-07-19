@@ -213,6 +213,16 @@ const defaultData: WizardData = {
 
 const STORAGE_KEY = "expers-wizard-draft";
 
+const EMPTY_VALUES = {
+  INDUSTRY_ID: "none",
+  INDUSTRY_NAME: "Без отрасли",
+  SUBSECTION_ID: "none",
+  SUBSECTION_NAME: "Без подсектора",
+  CATEGORY_ID: "none",
+  CATEGORY_NAME: "Без категории",
+  EXPERTISE_DEFAULT: "Общая экспертиза",
+} as const;
+
 const industryIcons: Record<string, React.ReactNode> = {
   manufacturing: <Building2 className="h-5 w-5" />,
   finance: <Landmark className="h-5 w-5" />,
@@ -267,7 +277,117 @@ export function ArticleWizardClient() {
         /* ignore */
       }
     }
-  }, []);
+
+    const params = new URLSearchParams(window.location.search);
+    const importId = params.get("importId");
+    if (!importId || !expert) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const controller = new AbortController();
+    let cancelled = false;
+
+    fetch(`/api/articles/${importId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: controller.signal,
+    })
+      .then((r) => {
+        if (!r.ok) {
+          toast.error("Не удалось загрузить черновик статьи");
+          return null;
+        }
+        return r.json();
+      })
+      .then((data) => {
+        if (cancelled || !data?.article) return;
+        const article = data.article;
+
+        const industryId =
+          article.industryId === EMPTY_VALUES.INDUSTRY_ID
+            ? ""
+            : article.industryId;
+        const industryName =
+          article.industryName === EMPTY_VALUES.INDUSTRY_NAME
+            ? ""
+            : article.industryName;
+        const subsectionId =
+          article.subsectionId === EMPTY_VALUES.SUBSECTION_ID
+            ? ""
+            : article.subsectionId;
+        const subsectionName =
+          article.subsectionName === EMPTY_VALUES.SUBSECTION_NAME
+            ? ""
+            : article.subsectionName;
+        const categoryId =
+          article.categoryId === EMPTY_VALUES.CATEGORY_ID
+            ? ""
+            : article.categoryId;
+        const categoryName =
+          article.categoryName === EMPTY_VALUES.CATEGORY_NAME
+            ? ""
+            : article.categoryName;
+        const expertiseAreas =
+          article.expertiseAreas?.length === 1 &&
+          article.expertiseAreas[0] === EMPTY_VALUES.EXPERTISE_DEFAULT
+            ? []
+            : article.expertiseAreas || [];
+
+        setData({
+          industryId,
+          industryName,
+          subsectionId,
+          subsectionName,
+          categoryId,
+          categoryName,
+          customCategory: article.customCategory || "",
+          expertiseAreas,
+          crossLinks: article.crossLinks || [],
+          title: article.title,
+          slug: article.slug || "",
+          introduction: article.description,
+          content: article.content,
+          faq: article.faq || defaultData.faq,
+          todo: article.todo || defaultData.todo,
+          tldr: article.tldr,
+          keyFacts: article.keyFacts || defaultData.keyFacts,
+          definition: article.definition,
+          featuredSnippet: {
+            question: article.featuredSnippet?.question || "",
+            answer: article.featuredSnippet?.answer || "",
+          },
+          problemSolutionResult: {
+            problem: article.problemSolutionResult?.problem || "",
+            solution: article.problemSolutionResult?.solution || "",
+            result: article.problemSolutionResult?.result || "",
+          },
+          howTo: article.howTo || [],
+          methodology: article.methodology,
+          sources: article.sources || [],
+          sections: defaultData.sections,
+        });
+
+        setCreatedArticleId(article.id);
+        setStep(11);
+        localStorage.removeItem("expers-import-draft");
+
+        window.history.replaceState(
+          {},
+          "",
+          window.location.pathname + `?id=${article.id}`
+        );
+      })
+      .catch(() => {
+        if (!cancelled) {
+          toast.error("Не удалось загрузить черновик статьи");
+        }
+      });
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [expert]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -333,9 +453,9 @@ export function ArticleWizardClient() {
         }
         case 7: {
           const content = buildContentFromSections(data.sections);
-          if (content.length > 10000) {
+          if (content.length > 150000) {
             setErrors({
-              sections: `Текст превышает 10 000 символов (сейчас ${content.length})`,
+              sections: `Текст превышает 150 000 символов (сейчас ${content.length})`,
             });
             return false;
           }
@@ -474,7 +594,10 @@ export function ArticleWizardClient() {
       const payData = await payRes.json();
       if (payRes.ok && payData.paymentUrl) {
         toast.dismiss(id);
-        setPayment({ paymentUrl: payData.paymentUrl, orderId: payData.orderId });
+        setPayment({
+          paymentUrl: payData.paymentUrl,
+          orderId: payData.orderId,
+        });
         setPayDialogOpen(true);
       } else {
         toast.error(payData.error || "Не удалось начать оплату", { id });
@@ -499,7 +622,9 @@ export function ArticleWizardClient() {
 
   function handlePaymentRejected(message: string) {
     setPayDialogOpen(false);
-    toast.error(message || "Платёж не прошёл. Попробуйте снова или другую карту.");
+    toast.error(
+      message || "Платёж не прошёл. Попробуйте снова или другую карту."
+    );
   }
 
   if (authLoading) {
@@ -2380,10 +2505,10 @@ function Step12Publish({
 
         <div className="mt-3 rounded-lg bg-gray-50 border border-gray-200 p-4">
           <p className="text-xs text-gray-500 leading-relaxed">
-            Стоимость права публикации — 5 000 ₽ (НДС не облагается, АУСН),
-            если оно ещё не приобретено. Оплата производится банковской картой
-            через сервис Т-Банка. После оплаты статья отправляется на
-            модерацию. Приобретая право публикации, вы принимаете условия{" "}
+            Стоимость права публикации — 5 000 ₽ (НДС не облагается, АУСН), если
+            оно ещё не приобретено. Оплата производится банковской картой через
+            сервис Т-Банка. После оплаты статья отправляется на модерацию.
+            Приобретая право публикации, вы принимаете условия{" "}
             <a
               href="/offer"
               target="_blank"

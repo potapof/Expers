@@ -29,8 +29,12 @@ export async function GET(request: NextRequest) {
   try {
     const articleIds = await getFavoriteArticleIds(payload.id);
     return NextResponse.json({ articleIds });
-  } catch {
-    return NextResponse.json({ articleIds: [] });
+  } catch (err) {
+    console.error("Failed to get favorites:", err);
+    return NextResponse.json(
+      { error: "Ошибка получения избранного" },
+      { status: 500 }
+    );
   }
 }
 
