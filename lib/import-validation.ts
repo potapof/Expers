@@ -1,5 +1,27 @@
 import { z } from "zod";
 
+z.setErrorMap(((issue: any, _ctx: any) => {
+  if (issue.code === "too_small") {
+    if (issue.type === "string" && typeof issue.minimum === "number") {
+      return { message: `Минимум ${issue.minimum} символов` };
+    }
+    return { message: `Минимум ${issue.minimum ?? ""}` };
+  }
+  if (issue.code === "too_big") {
+    if (issue.type === "string" && typeof issue.maximum === "number") {
+      return { message: `Максимум ${issue.maximum} символов` };
+    }
+    return { message: `Максимум ${issue.maximum ?? ""}` };
+  }
+  if (issue.code === "invalid_format" || issue.code === "invalid_string") {
+    return {
+      message:
+        "Некорректный формат. Допустимы только латинские буквы, цифры и дефисы",
+    };
+  }
+  return { message: "Некорректное значение" };
+}) as any);
+
 export const iterationSchemas: Record<number, z.ZodTypeAny> = {
   1: z.object({
     title: z.string().min(10).max(200),
