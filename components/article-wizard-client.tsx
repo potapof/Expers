@@ -245,10 +245,70 @@ function cn(...classes: (string | false | undefined | null)[]) {
 
 function sectionTextToHtml(text: string): string {
   if (text.includes("<p") || text.includes("<br")) return text;
-  return text
+
+  let result = text;
+
+  const lines = result.split("\n");
+  const tableRanges: [number, number][] = [];
+  let tableStart = -1;
+
+  for (let i = 0; i < lines.length; i++) {
+    const isTableLine =
+      lines[i].trim().startsWith("|") && lines[i].trim().endsWith("|");
+    if (isTableLine && tableStart === -1) {
+      tableStart = i;
+    } else if (!isTableLine && tableStart !== -1) {
+      tableRanges.push([tableStart, i - 1]);
+      tableStart = -1;
+    }
+  }
+  if (tableStart !== -1) {
+    tableRanges.push([tableStart, lines.length - 1]);
+  }
+
+  for (let r = tableRanges.length - 1; r >= 0; r--) {
+    const [start, end] = tableRanges[r];
+    const tableLines = lines.slice(start, end + 1);
+    const html = markdownTableToHtml(tableLines);
+    lines.splice(start, end - start + 1, html);
+  }
+
+  result = lines.join("\n");
+  result = result
     .split(/\n{2,}/)
     .map((p) => `<p>${p.trim()}</p>`)
     .join("");
+
+  return result;
+}
+
+function markdownTableToHtml(lines: string[]): string {
+  if (lines.length < 2) return lines.join("\n");
+
+  const headerLine = lines[0];
+  const headers = headerLine
+    .split("|")
+    .map((h) => h.trim())
+    .filter(Boolean);
+
+  let bodyStart = 1;
+  if (lines[1] && /^\|[\s\-:|]+\|$/.test(lines[1])) {
+    bodyStart = 2;
+  }
+
+  const rows: string[][] = [];
+  for (let i = bodyStart; i < lines.length; i++) {
+    const cells = lines[i]
+      .split("|")
+      .map((c) => c.trim())
+      .filter(Boolean);
+    if (cells.length > 0) rows.push(cells);
+  }
+
+  const thead = `<thead><tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr></thead>`;
+  const tbody = `<tbody>${rows.map((row) => `<tr>${row.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>`;
+
+  return `<table class="w-full border-collapse border border-gray-200 rounded-lg overflow-hidden text-sm">${thead}${tbody}</table>`;
 }
 
 export function ArticleWizardClient() {
