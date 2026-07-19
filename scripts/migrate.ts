@@ -71,6 +71,7 @@ sqlite.exec(`
     read_time TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'draft',
     expert_id TEXT NOT NULL,
+    sections_text TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
   );
@@ -158,6 +159,17 @@ for (const [name, type] of expertColumns) {
     sqlite.exec(`ALTER TABLE experts ADD COLUMN ${name} ${type};`);
     console.log(`  ✓ Колонка experts.${name} добавлена`);
   }
+}
+
+const articleExistingCols = new Set(
+  (
+    sqlite.prepare("PRAGMA table_info(articles)").all() as { name: string }[]
+  ).map((c) => c.name)
+);
+
+if (!articleExistingCols.has("sections_text")) {
+  sqlite.exec("ALTER TABLE articles ADD COLUMN sections_text TEXT;");
+  console.log("  ✓ Колонка articles.sections_text добавлена");
 }
 
 sqlite.exec(`

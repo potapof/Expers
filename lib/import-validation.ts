@@ -157,6 +157,7 @@ export const importArticleSchema = z.object({
     .array(z.object({ title: z.string().min(1), url: z.string().min(1) }))
     .min(0)
     .default([]),
+  sectionsText: z.string().optional().nullable(),
 });
 
 export type ImportArticleData = z.infer<typeof importArticleSchema>;

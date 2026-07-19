@@ -221,6 +221,7 @@ export interface Article {
   status:
     "draft" | "published" | "archived" | "pending_payment" | "pending_review";
   expertId: string;
+  sectionsText?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -263,6 +264,7 @@ function rowToArticle(row: typeof articles.$inferSelect): Article {
     readTime: row.readTime,
     status: row.status as Article["status"],
     expertId: row.expertId,
+    sectionsText: row.sectionsText ?? null,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
@@ -299,6 +301,7 @@ function articleToRow(article: Article) {
     readTime: article.readTime,
     status: article.status,
     expertId: article.expertId,
+    sectionsText: article.sectionsText ?? null,
     createdAt: article.createdAt,
     updatedAt: article.updatedAt,
   };

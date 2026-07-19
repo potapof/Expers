@@ -58,6 +58,7 @@ export const articles = sqliteTable(
     readTime: text("read_time").notNull(),
     status: text("status").notNull().default("draft"),
     expertId: text("expert_id").notNull(),
+    sectionsText: text("sections_text"),
     createdAt: text("created_at").notNull(),
     updatedAt: text("updated_at").notNull(),
   },

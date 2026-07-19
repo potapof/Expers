@@ -364,7 +364,19 @@ export function ArticleWizardClient() {
           howTo: article.howTo || [],
           methodology: article.methodology,
           sources: article.sources || [],
-          sections: defaultData.sections,
+          sections: article.sectionsText
+            ? (() => {
+                try {
+                  const parsed = JSON.parse(article.sectionsText);
+                  if (Array.isArray(parsed) && parsed.length > 0) {
+                    return parsed;
+                  }
+                } catch {
+                  /* ignore */
+                }
+                return defaultData.sections;
+              })()
+            : defaultData.sections,
         });
 
         setCreatedArticleId(article.id);

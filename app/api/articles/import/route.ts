@@ -75,6 +75,7 @@ export async function POST(request: NextRequest) {
     readTime,
     status: hasPaid ? ("pending_review" as const) : ("draft" as const),
     expertId: payload.id,
+    sectionsText: parsed.data.sectionsText ?? null,
     ...parsed.data,
     slug: parsed.data.slug || undefined,
   };

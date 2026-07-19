@@ -212,6 +212,7 @@ export function buildArticleData(
     todo,
     methodology: i8.methodology || "",
     sources,
+    sectionsText: JSON.stringify(sections),
   };
 }
 
