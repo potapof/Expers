@@ -140,48 +140,51 @@ export function buildArticleData(
     const d = parsedIterations.get(iter);
     if (!d) continue;
 
-    const isMultiSection = iter === 2 || iter === 6;
+    const countStr =
+      d["sectioncount"] || d["sectionCount"] || d["SectionCount"] || "0";
+    const count = parseInt(countStr, 10) || 0;
 
-    if (isMultiSection && d.section1Title) {
+    for (let s = 1; s <= Math.min(count, 12); s++) {
+      const tKey = (
+        d[`section${s}Заголовок`] !== undefined
+          ? `section${s}Заголовок`
+          : `section${s}заголовок`
+      ) as string;
+      const dKey = (
+        d[`section${s}Дизайн`] !== undefined
+          ? `section${s}Дизайн`
+          : `section${s}дизайн`
+      ) as string;
+      const txKey = (
+        d[`section${s}Текст`] !== undefined
+          ? `section${s}Текст`
+          : `section${s}текст`
+      ) as string;
+      const iKey = (
+        d[`section${s}Картинка`] !== undefined
+          ? `section${s}Картинка`
+          : `section${s}картинка`
+      ) as string;
+
+      const title = d[tKey] || `Секция ${iter}-${s}`;
+      const designRaw = d[dKey] || "text-only";
+      const text = d[txKey] || "";
+      const imageUrl = d[iKey] || undefined;
+
+      const design = VALID_DESIGNS.includes(
+        designRaw as (typeof VALID_DESIGNS)[number]
+      )
+        ? (designRaw as ArticleSection["design"])
+        : "text-only";
+
       sections.push({
-        id: `section-imported-${iter}-1`,
-        title: d.section1Title || d.sectionTitle || `Секция ${iter}`,
-        description: d.section1Description || "",
-        design: "image-only",
-        text: d.section1Text || "",
-        imageRatio: 100,
-        imageData: d.section1ImageUrl || undefined,
-        tableData: { headers: [], rows: [] },
-      });
-      sections.push({
-        id: `section-imported-${iter}-2`,
-        title: d.section2Title || d.sectionTitle || `Секция ${iter}`,
+        id: `section-imported-${iter}-${s}`,
+        title,
         description: "",
-        design: "text-only",
-        text: d.section2Text || "",
-        imageRatio: 100,
-        imageData: undefined,
-        tableData: { headers: [], rows: [] },
-      });
-    } else {
-      const sectionText = d.sectionText || "";
-
-      sections.push({
-        id: `section-imported-${iter}`,
-        title: d.sectionTitle || `Секция ${iter - 1}`,
-        description: d.sectionDescription || "",
-        design: VALID_DESIGNS.includes(
-          d.sectionDesign as (typeof VALID_DESIGNS)[number]
-        )
-          ? (d.sectionDesign as ArticleSection["design"])
-          : "text-only",
-        text: sectionText,
-        imageRatio: ["image-right", "image-left"].includes(
-          d.sectionDesign || ""
-        )
-          ? 45
-          : 100,
-        imageData: d.imageUrl || undefined,
+        design,
+        text,
+        imageRatio: ["image-right", "image-left"].includes(design) ? 45 : 100,
+        imageData: imageUrl,
         tableData: { headers: [], rows: [] },
       });
     }

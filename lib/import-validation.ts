@@ -14,10 +14,7 @@ z.setErrorMap(((issue: any, _ctx: any) => {
     return { message: `Максимум ${issue.maximum ?? ""}` };
   }
   if (issue.code === "invalid_format" || issue.code === "invalid_string") {
-    return {
-      message:
-        "Некорректный формат. Допустимы только латинские буквы, цифры и дефисы",
-    };
+    return { message: "Некорректный формат" };
   }
   return { message: "Некорректное значение" };
 }) as any);
@@ -25,7 +22,7 @@ z.setErrorMap(((issue: any, _ctx: any) => {
 export const iterationSchemas: Record<number, z.ZodTypeAny> = {
   1: z.object({
     title: z.string().min(10).max(200),
-    introduction: z.string().min(40).max(600),
+    introduction: z.string().min(100).max(600),
     slug: z
       .string()
       .min(2)
@@ -34,53 +31,12 @@ export const iterationSchemas: Record<number, z.ZodTypeAny> = {
       .optional()
       .or(z.literal("")),
   }),
-  2: z.object({
-    sectionTitle: z.string().min(5).max(200),
-    section1Title: z.string().min(5).max(200),
-    section1Description: z.string().max(500).optional().or(z.literal("")),
-    section1Design: z.literal("image-only"),
-    section1ImageUrl: z.string().min(1),
-    section1Text: z.string().optional().or(z.literal("")),
-    section2Title: z.string().min(5).max(200),
-    section2Design: z.literal("text-only"),
-    section2Text: z.string().min(5000),
-  }),
-  3: z.object({
-    sectionTitle: z.string().min(5).max(200),
-    sectionDescription: z.string().max(500).optional().or(z.literal("")),
-    sectionDesign: z.literal("text-only"),
-    sectionText: z.string().min(5000),
-  }),
-  4: z.object({
-    sectionTitle: z.string().min(5).max(200),
-    sectionDescription: z.string().max(500).optional().or(z.literal("")),
-    sectionDesign: z.literal("image-right"),
-    imageUrl: z.string().min(1),
-    sectionText: z.string().min(5000),
-  }),
-  5: z.object({
-    sectionTitle: z.string().min(5).max(200),
-    sectionDescription: z.string().max(500).optional().or(z.literal("")),
-    sectionDesign: z.literal("text-only"),
-    sectionText: z.string().min(5000),
-  }),
-  6: z.object({
-    sectionTitle: z.string().min(5).max(200),
-    section1Title: z.string().min(5).max(200),
-    section1Description: z.string().max(500).optional().or(z.literal("")),
-    section1Design: z.literal("image-only"),
-    section1ImageUrl: z.string().min(1),
-    section1Text: z.string().optional().or(z.literal("")),
-    section2Title: z.string().min(5).max(200),
-    section2Design: z.literal("text-only"),
-    section2Text: z.string().min(5000),
-  }),
-  7: z.object({
-    sectionTitle: z.string().min(5).max(200),
-    sectionDescription: z.string().max(500).optional().or(z.literal("")),
-    sectionDesign: z.literal("text-only"),
-    sectionText: z.string().min(5000),
-  }),
+  2: z.object({ sectionCount: z.string().min(1) }),
+  3: z.object({ sectionCount: z.string().min(1) }),
+  4: z.object({ sectionCount: z.string().min(1) }),
+  5: z.object({ sectionCount: z.string().min(1) }),
+  6: z.object({ sectionCount: z.string().min(1) }),
+  7: z.object({ sectionCount: z.string().min(1) }),
   8: z.object({
     faq: z.string().min(1),
     todo: z.string().min(1),
