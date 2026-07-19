@@ -169,7 +169,10 @@ export function buildArticleData(
       const title = d[tKey] || `Секция ${iter}-${s}`;
       const designRaw = d[dKey] || "text-only";
       const text = d[txKey] || "";
-      const imageUrl = d[iKey] || undefined;
+      const imageUrlRaw = d[iKey] || undefined;
+      const imageUrl = imageUrlRaw
+        ? imageUrlRaw.replace(/^\[([^\]]*)\]\(([^)]+)\)$/, "$2").trim()
+        : undefined;
 
       const design = VALID_DESIGNS.includes(
         designRaw as (typeof VALID_DESIGNS)[number]
