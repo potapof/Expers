@@ -141,10 +141,13 @@ test`;
 
   it("should validate section iteration 2 schema", () => {
     const data = {
-      sectionTitle: "Тестовый заголовок секции",
-      sectionDesign: "image-right",
-      imageUrl: "https://pixinlink.ru/800x400/test",
-      sectionText: "A".repeat(15000),
+      sectionTitle: "Заголовок",
+      section1Title: "Секция один",
+      section1Design: "image-only",
+      section1ImageUrl: "https://pixinlink.ru/1200x600/test",
+      section2Title: "Секция два",
+      section2Design: "text-only",
+      section2Text: "A".repeat(15000),
     };
 
     const result = iterationSchemas[2].safeParse(data);
@@ -246,9 +249,13 @@ test`;
 
   it("should validate image-only iteration (6)", () => {
     const data = {
-      sectionTitle: "Инфографика",
-      sectionDesign: "image-only",
-      imageUrl: "https://pixinlink.ru/1200x600/test",
+      sectionTitle: "Заголовок",
+      section1Title: "Инфографика",
+      section1Design: "image-only",
+      section1ImageUrl: "https://pixinlink.ru/1200x600/test",
+      section2Title: "Текст",
+      section2Design: "text-only",
+      section2Text: "A".repeat(15000),
     };
 
     const result = iterationSchemas[6].safeParse(data);
@@ -272,12 +279,18 @@ test-slug
 ## Итерация 2: Секция 1
 
 ### sectionTitle
-Секция один
-### sectionDesign
-image-right
-### imageUrl
-https://pixinlink.ru/800x400/test
-### sectionText
+Погружение
+### section1Title
+Hero
+### section1Design
+image-only
+### section1ImageUrl
+https://pixinlink.ru/1200x400/test
+### section2Title
+Текст
+### section2Design
+text-only
+### section2Text
 ${"A".repeat(5000)}
 
 ## Итерация 3: Секция 2
@@ -313,12 +326,18 @@ ${"D".repeat(600)}
 
 ### sectionTitle
 Инфографика
-### sectionDesign
+### section1Title
+Картинка
+### section1Design
 image-only
-### imageUrl
+### section1ImageUrl
 https://pixinlink.ru/1200x600/info
-### sectionText
-Подпись
+### section2Title
+Текст с таблицей
+### section2Design
+text-only
+### section2Text
+${"D".repeat(5000)}
 
 ## Итерация 7: Выводы
 
@@ -362,7 +381,7 @@ ${"F".repeat(5000)}
 
     expect(result.size).toBe(8);
     expect(result.get(1)?.["title"]).toBe("Тестовый заголовок");
-    expect(result.get(2)?.["sectionTitle"]).toBe("Секция один");
+    expect(result.get(2)?.["sectionTitle"]).toBe("Погружение");
     expect(result.get(8)?.["tldr"]).toBe(
       "Краткое содержание статьи длиной более двадцати"
     );
@@ -414,10 +433,13 @@ describe("buildArticleData", () => {
       slug: "testovaya-statya",
     });
     iterations.set(2, {
-      sectionTitle: "Секция 1",
-      sectionDesign: "image-right",
-      imageUrl: "https://pixinlink.ru/800x400/test",
-      sectionText: "A".repeat(5000),
+      sectionTitle: "Погружение",
+      section1Title: "Hero",
+      section1Design: "image-only",
+      section1ImageUrl: "https://pixinlink.ru/1200x400/test",
+      section2Title: "Текст",
+      section2Design: "text-only",
+      section2Text: "A".repeat(5000),
     });
     iterations.set(3, {
       sectionTitle: "Секция 2",
@@ -437,9 +459,12 @@ describe("buildArticleData", () => {
     });
     iterations.set(6, {
       sectionTitle: "Инфографика",
-      sectionDesign: "image-only",
-      imageUrl: "https://pixinlink.ru/1200x600/infographic",
-      sectionText: "Подпись",
+      section1Title: "Картинка",
+      section1Design: "image-only",
+      section1ImageUrl: "https://pixinlink.ru/1200x600/info",
+      section2Title: "Текст с таблицей",
+      section2Design: "text-only",
+      section2Text: "D".repeat(5000),
     });
     iterations.set(7, {
       sectionTitle: "Выводы",

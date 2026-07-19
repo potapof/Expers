@@ -140,24 +140,51 @@ export function buildArticleData(
     const d = parsedIterations.get(iter);
     if (!d) continue;
 
-    const sectionText = d.sectionText || "";
+    const isMultiSection = iter === 2 || iter === 6;
 
-    sections.push({
-      id: `section-imported-${iter}`,
-      title: d.sectionTitle || `Секция ${iter - 1}`,
-      description: d.sectionDescription || "",
-      design: VALID_DESIGNS.includes(
-        d.sectionDesign as (typeof VALID_DESIGNS)[number]
-      )
-        ? (d.sectionDesign as ArticleSection["design"])
-        : "text-only",
-      text: sectionText,
-      imageRatio: ["image-right", "image-left"].includes(d.sectionDesign || "")
-        ? 45
-        : 100,
-      imageData: d.imageUrl || undefined,
-      tableData: { headers: [], rows: [] },
-    });
+    if (isMultiSection && d.section1Title) {
+      sections.push({
+        id: `section-imported-${iter}-1`,
+        title: d.section1Title || d.sectionTitle || `Секция ${iter}`,
+        description: d.section1Description || "",
+        design: "image-only",
+        text: d.section1Text || "",
+        imageRatio: 100,
+        imageData: d.section1ImageUrl || undefined,
+        tableData: { headers: [], rows: [] },
+      });
+      sections.push({
+        id: `section-imported-${iter}-2`,
+        title: d.section2Title || d.sectionTitle || `Секция ${iter}`,
+        description: "",
+        design: "text-only",
+        text: d.section2Text || "",
+        imageRatio: 100,
+        imageData: undefined,
+        tableData: { headers: [], rows: [] },
+      });
+    } else {
+      const sectionText = d.sectionText || "";
+
+      sections.push({
+        id: `section-imported-${iter}`,
+        title: d.sectionTitle || `Секция ${iter - 1}`,
+        description: d.sectionDescription || "",
+        design: VALID_DESIGNS.includes(
+          d.sectionDesign as (typeof VALID_DESIGNS)[number]
+        )
+          ? (d.sectionDesign as ArticleSection["design"])
+          : "text-only",
+        text: sectionText,
+        imageRatio: ["image-right", "image-left"].includes(
+          d.sectionDesign || ""
+        )
+          ? 45
+          : 100,
+        imageData: d.imageUrl || undefined,
+        tableData: { headers: [], rows: [] },
+      });
+    }
   }
 
   const content = buildContentFromSections(sections);
