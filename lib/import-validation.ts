@@ -52,16 +52,16 @@ export const iterationSchemas: Record<number, z.ZodTypeAny> = {
   8: z.object({
     faq: z.string().min(1),
     todo: z.string().min(1),
-    tldr: z.string().min(20).max(500),
+    tldr: z.string().min(3).max(500),
     keyFacts: z.string().min(1),
-    definition: z.string().min(20).max(500),
-    featuredSnippetQuestion: z.string().min(10),
-    featuredSnippetAnswer: z.string().min(20),
-    problemSolutionProblem: z.string().min(20),
-    problemSolutionSolution: z.string().min(20),
-    problemSolutionResult: z.string().min(20),
+    definition: z.string().min(3).max(500),
+    featuredSnippetQuestion: z.string().min(3),
+    featuredSnippetAnswer: z.string().min(3),
+    problemSolutionProblem: z.string().min(3),
+    problemSolutionSolution: z.string().min(3),
+    problemSolutionResult: z.string().min(3),
     howTo: z.string().min(1),
-    methodology: z.string().min(20).max(1000),
+    methodology: z.string().min(3).max(1000),
     sources: z.string().min(1),
   }),
 };
@@ -95,21 +95,21 @@ export const importArticleSchema = z.object({
     )
     .max(8)
     .default([]),
-  tldr: z.string().min(20).max(500),
+  tldr: z.string().min(3).max(500),
   keyFacts: z
     .array(z.object({ icon: z.string(), text: z.string().min(1) }))
     .min(0)
     .max(7)
     .default([]),
-  definition: z.string().min(20).max(500),
+  definition: z.string().min(3).max(500),
   featuredSnippet: z.object({
-    question: z.string().min(10),
-    answer: z.string().min(20),
+    question: z.string().min(3),
+    answer: z.string().min(3),
   }),
   problemSolutionResult: z.object({
-    problem: z.string().min(20),
-    solution: z.string().min(20),
-    result: z.string().min(20),
+    problem: z.string().min(3),
+    solution: z.string().min(3),
+    result: z.string().min(3),
   }),
   howTo: z
     .array(
@@ -128,7 +128,7 @@ export const importArticleSchema = z.object({
     )
     .min(0)
     .default([]),
-  methodology: z.string().min(20).max(1000),
+  methodology: z.string().min(3).max(1000),
   sources: z
     .array(z.object({ title: z.string().min(1), url: z.string().min(1) }))
     .min(0)
