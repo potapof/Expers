@@ -132,25 +132,21 @@ export function buildArticleData(
   parsedIterations: Map<number, Record<string, string>>
 ): ImportArticleData {
   const i1 = parsedIterations.get(1) || {};
-  const i2 = parsedIterations.get(2) || {};
-  const i3 = parsedIterations.get(3) || {};
-  const i4 = parsedIterations.get(4) || {};
-  const i5 = parsedIterations.get(5) || {};
-  const i12 = parsedIterations.get(12) || {};
+  const i8 = parsedIterations.get(8) || {};
 
   const sections: ArticleSection[] = [];
 
-  for (let iter = 6; iter <= 11; iter++) {
+  for (let iter = 2; iter <= 7; iter++) {
     const d = parsedIterations.get(iter);
     if (!d) continue;
 
     const tableData =
-      iter === 9 && d.sectionTable
+      iter === 5 && d.sectionTable
         ? parseTable(d.sectionTable)
         : { headers: [], rows: [] };
 
     const sectionText =
-      iter === 9
+      iter === 5
         ? [d.sectionText || "", d.sectionTextAfter || ""]
             .filter(Boolean)
             .join("\n\n")
@@ -158,7 +154,7 @@ export function buildArticleData(
 
     sections.push({
       id: `section-imported-${iter}`,
-      title: d.sectionTitle || `Секция ${iter - 5}`,
+      title: d.sectionTitle || `Секция ${iter - 1}`,
       description: d.sectionDescription || "",
       design: VALID_DESIGNS.includes(
         d.sectionDesign as (typeof VALID_DESIGNS)[number]
@@ -176,69 +172,55 @@ export function buildArticleData(
 
   const content = buildContentFromSections(sections);
 
-  const faqStr = i12.faq || "";
+  const faqStr = i8.faq || "";
   const faq = parseFaq(faqStr);
 
-  const todoStr = i12.todo || "";
+  const todoStr = i8.todo || "";
   const todo = parseTodo(todoStr);
 
-  const keyFactsStr = i12.keyFacts || "";
+  const keyFactsStr = i8.keyFacts || "";
   const keyFacts = parseKeyFacts(keyFactsStr);
 
-  const howToStr = i12.howTo || "";
+  const howToStr = i8.howTo || "";
   const howTo = parseHowTo(howToStr);
 
-  const sourcesStr = i12.sources || "";
+  const sourcesStr = i8.sources || "";
   const sources = parseSources(sourcesStr);
 
-  const expertiseAreasStr = i3.expertiseAreas || "";
-  const expertiseAreas = expertiseAreasStr
-    ? expertiseAreasStr
-        .split("\n")
-        .map((a) => a.trim())
-        .filter(Boolean)
-    : [];
-
-  const crossLinksStr = i4.crossLinks || "";
-  let crossLinks: { articleId: string; title: string; industryId: string }[] =
-    [];
-  try {
-    crossLinks = JSON.parse(crossLinksStr);
-  } catch (e) {
-    console.error("Failed to parse crossLinks JSON:", e);
-    crossLinks = [];
-  }
-
   return {
-    title: i5.title || "",
-    description: i5.introduction || "",
+    title: i1.title || "",
+    description: i1.introduction || "",
     content,
-    slug: i5.slug || undefined,
-    industryId: i1.industryId || "none",
-    industryName: i1.industryName || "",
-    subsectionId: i1.subsectionId || "none",
-    subsectionName: i1.subsectionName || "",
-    categoryId: i2.categoryId || "none",
-    categoryName: i2.categoryName || "",
+    slug: i1.slug || undefined,
+    industryId: "none",
+    industryName: "Без отрасли",
+    subsectionId: "none",
+    subsectionName: "Без подсектора",
+    categoryId: "none",
+    categoryName: "Без категории",
     customCategory: "",
-    expertiseAreas,
-    crossLinks,
-    tldr: i12.tldr || "",
+    expertiseAreas: [
+      "Общая экспертиза",
+      "Бизнес-консалтинг",
+      "Стратегическое планирование",
+    ],
+    crossLinks: [],
+    tldr: i8.tldr || "",
     keyFacts,
-    definition: i12.definition || "",
+    definition: i8.definition || "",
     featuredSnippet: {
-      question: i12.featuredSnippetQuestion || "",
-      answer: i12.featuredSnippetAnswer || "",
+      question: i8.featuredSnippetQuestion || "",
+      answer: i8.featuredSnippetAnswer || "",
     },
     problemSolutionResult: {
-      problem: i12.problemSolutionProblem || "",
-      solution: i12.problemSolutionSolution || "",
-      result: i12.problemSolutionResult || "",
+      problem: i8.problemSolutionProblem || "",
+      solution: i8.problemSolutionSolution || "",
+      result: i8.problemSolutionResult || "",
     },
     howTo,
     faq,
     todo,
-    methodology: i12.methodology || "",
+    methodology: i8.methodology || "",
     sources,
   };
 }

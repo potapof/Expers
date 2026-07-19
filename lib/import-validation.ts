@@ -2,22 +2,6 @@ import { z } from "zod";
 
 export const iterationSchemas: Record<number, z.ZodTypeAny> = {
   1: z.object({
-    industryId: z.literal("none"),
-    industryName: z.string().min(1),
-    subsectionId: z.literal("none"),
-    subsectionName: z.string().min(1),
-  }),
-  2: z.object({
-    categoryId: z.literal("none"),
-    categoryName: z.string().min(1),
-  }),
-  3: z.object({
-    expertiseAreas: z.string().min(1),
-  }),
-  4: z.object({
-    crossLinks: z.string().min(1),
-  }),
-  5: z.object({
     title: z.string().min(10).max(200),
     introduction: z.string().min(40).max(600),
     slug: z
@@ -27,6 +11,34 @@ export const iterationSchemas: Record<number, z.ZodTypeAny> = {
       .regex(/^[a-z0-9-]+$/)
       .optional()
       .or(z.literal("")),
+  }),
+  2: z.object({
+    sectionTitle: z.string().min(5).max(200),
+    sectionDescription: z.string().max(500).optional().or(z.literal("")),
+    sectionDesign: z.literal("image-right"),
+    imageUrl: z.string().min(1),
+    sectionText: z.string().min(5000),
+  }),
+  3: z.object({
+    sectionTitle: z.string().min(5).max(200),
+    sectionDescription: z.string().max(500).optional().or(z.literal("")),
+    sectionDesign: z.literal("text-only"),
+    sectionText: z.string().min(5000),
+  }),
+  4: z.object({
+    sectionTitle: z.string().min(5).max(200),
+    sectionDescription: z.string().max(500).optional().or(z.literal("")),
+    sectionDesign: z.literal("image-left"),
+    imageUrl: z.string().min(1),
+    sectionText: z.string().min(5000),
+  }),
+  5: z.object({
+    sectionTitle: z.string().min(5).max(200),
+    sectionDescription: z.string().max(500).optional().or(z.literal("")),
+    sectionDesign: z.literal("table"),
+    sectionText: z.string().min(500),
+    sectionTable: z.string().min(1),
+    sectionTextAfter: z.string().optional().or(z.literal("")),
   }),
   6: z.object({
     sectionTitle: z.string().min(5).max(200),
@@ -42,34 +54,6 @@ export const iterationSchemas: Record<number, z.ZodTypeAny> = {
     sectionText: z.string().min(5000),
   }),
   8: z.object({
-    sectionTitle: z.string().min(5).max(200),
-    sectionDescription: z.string().max(500).optional().or(z.literal("")),
-    sectionDesign: z.literal("image-left"),
-    imageUrl: z.string().min(1),
-    sectionText: z.string().min(5000),
-  }),
-  9: z.object({
-    sectionTitle: z.string().min(5).max(200),
-    sectionDescription: z.string().max(500).optional().or(z.literal("")),
-    sectionDesign: z.literal("table"),
-    sectionText: z.string().min(500),
-    sectionTable: z.string().min(1),
-    sectionTextAfter: z.string().optional().or(z.literal("")),
-  }),
-  10: z.object({
-    sectionTitle: z.string().min(5).max(200),
-    sectionDescription: z.string().max(500).optional().or(z.literal("")),
-    sectionDesign: z.literal("image-right"),
-    imageUrl: z.string().min(1),
-    sectionText: z.string().min(5000),
-  }),
-  11: z.object({
-    sectionTitle: z.string().min(5).max(200),
-    sectionDescription: z.string().max(500).optional().or(z.literal("")),
-    sectionDesign: z.literal("text-only"),
-    sectionText: z.string().min(5000),
-  }),
-  12: z.object({
     faq: z.string().min(1),
     todo: z.string().min(1),
     tldr: z.string().min(20).max(500),
