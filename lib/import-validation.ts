@@ -5,16 +5,28 @@ z.setErrorMap(((issue: any, _ctx: any) => {
     if (issue.type === "string" && typeof issue.minimum === "number") {
       return { message: `Минимум ${issue.minimum} символов` };
     }
+    if (issue.type === "array" && typeof issue.minimum === "number") {
+      return { message: `Минимум ${issue.minimum} элементов` };
+    }
     return { message: `Минимум ${issue.minimum ?? ""}` };
   }
   if (issue.code === "too_big") {
     if (issue.type === "string" && typeof issue.maximum === "number") {
       return { message: `Максимум ${issue.maximum} символов` };
     }
+    if (issue.type === "array" && typeof issue.maximum === "number") {
+      return { message: `Максимум ${issue.maximum} элементов` };
+    }
     return { message: `Максимум ${issue.maximum ?? ""}` };
   }
   if (issue.code === "invalid_format" || issue.code === "invalid_string") {
-    return { message: "Некорректный формат" };
+    return {
+      message:
+        "Некорректный формат. Допустимы только латинские буквы, цифры и дефисы",
+    };
+  }
+  if (issue.code === "invalid_type") {
+    return { message: "Поле обязательно для заполнения" };
   }
   return { message: "Некорректное значение" };
 }) as any);

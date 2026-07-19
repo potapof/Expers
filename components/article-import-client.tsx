@@ -76,17 +76,23 @@ export function ArticleImportClient() {
           id,
         });
       } else {
-        toast.error(result.error || "Ошибка создания статьи", { id });
-        if (result.details) {
-          const fieldErrors = result.details.fieldErrors;
-          if (fieldErrors) {
-            const msgs = Object.entries(fieldErrors)
-              .map(
-                ([field, errs]) => `${field}: ${(errs as string[]).join(", ")}`
-              )
-              .join("\n");
-            setTimeout(() => toast.error(msgs, { duration: 8000 }), 500);
-          }
+        if (result.details?.fieldErrors) {
+          const fieldErrors = result.details.fieldErrors as Record<
+            string,
+            string[]
+          >;
+          const fieldNames = Object.keys(fieldErrors);
+          const summary = `Ошибка в ${fieldNames.length} полях: ${fieldNames.slice(0, 5).join(", ")}${fieldNames.length > 5 ? "..." : ""}`;
+          toast.error(summary, {
+            id,
+            description: fieldNames
+              .slice(0, 10)
+              .map((f) => `${f}: ${fieldErrors[f]?.join("; ") ?? ""}`)
+              .join("\n"),
+            duration: 10000,
+          });
+        } else {
+          toast.error(result.error || "Ошибка создания статьи", { id });
         }
       }
     } catch {
