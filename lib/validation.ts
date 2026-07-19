@@ -116,7 +116,7 @@ export const step10Schema = z.object({
   sources: z
     .array(
       z.object({
-        title: z.string().min(3),
+        title: z.string(),
         url: z.string().url("Введите корректный URL"),
       })
     )

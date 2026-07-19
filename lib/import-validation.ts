@@ -56,12 +56,12 @@ export const iterationSchemas: Record<number, z.ZodTypeAny> = {
     keyFacts: z.string().min(1),
     definition: z.string().max(30),
     featuredSnippetQuestion: z.string().max(30),
-    featuredSnippetAnswer: z.string().min(3),
+    featuredSnippetAnswer: z.string(),
     problemSolutionProblem: z.string().max(30),
     problemSolutionSolution: z.string().max(30),
     problemSolutionResult: z.string().max(30),
     howTo: z.string().min(1),
-    methodology: z.string().min(3).max(1000),
+    methodology: z.string().max(1000),
     sources: z.string().min(1),
   }),
 };
@@ -104,7 +104,7 @@ export const importArticleSchema = z.object({
   definition: z.string().max(30),
   featuredSnippet: z.object({
     question: z.string().max(30),
-    answer: z.string().min(3),
+    answer: z.string(),
   }),
   problemSolutionResult: z.object({
     problem: z.string().max(30),
@@ -128,7 +128,7 @@ export const importArticleSchema = z.object({
     )
     .min(0)
     .default([]),
-  methodology: z.string().min(3).max(1000),
+  methodology: z.string().max(1000),
   sources: z
     .array(z.object({ title: z.string().min(1), url: z.string().min(1) }))
     .min(0)
