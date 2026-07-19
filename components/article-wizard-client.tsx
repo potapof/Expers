@@ -279,8 +279,12 @@ export function ArticleWizardClient() {
     }
 
     const params = new URLSearchParams(window.location.search);
+    const articleId = params.get("id");
     const importId = params.get("importId");
-    if (!importId || !expert) return;
+    const loadId = articleId || importId;
+    const isImport = !!importId && !articleId;
+
+    if (!loadId || !expert) return;
 
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -288,13 +292,13 @@ export function ArticleWizardClient() {
     const controller = new AbortController();
     let cancelled = false;
 
-    fetch(`/api/articles/${importId}`, {
+    fetch(`/api/articles/${loadId}`, {
       headers: { Authorization: `Bearer ${token}` },
       signal: controller.signal,
     })
       .then((r) => {
         if (!r.ok) {
-          toast.error("Не удалось загрузить черновик статьи");
+          toast.error("Не удалось загрузить статью");
           return null;
         }
         return r.json();
@@ -303,35 +307,42 @@ export function ArticleWizardClient() {
         if (cancelled || !data?.article) return;
         const article = data.article;
 
-        const industryId =
-          article.industryId === EMPTY_VALUES.INDUSTRY_ID
+        const industryId = isImport
+          ? article.industryId === EMPTY_VALUES.INDUSTRY_ID
             ? ""
-            : article.industryId;
-        const industryName =
-          article.industryName === EMPTY_VALUES.INDUSTRY_NAME
+            : article.industryId
+          : article.industryId;
+        const industryName = isImport
+          ? article.industryName === EMPTY_VALUES.INDUSTRY_NAME
             ? ""
-            : article.industryName;
-        const subsectionId =
-          article.subsectionId === EMPTY_VALUES.SUBSECTION_ID
+            : article.industryName
+          : article.industryName;
+        const subsectionId = isImport
+          ? article.subsectionId === EMPTY_VALUES.SUBSECTION_ID
             ? ""
-            : article.subsectionId;
-        const subsectionName =
-          article.subsectionName === EMPTY_VALUES.SUBSECTION_NAME
+            : article.subsectionId
+          : article.subsectionId;
+        const subsectionName = isImport
+          ? article.subsectionName === EMPTY_VALUES.SUBSECTION_NAME
             ? ""
-            : article.subsectionName;
-        const categoryId =
-          article.categoryId === EMPTY_VALUES.CATEGORY_ID
+            : article.subsectionName
+          : article.subsectionName;
+        const categoryId = isImport
+          ? article.categoryId === EMPTY_VALUES.CATEGORY_ID
             ? ""
-            : article.categoryId;
-        const categoryName =
-          article.categoryName === EMPTY_VALUES.CATEGORY_NAME
+            : article.categoryId
+          : article.categoryId;
+        const categoryName = isImport
+          ? article.categoryName === EMPTY_VALUES.CATEGORY_NAME
             ? ""
-            : article.categoryName;
-        const expertiseAreas =
-          article.expertiseAreas?.length === 1 &&
-          article.expertiseAreas[0] === EMPTY_VALUES.EXPERTISE_DEFAULT
+            : article.categoryName
+          : article.categoryName;
+        const expertiseAreas = isImport
+          ? article.expertiseAreas?.length === 1 &&
+            article.expertiseAreas[0] === EMPTY_VALUES.EXPERTISE_DEFAULT
             ? []
-            : article.expertiseAreas || [];
+            : article.expertiseAreas || []
+          : article.expertiseAreas || [];
 
         setData({
           industryId,
@@ -380,8 +391,10 @@ export function ArticleWizardClient() {
         });
 
         setCreatedArticleId(article.id);
-        setStep(11);
-        localStorage.removeItem("expers-import-draft");
+        if (isImport) {
+          setStep(11);
+          localStorage.removeItem("expers-import-draft");
+        }
 
         window.history.replaceState(
           {},
