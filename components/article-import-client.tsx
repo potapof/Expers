@@ -413,7 +413,7 @@ export function ArticleImportClient() {
           {showExample && (
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 mb-4">
               <pre className="text-xs text-gray-600 whitespace-pre-wrap font-mono">
-                {templateIter.exampleOutput}
+                {`## Итерация ${templateIter.iteration}: ${templateIter.title}\n\n${templateIter.exampleOutput}`}
               </pre>
             </div>
           )}

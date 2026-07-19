@@ -650,7 +650,7 @@ export function generateTemplate(authorName: string, topic?: string): string {
     const header = `## Итерация ${iter.iteration}: ${iter.title}`;
     const wizardInfo = `**${iter.wizardStepLabel}**`;
     const prompt = iter.prompt;
-    const example = `### Пример вывода\n${iter.exampleOutput}`;
+    const example = `**Пример вывода:**\n\n${iter.exampleOutput}`;
 
     parts.push(`${header}\n\n${wizardInfo}\n\n${prompt}\n\n${example}`);
   }
