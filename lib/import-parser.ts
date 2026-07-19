@@ -140,17 +140,7 @@ export function buildArticleData(
     const d = parsedIterations.get(iter);
     if (!d) continue;
 
-    const tableData =
-      iter === 5 && d.sectionTable
-        ? parseTable(d.sectionTable)
-        : { headers: [], rows: [] };
-
-    const sectionText =
-      iter === 5
-        ? [d.sectionText || "", d.sectionTextAfter || ""]
-            .filter(Boolean)
-            .join("\n\n")
-        : d.sectionText || "";
+    const sectionText = d.sectionText || "";
 
     sections.push({
       id: `section-imported-${iter}`,
@@ -166,7 +156,7 @@ export function buildArticleData(
         ? 45
         : 100,
       imageData: d.imageUrl || undefined,
-      tableData,
+      tableData: { headers: [], rows: [] },
     });
   }
 

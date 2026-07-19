@@ -236,24 +236,23 @@ test`;
   it("should validate table iteration (5) with sectionTable", () => {
     const data = {
       sectionTitle: "Сравнительная таблица",
-      sectionDesign: "table",
-      sectionText: "A".repeat(600),
-      sectionTable: "| A | B |\n|---|---|\n| 1 | 2 |",
+      sectionDesign: "text-only",
+      sectionText: "A".repeat(5000),
     };
 
     const result = iterationSchemas[5].safeParse(data);
     expect(result.success).toBe(true);
   });
 
-  it("should reject table iteration without sectionTable", () => {
+  it("should validate image-only iteration (6)", () => {
     const data = {
-      sectionTitle: "Сравнительная таблица",
-      sectionDesign: "table",
-      sectionText: "A".repeat(600),
+      sectionTitle: "Инфографика",
+      sectionDesign: "image-only",
+      imageUrl: "https://pixinlink.ru/1200x600/test",
     };
 
-    const result = iterationSchemas[5].safeParse(data);
-    expect(result.success).toBe(false);
+    const result = iterationSchemas[6].safeParse(data);
+    expect(result.success).toBe(true);
   });
 });
 
@@ -295,35 +294,31 @@ ${"B".repeat(5000)}
 ### sectionTitle
 Секция три
 ### sectionDesign
-image-left
+image-right
 ### imageUrl
 https://pixinlink.ru/800x400/test
 ### sectionText
 ${"C".repeat(5000)}
 
-## Итерация 5: Таблица
+## Итерация 5: Сравнительный анализ
 
 ### sectionTitle
-Таблица
+Сравнение
 ### sectionDesign
-table
+text-only
 ### sectionText
 ${"D".repeat(600)}
-### sectionTable
-| A | B |
-|---|---|
-| 1 | 2 |
 
-## Итерация 6: Инструменты
+## Итерация 6: Инфографика
 
 ### sectionTitle
-Инструменты
+Инфографика
 ### sectionDesign
-image-right
+image-only
 ### imageUrl
-https://pixinlink.ru/800x400/tools
+https://pixinlink.ru/1200x600/info
 ### sectionText
-${"E".repeat(5000)}
+Подпись
 
 ## Итерация 7: Выводы
 
@@ -431,21 +426,20 @@ describe("buildArticleData", () => {
     });
     iterations.set(4, {
       sectionTitle: "Секция 3",
-      sectionDesign: "image-left",
+      sectionDesign: "image-right",
       imageUrl: "https://pixinlink.ru/800x400/test",
       sectionText: "C".repeat(5000),
     });
     iterations.set(5, {
-      sectionTitle: "Таблица",
-      sectionDesign: "table",
+      sectionTitle: "Сравнительный анализ",
+      sectionDesign: "text-only",
       sectionText: "A".repeat(600),
-      sectionTable: "| A | B |\n|---|---|\n| 1 | 2 |",
     });
     iterations.set(6, {
-      sectionTitle: "Инструменты",
-      sectionDesign: "image-right",
-      imageUrl: "https://pixinlink.ru/800x400/tools",
-      sectionText: "D".repeat(5000),
+      sectionTitle: "Инфографика",
+      sectionDesign: "image-only",
+      imageUrl: "https://pixinlink.ru/1200x600/infographic",
+      sectionText: "Подпись",
     });
     iterations.set(7, {
       sectionTitle: "Выводы",
