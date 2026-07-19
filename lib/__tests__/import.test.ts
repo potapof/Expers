@@ -367,7 +367,7 @@ ${"F".repeat(5000)}
 
     expect(result.size).toBe(8);
     expect(result.get(1)?.["title"]).toBe("Тестовый заголовок");
-    expect(result.get(2)?.["sectiontitle"]).toBe("Секция один");
+    expect(result.get(2)?.["sectionTitle"]).toBe("Секция один");
     expect(result.get(8)?.["tldr"]).toBe(
       "Краткое содержание статьи длиной более двадцати"
     );

@@ -320,12 +320,12 @@ export function parseAllIterations(
     for (const block of blocks) {
       const newlineIdx = block.indexOf("\n");
       if (newlineIdx === -1) {
-        fields[block.trim().toLowerCase()] = "";
+        fields[block.trim()] = "";
         continue;
       }
       const key = block.slice(0, newlineIdx).trim();
       const value = block.slice(newlineIdx + 1).trim();
-      fields[key.toLowerCase()] = value;
+      fields[key] = value;
     }
 
     if (Object.keys(fields).length > 0) {

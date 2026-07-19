@@ -77,6 +77,17 @@ export function ArticleImportClient() {
         });
       } else {
         toast.error(result.error || "Ошибка создания статьи", { id });
+        if (result.details) {
+          const fieldErrors = result.details.fieldErrors;
+          if (fieldErrors) {
+            const msgs = Object.entries(fieldErrors)
+              .map(
+                ([field, errs]) => `${field}: ${(errs as string[]).join(", ")}`
+              )
+              .join("\n");
+            setTimeout(() => toast.error(msgs, { duration: 8000 }), 500);
+          }
+        }
       }
     } catch {
       toast.error("Ошибка соединения", { id });
