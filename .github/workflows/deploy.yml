@@ -3,6 +3,7 @@ name: Deploy to Server
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: deploy
@@ -12,7 +13,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
+      - name: Clean disk and deploy
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -25,6 +26,15 @@ jobs:
               exit 1
             fi
             cd "$PROJECT_DIR"
+
+            echo "=== Cleaning Docker ==="
+            docker system prune -af --volumes 2>/dev/null || true
+            echo "=== Cleaning git ==="
+            git gc --aggressive --prune=now 2>/dev/null || true
+            echo "=== Disk after cleanup ==="
+            df -h /
+
+            echo "=== Deploy ==="
             git pull
             docker compose down --remove-orphans
             docker rm -f $(docker ps -aq) 2>/dev/null || true
@@ -35,3 +45,4 @@ jobs:
             sleep 10
             docker compose exec app npm run db:migrate
             sudo systemctl reload caddy
+            echo "=== Deploy complete ==="
