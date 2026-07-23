@@ -88,8 +88,8 @@ test
     expect(result.success).toBe(false);
   });
 
-  it("should parse and validate iteration 8 (GEO blocks)", () => {
-    const md = `## Итерация 8: GEO-блоки
+  it("should parse and validate iteration 8 (FAQ + Todo)", () => {
+    const md = `## Итерация 8: FAQ и Чеклист
 
 ### faq
 Вопрос 1
@@ -100,45 +100,7 @@ test
 
 ### todo
 Пункт 1
-Пункт 2
-
-### tldr
-Краткое содержание статьи длиной более двадцати
-
-### keyFacts
-Факт 1
-Факт 2
-
-### definition
-Определение темы длиной более двадцати символов
-
-### featuredSnippetQuestion
-Вопрос для сниппета
-
-### featuredSnippetAnswer
-Развёрнутый ответ для featured snippet
-
-### problemSolutionProblem
-Проблема описана здесь длиной более двадцати
-
-### problemSolutionSolution
-Решение описано здесь длиной более двадцати символов
-
-### problemSolutionResult
-Результат описан здесь длиной более двадцати символов
-
-### howTo
-Шаг 1 — Название
-Описание
----
-Шаг 2 — Название
-Описание
-
-### methodology
-Методология исследования статьи
-
-### sources
-Источник 1 — https://example.com/1`;
+Пункт 2`;
 
     const result = parseIterationMarkdown(
       md,
@@ -147,11 +109,97 @@ test
     );
 
     expect(result.ok).toBe(true);
-    expect(result.data?.tldr).toBe(
-      "Краткое содержание статьи длиной более двадцати"
-    );
+    expect(result.data?.faq).toContain("Вопрос 1");
+    expect(result.data?.todo).toContain("Пункт 1");
 
     const zodResult = iterationSchemas[8].safeParse(result.data);
+    expect(zodResult.success).toBe(true);
+  });
+
+  it("should parse and validate iteration 9 (TL;DR, Key Facts, Definition, Featured Snippet)", () => {
+    const md = `## Итерация 9: Сниппеты и ключевые факты
+
+### tldr
+Краткое содержание статьи в двух-трёх предложениях
+
+### keyFacts
+Факт 1
+Факт 2
+
+### definition
+Определение темы в одном абзаце
+
+### featuredSnippetQuestion
+Вопрос для сниппета
+
+### featuredSnippetAnswer
+Развёрнутый ответ для featured snippet`;
+
+    const result = parseIterationMarkdown(
+      md,
+      TEMPLATE_ITERATIONS[8].outputFields,
+      TEMPLATE_ITERATIONS[8].optionalFields
+    );
+
+    expect(result.ok).toBe(true);
+    expect(result.data?.tldr).toBe(
+      "Краткое содержание статьи в двух-трёх предложениях"
+    );
+
+    const zodResult = iterationSchemas[9].safeParse(result.data);
+    expect(zodResult.success).toBe(true);
+  });
+
+  it("should parse and validate iteration 10 (Problem→Solution→Result + HowTo)", () => {
+    const md = `## Итерация 10: Проблема-решение и HowTo
+
+### problemSolutionProblem
+Проблема пользователя описана здесь
+
+### problemSolutionSolution
+Решение проблемы описано здесь
+
+### problemSolutionResult
+Результат после решения описан здесь
+
+### howTo
+Шаг 1 — Название
+Описание
+---
+Шаг 2 — Название
+Описание`;
+
+    const result = parseIterationMarkdown(
+      md,
+      TEMPLATE_ITERATIONS[9].outputFields,
+      TEMPLATE_ITERATIONS[9].optionalFields
+    );
+
+    expect(result.ok).toBe(true);
+
+    const zodResult = iterationSchemas[10].safeParse(result.data);
+    expect(zodResult.success).toBe(true);
+  });
+
+  it("should parse and validate iteration 11 (Methodology + Sources)", () => {
+    const md = `## Итерация 11: Методология, источники и самопроверка
+
+### methodology
+Методология исследования в одном абзаце
+
+### sources
+Источник 1 — https://example.com/1
+Источник 2 — https://example.com/2`;
+
+    const result = parseIterationMarkdown(
+      md,
+      TEMPLATE_ITERATIONS[10].outputFields,
+      TEMPLATE_ITERATIONS[10].optionalFields
+    );
+
+    expect(result.ok).toBe(true);
+
+    const zodResult = iterationSchemas[11].safeParse(result.data);
     expect(zodResult.success).toBe(true);
   });
 });
@@ -197,12 +245,15 @@ https://pixinlink.ru/800x400/test
 ### section3Текст
 ${"B".repeat(1500)}
 
-## Итерация 8: GEO
+## Итерация 8: FAQ
 
 ### faq
 Вопрос\\nОтвет
 ### todo
 Пункт 1\\nПункт 2
+
+## Итерация 9: Сниппеты
+
 ### tldr
 Краткое содержание статьи длиной более двадцати
 ### keyFacts
@@ -213,6 +264,9 @@ ${"B".repeat(1500)}
 Вопрос
 ### featuredSnippetAnswer
 Развёрнутый ответ для сниппета
+
+## Итерация 10: Решения
+
 ### problemSolutionProblem
 Проблема длиной более двадцати символов
 ### problemSolutionSolution
@@ -221,13 +275,16 @@ ${"B".repeat(1500)}
 Результат длиной более двадцати символов
 ### howTo
 Шаг 1\\nОписание
+
+## Итерация 11: Методология
+
 ### methodology
 Методология длиной более двадцати
 ### sources
 Источник — https://example.com`;
 
     const result = parseAllIterations(chat);
-    expect(result.size).toBe(3);
+    expect(result.size).toBe(6);
     expect(result.get(1)?.["title"]).toBe("Тестовый заголовок");
     expect(
       result.get(2)?.["sectioncount"] || result.get(2)?.["sectionCount"]
@@ -298,15 +355,21 @@ describe("buildArticleData", () => {
     iterations.set(8, {
       faq: "Вопрос\nОтвет",
       todo: "Пункт 1\nПункт 2",
+    });
+    iterations.set(9, {
       tldr: "Краткое содержание статьи длиной более двадцати",
       keyFacts: "Факт 1\nФакт 2",
       definition: "Определение длиной более двадцати символов для валидации",
       featuredSnippetQuestion: "Вопрос для featured snippet?",
       featuredSnippetAnswer: "Развёрнутый ответ на featured snippet вопрос",
+    });
+    iterations.set(10, {
       problemSolutionProblem: "Проблема длиной более двадцати символов",
       problemSolutionSolution: "Решение длиной более двадцати символов здесь",
       problemSolutionResult: "Результат длиной более двадцати символов описан",
       howTo: "Шаг 1\nОписание шага 1\n---\nШаг 2\nОписание шага 2",
+    });
+    iterations.set(11, {
       methodology: "Методология длиной более двадцати символов для проверки",
       sources: "Источник 1 — https://example.com/1",
     });

@@ -48,6 +48,7 @@ import {
   Clock,
   User,
   X,
+  Save,
   PenSquare,
   ImageIcon,
 } from "lucide-react";
@@ -324,6 +325,9 @@ export function ArticleWizardClient() {
     orderId: string;
   } | null>(null);
   const [payDialogOpen, setPayDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [originalStatus, setOriginalStatus] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -462,6 +466,10 @@ export function ArticleWizardClient() {
         if (isImport) {
           setStep(11);
           localStorage.removeItem("expers-import-draft");
+        } else {
+          setIsEditing(true);
+          setOriginalStatus(article.status);
+          localStorage.removeItem(STORAGE_KEY);
         }
 
         window.history.replaceState(
@@ -603,6 +611,69 @@ export function ArticleWizardClient() {
     setErrors({});
   }
 
+  function buildRequestBody(): Record<string, unknown> {
+    return {
+      title: data.title,
+      description: data.introduction,
+      content: data.content,
+      industryId: data.industryId,
+      industryName: data.industryName,
+      subsectionId: data.subsectionId,
+      subsectionName: data.subsectionName,
+      categoryId: data.categoryId,
+      categoryName: data.categoryName,
+      customCategory: data.customCategory,
+      expertiseAreas: data.expertiseAreas.filter(Boolean),
+      crossLinks: data.crossLinks,
+      tldr: data.tldr,
+      keyFacts: data.keyFacts.filter((kf) => kf.text),
+      definition: data.definition,
+      featuredSnippet: data.featuredSnippet,
+      problemSolutionResult: data.problemSolutionResult,
+      howTo: data.howTo.filter((h) => h.title),
+      faq: data.faq.filter((f) => f.question),
+      todo: data.todo.filter((t) => t.text),
+      methodology: data.methodology,
+      sources: data.sources.filter((s) => s.title),
+      sectionsText: JSON.stringify(data.sections),
+      ...(data.slug ? { slug: data.slug } : {}),
+    };
+  }
+
+  async function handleSaveDraft() {
+    if (!createdArticleId) return;
+    setSaving(true);
+    const token = localStorage.getItem("token");
+    const body = { ...buildRequestBody(), status: "draft" };
+
+    try {
+      const res = await fetch(`/api/articles/${createdArticleId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        toast.success("Черновик сохранён");
+        localStorage.removeItem(STORAGE_KEY);
+        if (result.article?.status !== originalStatus) {
+          setOriginalStatus(result.article?.status);
+        }
+      } else {
+        const result = await res.json().catch(() => ({}));
+        toast.error(result.error || "Ошибка сохранения");
+      }
+    } catch {
+      toast.error("Ошибка соединения");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function handlePublish() {
     setPublishing(true);
     const id = toast.loading("Публикуем статью...");
@@ -611,33 +682,46 @@ export function ArticleWizardClient() {
       const token = localStorage.getItem("token");
 
       let articleId = createdArticleId;
-      const body = {
-        title: data.title,
-        description: data.introduction,
-        content: data.content,
-        industryId: data.industryId,
-        industryName: data.industryName,
-        subsectionId: data.subsectionId,
-        subsectionName: data.subsectionName,
-        categoryId: data.categoryId,
-        categoryName: data.categoryName,
-        customCategory: data.customCategory,
-        expertiseAreas: data.expertiseAreas.filter(Boolean),
-        crossLinks: data.crossLinks,
-        tldr: data.tldr,
-        keyFacts: data.keyFacts.filter((kf) => kf.text),
-        definition: data.definition,
-        featuredSnippet: data.featuredSnippet,
-        problemSolutionResult: data.problemSolutionResult,
-        howTo: data.howTo.filter((h) => h.title),
-        faq: data.faq.filter((f) => f.question),
-        todo: data.todo.filter((t) => t.text),
-        methodology: data.methodology,
-        sources: data.sources.filter((s) => s.title),
-        ...(data.slug ? { slug: data.slug } : {}),
-      };
+      const body = buildRequestBody();
 
-      if (!articleId) {
+      if (articleId) {
+        const bodyWithStatus = { ...body, status: "pending_payment" };
+        const res = await fetch(`/api/articles/${articleId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(bodyWithStatus),
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          const articleStatus = result.article?.status;
+          localStorage.removeItem(STORAGE_KEY);
+
+          if (articleStatus === "pending_review") {
+            toast.success(
+              "Статья отправлена на модерацию. После проверки модератором она будет опубликована в каталоге.",
+              { id, duration: 6000 }
+            );
+            window.location.href = "/cabinet";
+            return;
+          }
+
+          setOriginalStatus(articleStatus);
+        } else if (res.status === 503) {
+          toast.error(
+            "База данных временно недоступна. Черновик сохранён — попробуйте позже.",
+            { id }
+          );
+          return;
+        } else {
+          toast.error(result.error || "Ошибка обновления статьи", { id });
+          return;
+        }
+      } else {
         const res = await fetch("/api/articles", {
           method: "POST",
           headers: {
@@ -750,7 +834,30 @@ export function ArticleWizardClient() {
 
   return (
     <div className="mx-auto px-4 max-w-4xl py-8">
-      <ProgressBar currentStep={step} steps={WIZARD_STEPS} />
+      <ProgressBar
+        currentStep={step}
+        steps={WIZARD_STEPS}
+        onStepClick={isEditing ? setStep : undefined}
+      />
+
+      {isEditing && originalStatus === "published" && (
+        <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
+          <p className="text-sm text-amber-800">
+            Вы редактируете опубликованную статью. При сохранении статья будет
+            снята с публикации и переведена в черновик. После доработки
+            отправьте её на модерацию повторно.
+          </p>
+        </div>
+      )}
+
+      {isEditing && originalStatus === "pending_review" && (
+        <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
+          <p className="text-sm text-blue-800">
+            Статья находится на модерации. При сохранении она будет отозвана с
+            проверки и возвращена в черновик.
+          </p>
+        </div>
+      )}
 
       <div className="mt-8">
         {step === 1 && (
@@ -823,7 +930,25 @@ export function ArticleWizardClient() {
           Назад
         </Button>
 
-        <span className="text-sm text-gray-400">Шаг {step} из 12</span>
+        <div className="flex items-center gap-2">
+          {isEditing && !saving && (
+            <Button
+              variant="outline"
+              onClick={handleSaveDraft}
+              className="gap-2"
+            >
+              <Save className="h-4 w-4" />
+              Сохранить черновик
+            </Button>
+          )}
+          {saving && (
+            <Button variant="outline" disabled className="gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />
+              Сохранение...
+            </Button>
+          )}
+          <span className="text-sm text-gray-400">Шаг {step} из 12</span>
+        </div>
 
         {step < 11 ? (
           <Button onClick={handleNext} className="gap-2">
@@ -835,6 +960,36 @@ export function ArticleWizardClient() {
             К публикации
             <ChevronRight className="h-4 w-4" />
           </Button>
+        ) : step === 12 && isEditing ? (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleSaveDraft}
+              disabled={saving}
+              size="default"
+              className="gap-2"
+            >
+              <Save className="h-4 w-4" />
+              Сохранить черновик
+            </Button>
+            <Button
+              onClick={handlePublish}
+              disabled={publishing}
+              className="gap-2"
+            >
+              {publishing ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Публикуем...
+                </>
+              ) : (
+                <>
+                  Опубликовать
+                  <Send className="h-4 w-4" />
+                </>
+              )}
+            </Button>
+          </div>
         ) : (
           <Button
             onClick={handlePublish}
@@ -862,18 +1017,25 @@ export function ArticleWizardClient() {
 function ProgressBar({
   currentStep,
   steps,
+  onStepClick,
 }: {
   currentStep: number;
   steps: WizardStep[];
+  onStepClick?: (step: number) => void;
 }) {
+  const isClickable = !!onStepClick;
   return (
     <div className="hidden sm:block">
       <div className="flex items-center justify-between mb-2">
         {steps.map((s) => (
           <div key={s.id} className="flex items-center flex-1">
-            <div
+            <button
+              type="button"
+              onClick={() => onStepClick?.(s.id)}
+              disabled={!isClickable}
               className={cn(
-                "flex items-center justify-center h-8 w-8 rounded-full text-xs font-medium shrink-0 transition-colors",
+                "flex items-center justify-center h-8 w-8 rounded-full text-xs font-medium shrink-0 transition-colors border-0",
+                isClickable && "cursor-pointer hover:opacity-80",
                 s.id < currentStep
                   ? "bg-[#27AE60] text-white"
                   : s.id === currentStep
@@ -882,7 +1044,7 @@ function ProgressBar({
               )}
             >
               {s.id < currentStep ? <Check className="h-4 w-4" /> : s.id}
-            </div>
+            </button>
             {s.id < 12 && (
               <div
                 className={cn(

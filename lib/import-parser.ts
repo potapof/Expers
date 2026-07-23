@@ -133,6 +133,9 @@ export function buildArticleData(
 ): ImportArticleData {
   const i1 = parsedIterations.get(1) || {};
   const i8 = parsedIterations.get(8) || {};
+  const i9 = parsedIterations.get(9) || {};
+  const i10 = parsedIterations.get(10) || {};
+  const i11 = parsedIterations.get(11) || {};
 
   const sections: ArticleSection[] = [];
 
@@ -201,13 +204,13 @@ export function buildArticleData(
   const todoStr = i8.todo || "";
   const todo = parseTodo(todoStr);
 
-  const keyFactsStr = i8.keyFacts || "";
+  const keyFactsStr = i9.keyFacts || i8.keyFacts || "";
   const keyFacts = parseKeyFacts(keyFactsStr);
 
-  const howToStr = i8.howTo || "";
+  const howToStr = i10.howTo || i8.howTo || "";
   const howTo = parseHowTo(howToStr);
 
-  const sourcesStr = i8.sources || "";
+  const sourcesStr = i11.sources || i8.sources || "";
   const sources = parseSources(sourcesStr);
 
   return {
@@ -228,22 +231,22 @@ export function buildArticleData(
       "Стратегическое планирование",
     ],
     crossLinks: [],
-    tldr: i8.tldr || "",
+    tldr: i9.tldr || i8.tldr || "",
     keyFacts,
-    definition: i8.definition || "",
+    definition: i9.definition || i8.definition || "",
     featuredSnippet: {
-      question: i8.featuredSnippetQuestion || "",
-      answer: i8.featuredSnippetAnswer || "",
+      question: i9.featuredSnippetQuestion || i8.featuredSnippetQuestion || "",
+      answer: i9.featuredSnippetAnswer || i8.featuredSnippetAnswer || "",
     },
     problemSolutionResult: {
-      problem: i8.problemSolutionProblem || "",
-      solution: i8.problemSolutionSolution || "",
-      result: i8.problemSolutionResult || "",
+      problem: i10.problemSolutionProblem || i8.problemSolutionProblem || "",
+      solution: i10.problemSolutionSolution || i8.problemSolutionSolution || "",
+      result: i10.problemSolutionResult || i8.problemSolutionResult || "",
     },
     howTo,
     faq,
     todo,
-    methodology: i8.methodology || "",
+    methodology: i11.methodology || i8.methodology || "",
     sources,
     sectionsText: JSON.stringify(sections),
   };

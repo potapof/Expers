@@ -52,16 +52,22 @@ export const iterationSchemas: Record<number, z.ZodTypeAny> = {
   8: z.object({
     faq: z.string().min(1),
     todo: z.string().min(1),
-    tldr: z.string().max(30),
+  }),
+  9: z.object({
+    tldr: z.string().min(1),
     keyFacts: z.string().min(1),
-    definition: z.string().max(30),
-    featuredSnippetQuestion: z.string().max(30),
+    definition: z.string().max(400),
+    featuredSnippetQuestion: z.string().max(120),
     featuredSnippetAnswer: z.string(),
-    problemSolutionProblem: z.string().max(30),
-    problemSolutionSolution: z.string().max(30),
-    problemSolutionResult: z.string().max(30),
+  }),
+  10: z.object({
+    problemSolutionProblem: z.string().max(200),
+    problemSolutionSolution: z.string().max(200),
+    problemSolutionResult: z.string().max(200),
     howTo: z.string().min(1),
-    methodology: z.string().max(1000),
+  }),
+  11: z.object({
+    methodology: z.string().max(500),
     sources: z.string().min(1),
   }),
 };
@@ -95,21 +101,21 @@ export const importArticleSchema = z.object({
     )
     .max(8)
     .default([]),
-  tldr: z.string().max(30),
+  tldr: z.string().max(250),
   keyFacts: z
     .array(z.object({ icon: z.string(), text: z.string().min(1) }))
     .min(0)
     .max(7)
     .default([]),
-  definition: z.string().max(30),
+  definition: z.string().max(400),
   featuredSnippet: z.object({
-    question: z.string().max(30),
+    question: z.string().max(120),
     answer: z.string(),
   }),
   problemSolutionResult: z.object({
-    problem: z.string().max(30),
-    solution: z.string().max(30),
-    result: z.string().max(30),
+    problem: z.string().max(200),
+    solution: z.string().max(200),
+    result: z.string().max(200),
   }),
   howTo: z
     .array(

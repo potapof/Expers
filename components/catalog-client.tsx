@@ -196,7 +196,10 @@ export function CatalogClient({ articles }: { articles: CatalogArticle[] }) {
       </aside>
       <main className="flex-1 min-w-0 py-8">
         <div className="flex items-center justify-between mb-1">
-          <h1 className="text-3xl font-bold tracking-tight text-[#2C3E50]">
+          <h1
+            className="text-3xl font-bold tracking-tight text-[#2C3E50]"
+            suppressHydrationWarning
+          >
             {selectedCategoryId
               ? (() => {
                   const cat = getCategoryName(selectedCategoryId);
@@ -244,7 +247,10 @@ export function CatalogClient({ articles }: { articles: CatalogArticle[] }) {
                           {industry?.name}
                         </span>
                       </div>
-                      <h2 className="text-xl font-semibold text-[#2C3E50] group-hover:text-[#0039CA] transition-colors leading-snug mb-2">
+                      <h2
+                        className="text-xl font-semibold text-[#2C3E50] group-hover:text-[#0039CA] transition-colors leading-snug mb-2"
+                        suppressHydrationWarning
+                      >
                         {article.title}
                       </h2>
                       <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 mb-3">

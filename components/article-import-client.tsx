@@ -43,9 +43,9 @@ export function ArticleImportClient() {
         return;
       }
 
-      if (parsedIterations.size < 4) {
+      if (parsedIterations.size < 6) {
         toast.error(
-          `Найдено только ${parsedIterations.size} итераций. Нужно минимум 4 (заголовок, секции, GEO-блоки).`,
+          `Найдено только ${parsedIterations.size} итераций. Нужно минимум 6 (заголовок, секции, GEO-блоки).`,
           { id }
         );
         setImporting(false);
@@ -179,7 +179,7 @@ export function ArticleImportClient() {
               итерацию N и напишите Продолжить».
             </li>
             <li>
-              Когда ИИ завершит все 8 итераций, скопируйте{" "}
+              Когда ИИ завершит все 11 итераций, скопируйте{" "}
               <strong>весь диалог</strong> и вставьте в поле ниже.
             </li>
             <li>
@@ -194,10 +194,11 @@ export function ArticleImportClient() {
             <br />
             <strong>Итерация 1</strong> — заголовок, введение и slug.
             <br />
-            <strong>Итерации 2–7</strong> — основной контент (6 секций, 80–120
-            KB).
+            <strong>Итерации 2–7</strong> — основной контент (34 секции, 6
+            блоков).
             <br />
-            <strong>Итерация 8</strong> — SEO-блоки (FAQ, чеклист, сниппеты).
+            <strong>Итерации 8–11</strong> — GEO-блоки (FAQ, чеклист, сниппеты,
+            HowTo, источники).
           </p>
         </div>
       )}
@@ -215,8 +216,8 @@ export function ArticleImportClient() {
           onChange={(e) => setText(e.target.value)}
           placeholder={`Вставьте сюда весь ответ ИИ...
 
-Пример формата:
-## Итерация 1: Заголовок и введение
+Пример формата (11 итераций):
+## Итерация 1: Заголовок и SEO
 
 ### title
 Мой заголовок
@@ -227,19 +228,29 @@ export function ArticleImportClient() {
 ### slug
 my-slug
 
-## Итерация 2: Секция 1 — Погружение в проблему
+## Итерация 2: Погружение в проблему
 
-### sectionTitle
+### sectionCount
+8
+
+### section1Заголовок
 Заголовок секции
+### section1Дизайн
+image-only
+### section1Картинка
+https://pixinlink.ru/1200x600/example
+### section1Текст
+Подпись...
 
-### sectionDesign
-image-right
+### section2Заголовок
+Заголовок секции 2
+### section2Дизайн
+text-only
+### section2Текст
+Полный текст секции...
 
-### imageUrl
-https://pixinlink.ru/800x400/example
-
-### sectionText
-Полный текст секции...`}
+## Итерация 8: FAQ и Чеклист
+...`}
           rows={20}
           className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-mono outline-none transition-colors focus:border-[#0039CA] focus:ring-1 focus:ring-[#0039CA] resize-y"
         />
