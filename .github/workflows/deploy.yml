@@ -45,9 +45,14 @@ jobs:
 
             echo "=== Diagnostics ==="
             docker compose ps
-            echo "---"
-            docker compose logs --tail=20 app
-            echo "---"
-            sleep 3
-            curl -sf http://localhost:8080/api/health && echo "OK: health" || echo "FAIL: health"
+            echo "--- app health ---"
+            curl -sf http://localhost:8080/api/health && echo "OK: app" || echo "FAIL: app"
+            echo "--- caddy health ---"
+            curl -sf http://localhost:2019/config/ 2>/dev/null && echo "OK: caddy api" || echo "WARN: caddy api"
+            echo "--- public check ---"
+            curl -sf --max-time 5 https://expers.ru/api/health && echo "OK: public" || echo "FAIL: public"
+            echo "--- caddy status ---"
+            sudo systemctl status caddy --no-pager -l 2>&1 | tail -10
+            echo "--- app logs ---"
+            docker compose logs --tail=15 app
             echo "=== Deploy complete ==="
