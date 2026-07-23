@@ -13,7 +13,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Clean disk and deploy
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -28,12 +28,8 @@ jobs:
             fi
             cd "$PROJECT_DIR"
 
-            echo "=== Cleaning Docker ==="
-            docker system prune -af --volumes 2>/dev/null || true
-            echo "=== Cleaning git ==="
-            git gc --aggressive --prune=now 2>/dev/null || true
-            echo "=== Disk after cleanup ==="
-            df -h /
+            echo "=== Disk ==="
+            df -h / | tail -1
 
             echo "=== Deploy ==="
             git pull
@@ -46,4 +42,12 @@ jobs:
             sleep 10
             docker compose exec app npm run db:migrate
             sudo systemctl reload caddy
+
+            echo "=== Diagnostics ==="
+            docker compose ps
+            echo "---"
+            docker compose logs --tail=20 app
+            echo "---"
+            sleep 3
+            curl -sf http://localhost:8080/api/health && echo "OK: health" || echo "FAIL: health"
             echo "=== Deploy complete ==="
