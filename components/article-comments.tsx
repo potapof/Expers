@@ -171,7 +171,10 @@ export function ArticleComments({
     <section className="mt-12">
       <Separator className="mb-8" />
 
-      <h2 className="mb-6 flex items-center gap-2 text-xl font-bold text-[#2C3E50]">
+      <h2
+        className="mb-6 flex items-center gap-2 text-xl font-bold text-[#2C3E50]"
+        suppressHydrationWarning
+      >
         <MessageSquare className="h-5 w-5 text-[#0039CA]" />
         Комментарии
         {topLevelComments.length > 0 && (

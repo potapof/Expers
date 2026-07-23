@@ -415,7 +415,12 @@ function HowToBlock({
               {index + 1}
             </span>
             <div>
-              <h4 className="font-medium text-[#2C3E50] mb-1">{step.title}</h4>
+              <h4
+                className="font-medium text-[#2C3E50] mb-1"
+                suppressHydrationWarning
+              >
+                {step.title}
+              </h4>
               <p className="text-sm text-gray-600 leading-relaxed">
                 {step.description}
               </p>
@@ -553,7 +558,9 @@ function AuthorBlock({
           {author.name.charAt(0)}
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-[#2C3E50]">{author.name}</h3>
+          <h3 className="font-semibold text-[#2C3E50]" suppressHydrationWarning>
+            {author.name}
+          </h3>
           {author.bio && (
             <p className="text-sm text-gray-600 mt-1 leading-relaxed">
               {author.bio}
@@ -670,7 +677,10 @@ function CrossLinksBlock({ related }: { related: RelatedArticle[] }) {
                   {relIndustry?.name || item.industryId}
                 </span>
               </div>
-              <h4 className="text-sm font-medium text-[#2C3E50] group-hover:text-[#0039CA] transition-colors leading-snug">
+              <h4
+                className="text-sm font-medium text-[#2C3E50] group-hover:text-[#0039CA] transition-colors leading-snug"
+                suppressHydrationWarning
+              >
                 {item.title}
               </h4>
               {(item.authorName || item.date) && (
@@ -703,6 +713,7 @@ function ArticleContentBlock({ content }: { content: string }) {
             <h2
               key={index}
               className="text-xl font-semibold text-[#2C3E50] mt-8 mb-4"
+              suppressHydrationWarning
             >
               {para.replace("## ", "")}
             </h2>
@@ -713,6 +724,7 @@ function ArticleContentBlock({ content }: { content: string }) {
             <h3
               key={index}
               className="text-lg font-semibold text-[#2C3E50] mt-6 mb-3"
+              suppressHydrationWarning
             >
               {para.replace("### ", "")}
             </h3>
@@ -822,7 +834,10 @@ export default async function ArticleSlugPage({
             </span>
           </div>
 
-          <h1 className="text-3xl font-bold tracking-tight text-[#2C3E50] leading-tight mb-4">
+          <h1
+            className="text-3xl font-bold tracking-tight text-[#2C3E50] leading-tight mb-4"
+            suppressHydrationWarning
+          >
             {articleView.title}
           </h1>
 
