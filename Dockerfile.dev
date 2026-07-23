@@ -1,13 +1,13 @@
 FROM node:24-alpine
 
-RUN apk add --no-cache openssl ca-certificates
+RUN npm install -g npm@10 && apk add --no-cache openssl ca-certificates
 
 WORKDIR /app
 
 # Install dependencies inside the image so native binaries match Alpine (musl).
 # Host node_modules must NOT be mounted over this (see docker-compose anonymous volume).
 COPY package.json package-lock.json ./
-RUN npm config set allow-scripts true && npm ci
+RUN npm ci
 
 EXPOSE 8080
 
