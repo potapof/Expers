@@ -19,6 +19,7 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          command_timeout: 20m
           script: |
             PROJECT_DIR=$(find "$HOME" -maxdepth 3 -name "docker-compose.yml" 2>/dev/null | head -1 | xargs dirname)
             if [ -z "$PROJECT_DIR" ]; then
