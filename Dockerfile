@@ -1,7 +1,7 @@
 # Production Dockerfile for Yandex Cloud Serverless Container
 # This Dockerfile is optimized for production deployment
 
-FROM node:24-alpine AS builder
+FROM node:24.11-alpine AS builder
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN mkdir -p public
 RUN npm run build
 
 # Production stage
-FROM node:24-alpine AS runner
+FROM node:24.11-alpine AS runner
 
 WORKDIR /app
 

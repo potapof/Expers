@@ -1,4 +1,4 @@
-FROM node:24-alpine
+FROM node:24.11-alpine
 
 RUN npm install -g npm@10 && apk add --no-cache openssl ca-certificates
 

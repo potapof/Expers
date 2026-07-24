@@ -28,7 +28,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    await approveArticle(parsed.data.articleId);
+    const ok = await approveArticle(parsed.data.articleId);
+    if (!ok) {
+      return NextResponse.json(
+        { error: "Статья не в статусе ожидания проверки" },
+        { status: 409 }
+      );
+    }
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Approve moderation error:", err);

@@ -1388,27 +1388,29 @@ export async function getModerationQueue(): Promise<Article[]> {
   return rows.map(rowToArticle);
 }
 
-export async function approveArticle(id: string): Promise<void> {
-  db.update(articles)
+export async function approveArticle(id: string): Promise<boolean> {
+  const result = db.update(articles)
     .set({ status: "published", updatedAt: new Date().toISOString() })
-    .where(eq(articles.id, id))
+    .where(and(eq(articles.id, id), eq(articles.status, "pending_review")))
     .run();
+  return result.changes > 0;
 }
 
-export async function rejectArticle(id: string, reason: string): Promise<void> {
+export async function rejectArticle(id: string, reason: string): Promise<boolean> {
   const article = await getArticleById(id);
   const rejectionNote = article
     ? `[Отклонено: ${reason}] ${article.description}`
     : `[Отклонено: ${reason}]`;
 
-  db.update(articles)
+  const result = db.update(articles)
     .set({
       status: "draft",
       updatedAt: new Date().toISOString(),
       description: rejectionNote,
     })
-    .where(eq(articles.id, id))
+    .where(and(eq(articles.id, id), eq(articles.status, "pending_review")))
     .run();
+  return result.changes > 0;
 }
 
 export async function getModerationCount(): Promise<number> {

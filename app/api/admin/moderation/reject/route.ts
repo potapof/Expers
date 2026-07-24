@@ -29,7 +29,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    await rejectArticle(parsed.data.articleId, parsed.data.reason);
+    const ok = await rejectArticle(parsed.data.articleId, parsed.data.reason);
+    if (!ok) {
+      return NextResponse.json(
+        { error: "Статья не в статусе ожидания проверки" },
+        { status: 409 }
+      );
+    }
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Ошибка отклонения" }, { status: 500 });
