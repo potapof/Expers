@@ -25,7 +25,11 @@ import {
 import { Button } from "@/components/ui/button";
 
 type ArticleStatus =
-  "draft" | "published" | "archived" | "pending_payment" | "pending_review";
+  | "draft"
+  | "published"
+  | "archived"
+  | "pending_payment"
+  | "pending_review";
 
 const CABINET_IMPORT_PATH = "/cabinet/import";
 
@@ -76,7 +80,8 @@ function syncFromPublished(expertId: string, expertName: string): void {
       if (!id || existingIds.has(id)) continue;
 
       const full = (item as Record<string, unknown>)._full as
-        Record<string, unknown> | undefined;
+        | Record<string, unknown>
+        | undefined;
 
       const now = new Date().toISOString();
       const article: Article = {

@@ -219,7 +219,11 @@ export interface Article {
   sources: { title: string; url: string }[];
   readTime: string;
   status:
-    "draft" | "published" | "archived" | "pending_payment" | "pending_review";
+    | "draft"
+    | "published"
+    | "archived"
+    | "pending_payment"
+    | "pending_review";
   expertId: string;
   sectionsText?: string | null;
   createdAt: string;
@@ -784,7 +788,11 @@ export async function setSections(
 }
 
 export type PaymentStatus =
-  "NEW" | "CONFIRMED" | "REJECTED" | "CANCELED" | "REFUNDED";
+  | "NEW"
+  | "CONFIRMED"
+  | "REJECTED"
+  | "CANCELED"
+  | "REFUNDED";
 
 export interface Payment {
   orderId: string;
