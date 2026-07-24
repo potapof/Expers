@@ -39,15 +39,7 @@ export function SubscribeSectionButton({
   if (!expert) {
     return (
       <span
-        role="button"
-        tabIndex={-1}
-        aria-disabled="true"
-        onClick={(e) => {
-          e.stopPropagation();
-          toast("Подписки доступны после входа", {
-            description: "Войдите или зарегистрируйтесь, чтобы подписаться",
-          });
-        }}
+        aria-hidden="true"
         className="shrink-0 rounded p-1 text-gray-200 cursor-not-allowed"
         title="Войдите, чтобы подписаться"
       >
