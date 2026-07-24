@@ -19,7 +19,7 @@ function S({
 }) {
   return (
     <section className="mb-8">
-      <h2 className="text-lg font-bold text-[#2C3E50] mb-3">
+      <h2 suppressHydrationWarning className="text-lg font-bold text-[#2C3E50] mb-3">
         {n}. {title}
       </h2>
       <div className="space-y-2.5 text-[15px] leading-relaxed text-gray-600">
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
               <ShieldCheck className="h-6 w-6 text-[#0039CA]" />
             </span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#2C3E50] mb-3">
+          <h1 suppressHydrationWarning className="text-3xl font-bold tracking-tight text-[#2C3E50] mb-3">
             Политика обработки персональных данных
           </h1>
           <p className="text-xs text-gray-400 mt-3">

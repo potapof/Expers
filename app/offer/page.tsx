@@ -19,7 +19,7 @@ function S({
 }) {
   return (
     <section className="mb-8">
-      <h2 className="text-lg font-bold text-[#2C3E50] mb-3">
+      <h2 suppressHydrationWarning className="text-lg font-bold text-[#2C3E50] mb-3">
         {n}. {title}
       </h2>
       <div className="space-y-2.5 text-[15px] leading-relaxed text-gray-600">
@@ -39,7 +39,7 @@ export default function OfferPage() {
               <FileText className="h-6 w-6 text-[#0039CA]" />
             </span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#2C3E50] mb-3">
+          <h1 suppressHydrationWarning className="text-3xl font-bold tracking-tight text-[#2C3E50] mb-3">
             Публичная оферта
           </h1>
           <p className="text-gray-500 text-sm max-w-xl mx-auto">
@@ -322,7 +322,7 @@ export default function OfferPage() {
         </S>
 
         <section className="mt-10 rounded-2xl border border-gray-100 bg-gray-50/60 p-6">
-          <h2 className="text-lg font-bold text-[#2C3E50] mb-4">
+          <h2 suppressHydrationWarning className="text-lg font-bold text-[#2C3E50] mb-4">
             11. Реквизиты Исполнителя
           </h2>
           <dl className="grid gap-y-2 gap-x-6 sm:grid-cols-[220px_1fr] text-sm text-gray-600">

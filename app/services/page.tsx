@@ -35,7 +35,7 @@ export default function ServicesPage() {
             <Sparkles className="h-4 w-4" />
             Читателям и экспертам
           </span>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#2C3E50] mb-5">
+          <h1 suppressHydrationWarning className="text-4xl sm:text-5xl font-bold tracking-tight text-[#2C3E50] mb-5">
             Услуги EXPERS.ru
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
@@ -48,7 +48,7 @@ export default function ServicesPage() {
         {/* Читателю */}
         <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="text-center mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3E50] mb-3">
+            <h2 suppressHydrationWarning className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3E50] mb-3">
               Читателю — бесплатно
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
@@ -65,7 +65,7 @@ export default function ServicesPage() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0039CA]/10 mb-4">
                 <BookOpen className="h-5 w-5 text-[#0039CA]" />
               </div>
-              <h3 className="text-lg font-semibold text-[#2C3E50] mb-2">
+              <h3 suppressHydrationWarning className="text-lg font-semibold text-[#2C3E50] mb-2">
                 Каталог статей по 13 отраслям
               </h3>
               <p className="text-sm leading-relaxed text-gray-500">
@@ -81,7 +81,7 @@ export default function ServicesPage() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0039CA]/10 mb-4">
                 <Heart className="h-5 w-5 text-[#0039CA]" />
               </div>
-              <h3 className="text-lg font-semibold text-[#2C3E50] mb-2">
+              <h3 suppressHydrationWarning className="text-lg font-semibold text-[#2C3E50] mb-2">
                 Личный кабинет
               </h3>
               <p className="text-sm leading-relaxed text-gray-500">
@@ -95,7 +95,7 @@ export default function ServicesPage() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0039CA]/10 mb-4">
                 <Bell className="h-5 w-5 text-[#0039CA]" />
               </div>
-              <h3 className="text-lg font-semibold text-[#2C3E50] mb-2">
+              <h3 suppressHydrationWarning className="text-lg font-semibold text-[#2C3E50] mb-2">
                 Подписки
               </h3>
               <p className="text-sm leading-relaxed text-gray-500">
@@ -109,7 +109,7 @@ export default function ServicesPage() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0039CA]/10 mb-4">
                 <MessageSquare className="h-5 w-5 text-[#0039CA]" />
               </div>
-              <h3 className="text-lg font-semibold text-[#2C3E50] mb-2">
+              <h3 suppressHydrationWarning className="text-lg font-semibold text-[#2C3E50] mb-2">
                 Комментарии
               </h3>
               <p className="text-sm leading-relaxed text-gray-500">
@@ -125,7 +125,7 @@ export default function ServicesPage() {
         {/* Автору */}
         <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="text-center mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3E50] mb-3">
+            <h2 suppressHydrationWarning className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3E50] mb-3">
               Автору-эксперту — публикация статьи
             </h2>
             <div className="inline-flex items-baseline gap-2 rounded-full bg-[#0039CA] px-6 py-2.5">
@@ -138,7 +138,7 @@ export default function ServicesPage() {
 
           <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden">
             <div className="border-b border-gray-100 bg-gray-50/60 px-6 py-4">
-              <h3 className="font-semibold text-[#2C3E50] flex items-center gap-2">
+              <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50] flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-[#1ABC9C]" />
                 Что входит
               </h3>
@@ -265,7 +265,7 @@ export default function ServicesPage() {
         {/* Скоро */}
         <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="text-center mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3E50] mb-3">
+            <h2 suppressHydrationWarning className="text-2xl sm:text-3xl font-bold tracking-tight text-[#2C3E50] mb-3">
               Скоро
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
@@ -284,7 +284,7 @@ export default function ServicesPage() {
                   Скоро
                 </span>
               </div>
-              <h3 className="font-semibold text-[#2C3E50] mb-2">
+              <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50] mb-2">
                 Приоритетное размещение
               </h3>
               <p className="text-sm leading-relaxed text-gray-500">
@@ -303,7 +303,7 @@ export default function ServicesPage() {
                   Скоро
                 </span>
               </div>
-              <h3 className="font-semibold text-[#2C3E50] mb-2">
+              <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50] mb-2">
                 Реклама в каталоге
               </h3>
               <p className="text-sm leading-relaxed text-gray-500">
@@ -322,7 +322,7 @@ export default function ServicesPage() {
                   Скоро
                 </span>
               </div>
-              <h3 className="font-semibold text-[#2C3E50] mb-2">
+              <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50] mb-2">
                 Продвижение страницы автора
               </h3>
               <p className="text-sm leading-relaxed text-gray-500">
@@ -342,7 +342,7 @@ export default function ServicesPage() {
                   <Globe className="h-6 w-6 text-white" />
                 </span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+              <h2 suppressHydrationWarning className="text-2xl sm:text-3xl font-bold text-white mb-4">
                 Начните публиковаться сегодня
               </h2>
               <p className="text-white/80 leading-relaxed max-w-2xl mx-auto mb-8">

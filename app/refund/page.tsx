@@ -24,7 +24,7 @@ export default function RefundPage() {
               <RotateCcw className="h-6 w-6 text-[#0039CA]" />
             </span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#2C3E50] mb-3">
+          <h1 suppressHydrationWarning className="text-3xl font-bold tracking-tight text-[#2C3E50] mb-3">
             Условия возврата
           </h1>
           <p className="text-gray-500 text-sm max-w-xl mx-auto">
@@ -59,7 +59,7 @@ export default function RefundPage() {
         </div>
 
         <section>
-          <h2 className="text-lg font-bold text-[#2C3E50] mb-4">
+          <h2 suppressHydrationWarning className="text-lg font-bold text-[#2C3E50] mb-4">
             Когда возврат возможен
           </h2>
           <div className="space-y-3">
@@ -83,7 +83,7 @@ export default function RefundPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-bold text-[#2C3E50] mb-4">
+          <h2 suppressHydrationWarning className="text-lg font-bold text-[#2C3E50] mb-4">
             Когда возврат невозможен
           </h2>
           <div className="space-y-3">
@@ -104,7 +104,7 @@ export default function RefundPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-bold text-[#2C3E50] mb-4">
+          <h2 suppressHydrationWarning className="text-lg font-bold text-[#2C3E50] mb-4">
             Как оформить возврат
           </h2>
           <div className="space-y-0">
@@ -140,7 +140,7 @@ export default function RefundPage() {
         </section>
 
         <section className="rounded-2xl border border-gray-100 bg-gray-50/60 p-6">
-          <h2 className="text-base font-bold text-[#2C3E50] mb-4">
+          <h2 suppressHydrationWarning className="text-base font-bold text-[#2C3E50] mb-4">
             Контакты для обращений
           </h2>
           <div className="grid gap-3 sm:grid-cols-2">

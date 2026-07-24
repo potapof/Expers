@@ -35,7 +35,7 @@ function SectionHeading({
   children: React.ReactNode;
 }) {
   return (
-    <h2 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-[#2C3E50] mb-4">
+    <h2 suppressHydrationWarning className="flex items-center gap-3 text-2xl font-bold tracking-tight text-[#2C3E50] mb-4">
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0039CA]/10">
         <Icon className="h-5 w-5 text-[#0039CA]" />
       </span>
@@ -54,7 +54,7 @@ export default function AboutPage() {
             <Sparkles className="h-4 w-4" />
             Generative Engine Optimization
           </span>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#2C3E50] mb-5">
+          <h1 suppressHydrationWarning className="text-4xl sm:text-5xl font-bold tracking-tight text-[#2C3E50] mb-5">
             О каталоге EXPERS.ru
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
@@ -170,7 +170,7 @@ export default function AboutPage() {
               <div className="rounded-xl border border-gray-100 bg-white p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <XCircle className="h-5 w-5 text-red-400 shrink-0" />
-                  <h3 className="font-semibold text-[#2C3E50]">LinkedIn</h3>
+                  <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50]">LinkedIn</h3>
                 </div>
                 <p className="text-sm text-gray-500 leading-relaxed">
                   Крупнейшая профессиональная соцсеть в мире. Но для российского
@@ -185,7 +185,7 @@ export default function AboutPage() {
               <div className="rounded-xl border border-gray-100 bg-white p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <XCircle className="h-5 w-5 text-red-400 shrink-0" />
-                  <h3 className="font-semibold text-[#2C3E50]">ТенЧат</h3>
+                  <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50]">ТенЧат</h3>
                 </div>
                 <p className="text-sm text-gray-500 leading-relaxed">
                   Российская платформа, но с сильным фокусом на медийную
@@ -201,7 +201,7 @@ export default function AboutPage() {
               <div className="rounded-xl border border-gray-100 bg-white p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <XCircle className="h-5 w-5 text-red-400 shrink-0" />
-                  <h3 className="font-semibold text-[#2C3E50]">
+                  <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50]">
                     Собственный сайт компании
                   </h3>
                 </div>
@@ -218,7 +218,7 @@ export default function AboutPage() {
               <div className="rounded-xl border-2 border-[#0039CA]/30 bg-blue-50/40 p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle2 className="h-5 w-5 text-[#1ABC9C] shrink-0" />
-                  <h3 className="font-semibold text-[#2C3E50]">EXPERS.ru</h3>
+                  <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50]">EXPERS.ru</h3>
                 </div>
                 <p className="text-sm text-gray-600 leading-relaxed">
                   Каталог, специально спроектированный для того, чтобы эксперты
@@ -287,7 +287,7 @@ export default function AboutPage() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0039CA]/10 mb-4">
                 <Users className="h-5 w-5 text-[#0039CA]" />
               </div>
-              <h2 className="text-xl font-bold text-[#2C3E50] mb-3">
+              <h2 suppressHydrationWarning className="text-xl font-bold text-[#2C3E50] mb-3">
                 Что получает автор-эксперт
               </h2>
               <div className="space-y-3 text-sm leading-relaxed text-gray-600">
@@ -311,7 +311,7 @@ export default function AboutPage() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1ABC9C]/10 mb-4">
                 <Building2 className="h-5 w-5 text-[#1ABC9C]" />
               </div>
-              <h2 className="text-xl font-bold text-[#2C3E50] mb-3">
+              <h2 suppressHydrationWarning className="text-xl font-bold text-[#2C3E50] mb-3">
                 Что получает компания
               </h2>
               <div className="space-y-3 text-sm leading-relaxed text-gray-600">
@@ -378,7 +378,7 @@ export default function AboutPage() {
               >
                 <div className="flex items-center gap-2.5 mb-1.5">
                   <item.icon className="h-4.5 w-4.5 text-[#0039CA] shrink-0" />
-                  <h3 className="text-sm font-semibold text-[#2C3E50]">
+                  <h3 suppressHydrationWarning className="text-sm font-semibold text-[#2C3E50]">
                     {item.title}
                   </h3>
                 </div>
@@ -430,7 +430,7 @@ export default function AboutPage() {
                   <ShieldCheck className="h-6 w-6 text-white" />
                 </span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+              <h2 suppressHydrationWarning className="text-2xl sm:text-3xl font-bold text-white mb-4">
                 EXPERS.ru — инфраструктура видимости
               </h2>
               <p className="text-white/80 leading-relaxed max-w-2xl mx-auto mb-3">
