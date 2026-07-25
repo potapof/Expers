@@ -62,7 +62,7 @@ test.describe("API Extended — Непокрытые роуты", () => {
     const meRes = await authorApi.get("/api/auth/me");
     const me = await meRes.json();
     const authorId = (me.expert as Record<string, unknown>)?.id as string;
-    const res = await readerApi.get(`/api/subscriptions?authorId=${authorId}`);
+    const res = await authorApi.get(`/api/subscriptions?authorId=${authorId}`);
     expect(res.status()).toBe(200);
   });
 

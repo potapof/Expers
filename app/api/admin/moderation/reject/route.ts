@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { verifyAdmin } from "@/lib/admin";
 import { isDatabaseAvailable } from "@/lib/db";
-import { rejectArticle } from "@/lib/models";
+import { rejectArticle, getArticleById } from "@/lib/models";
 
 const bodySchema = z.object({
   articleId: z.string().min(1),
@@ -29,6 +29,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const article = await getArticleById(parsed.data.articleId);
+    if (!article) {
+      return NextResponse.json({ error: "Статья не найдена" }, { status: 404 });
+    }
     const ok = await rejectArticle(parsed.data.articleId, parsed.data.reason);
     if (!ok) {
       return NextResponse.json(
