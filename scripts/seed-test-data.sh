@@ -28,7 +28,7 @@ echo "  reader@test.expers.ru: $R1"
 A1=$(register "Тестовый Автор" "author@test.expers.ru" "test123456")
 echo "  author@test.expers.ru: $A1"
 
-A2=$(register "Тестовый Админ" "admin@test.expers.ru" "admin123456")
+A2=$(register "Тестовый Админ" "admin@test.expers.ru" "admin123")
 echo "  admin@test.expers.ru: $A2"
 
 # ------------------------------------------------------------------

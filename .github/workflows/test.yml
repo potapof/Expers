@@ -60,6 +60,7 @@ jobs:
       - run: npx playwright install chromium
       - run: docker compose up -d --build
       - run: docker compose exec -T app npm run db:migrate
+      - run: bash scripts/seed-test-data.sh
       - run: npm run test:e2e -- --project=chromium
       - uses: actions/upload-artifact@v4
         if: failure()
