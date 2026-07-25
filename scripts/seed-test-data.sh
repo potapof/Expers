@@ -169,6 +169,19 @@ JSONEOF
 create_article "$CREATE_DIR/article-4.json"
 
 echo ""
+echo "=== Promote admin ==="
+docker compose exec -T app node -e "
+const Database = require('better-sqlite3');
+const path = require('path');
+const dbPath = process.env.DB_PATH || '/app/data/expers.db';
+const db = new Database(dbPath);
+db.pragma('journal_mode = WAL');
+const result = db.prepare(\"UPDATE experts SET role = 'admin' WHERE email = 'admin@test.expers.ru'\").run();
+console.log('Admin role updated, changes:', result.changes);
+db.close();
+" 2>/dev/null || echo "WARN: could not promote admin via Docker"
+
+echo ""
 echo "=== Seed complete ==="
 echo "Articles:"
 curl -k -s "$BASE/api/articles?mine=true" -H "Authorization: Bearer $AUTHOR_TOKEN" | jq '.articles | length'
