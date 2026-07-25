@@ -60,6 +60,16 @@ jobs:
       - run: npx playwright install chromium
       - run: docker compose up -d --build
       - run: docker compose exec -T app npm run db:migrate
+      - name: Wait for app to be ready
+        run: |
+          for i in $(seq 1 15); do
+            if curl -sf http://localhost:8080/api/health; then
+              echo "App is ready"
+              break
+            fi
+            echo "Waiting for app... ($i)"
+            sleep 3
+          done
       - run: bash scripts/seed-test-data.sh
       - run: npm run test:e2e -- --project=chromium
       - uses: actions/upload-artifact@v4
