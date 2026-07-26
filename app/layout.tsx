@@ -29,6 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" className={cn("font-sans", geist.variable)}>
+      <head>
+        <meta name="mailru-domain" content="rBsp3ZgjG0Aet95T" />
+      </head>
       <body className="antialiased min-h-screen bg-white flex flex-col">
         <BridgeProvider />
         <AuthProvider>
