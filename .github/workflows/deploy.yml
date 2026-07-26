@@ -41,6 +41,7 @@ jobs:
             docker compose up -d --build app
             sleep 10
             docker compose exec app npm run db:migrate
+            sudo cp Caddyfile /etc/caddy/Caddyfile
             sudo systemctl reload caddy
 
             echo "=== Diagnostics ==="
