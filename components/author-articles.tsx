@@ -334,6 +334,16 @@ function ArticleCard({
       </div>
 
       <div className="mt-4 flex items-center gap-2 pt-3 border-t border-gray-50">
+        <a
+          href={`/articles/${article.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center h-8 px-2 text-xs text-gray-500 hover:text-[#2C3E50] rounded-md hover:bg-gray-50 transition-colors"
+        >
+          <Eye className="h-3.5 w-3.5 mr-1" />
+          Просмотр
+        </a>
+
         <Button
           variant="ghost"
           size="sm"
@@ -343,6 +353,33 @@ function ArticleCard({
           <Edit className="h-3.5 w-3.5 mr-1" />
           Редактировать
         </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onDuplicate(article.id)}
+          className="h-8 px-2 text-xs text-gray-500 hover:text-[#2C3E50]"
+        >
+          <Copy className="h-3.5 w-3.5 mr-1" />
+          Дублировать
+        </Button>
+
+        {article.status === "pending_review" && (
+          <span className="inline-flex items-center h-8 px-2 text-xs text-blue-600">
+            <ShieldCheck className="h-3.5 w-3.5 mr-1" />
+            На модерации
+          </span>
+        )}
+
+        {article.status !== "pending_review" &&
+          article.status !== "published" &&
+          article.status !== "archived" && (
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLORS[article.status]}`}
+            >
+              {STATUS_LABELS[article.status]}
+            </span>
+          )}
 
         {article.status === "draft" && (
           <Button
@@ -368,13 +405,6 @@ function ArticleCard({
           </Button>
         )}
 
-        {article.status === "pending_review" && (
-          <span className="inline-flex items-center h-8 px-2 text-xs text-blue-600">
-            <ShieldCheck className="h-3.5 w-3.5 mr-1" />
-            Ожидает проверки модератором
-          </span>
-        )}
-
         {article.status !== "archived" &&
           article.status !== "pending_review" && (
             <Button
@@ -387,16 +417,6 @@ function ArticleCard({
               Архивировать
             </Button>
           )}
-
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onDuplicate(article.id)}
-          className="h-8 px-2 text-xs text-gray-500 hover:text-[#2C3E50]"
-        >
-          <Copy className="h-3.5 w-3.5 mr-1" />
-          Дублировать
-        </Button>
 
         <Button
           variant="ghost"
