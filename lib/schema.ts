@@ -22,6 +22,11 @@ export const experts = sqliteTable("experts", {
   authorPagePublished: integer("author_page_published", {
     mode: "boolean",
   }).default(false),
+  emailVerified: integer("email_verified", {
+    mode: "boolean",
+  })
+    .notNull()
+    .default(false),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });
@@ -163,3 +168,13 @@ export const payments = sqliteTable(
   },
   (table) => [index("payments_user_idx").on(table.userId, table.createdAt)]
 );
+
+export const emailVerifications = sqliteTable("email_verifications", {
+  id: text("id").primaryKey(),
+  expertId: text("expert_id").notNull(),
+  email: text("email").notNull(),
+  code: text("code").notNull(),
+  expiresAt: text("expires_at").notNull(),
+  used: integer("used", { mode: "boolean" }).notNull().default(false),
+  createdAt: text("created_at").notNull(),
+});

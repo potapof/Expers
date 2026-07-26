@@ -3,6 +3,8 @@ import { z } from "zod";
 import { getExpertByEmail, createPasswordReset } from "@/lib/models";
 import { isDatabaseAvailable } from "@/lib/db";
 import { checkRateLimit, resetRateLimit } from "@/lib/rate-limiter";
+import { sendMail } from "@/lib/mail";
+import { resetPasswordEmail } from "@/lib/mail-templates";
 
 const forgotSchema = z.object({
   email: z.string().email().max(200),
@@ -36,7 +38,12 @@ export async function POST(request: NextRequest) {
   const expert = await getExpertByEmail(email);
 
   if (expert) {
-    await createPasswordReset(email);
+    const code = await createPasswordReset(email);
+    sendMail({
+      to: email,
+      subject: "Сброс пароля — Expers",
+      html: resetPasswordEmail(code),
+    }).catch((err) => console.error("Reset password email failed:", err));
   }
 
   resetRateLimit(request);

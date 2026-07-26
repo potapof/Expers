@@ -132,6 +132,16 @@ sqlite.exec(`
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS email_verifications (
+    id TEXT PRIMARY KEY,
+    expert_id TEXT NOT NULL,
+    email TEXT NOT NULL,
+    code TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    used INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+  );
 `);
 
 console.log("  ✓ Таблицы созданы");
@@ -170,6 +180,13 @@ const articleExistingCols = new Set(
 if (!articleExistingCols.has("sections_text")) {
   sqlite.exec("ALTER TABLE articles ADD COLUMN sections_text TEXT;");
   console.log("  ✓ Колонка articles.sections_text добавлена");
+}
+
+if (!existingColumns.has("email_verified")) {
+  sqlite.exec(
+    "ALTER TABLE experts ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0;"
+  );
+  console.log("  ✓ Колонка experts.email_verified добавлена");
 }
 
 sqlite.exec(`

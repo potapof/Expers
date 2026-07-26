@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createExpert, getExpertByEmail } from "@/lib/models";
+import {
+  createExpert,
+  getExpertByEmail,
+  createEmailVerification,
+} from "@/lib/models";
 import { hashPassword, generateToken, toSafeExpert } from "@/lib/auth";
 import { isDatabaseAvailable } from "@/lib/db";
 import { checkRateLimit, resetRateLimit } from "@/lib/rate-limiter";
+import { sendMail } from "@/lib/mail";
+import { verificationEmail, welcomeEmail } from "@/lib/mail-templates";
 
 const registerSchema = z.object({
   name: z.string().min(1).max(200),
@@ -59,9 +65,21 @@ export async function POST(request: NextRequest) {
 
   const token = generateToken(expert);
 
+  const code = await createEmailVerification(id, email);
+  sendMail({
+    to: email,
+    subject: "Подтверждение почты — Expers",
+    html: verificationEmail(code),
+  }).catch((err) => console.error("Verification email failed:", err));
+  sendMail({
+    to: email,
+    subject: "Добро пожаловать в Expers",
+    html: welcomeEmail(name),
+  }).catch((err) => console.error("Welcome email failed:", err));
+
   return NextResponse.json(
     {
-      expert: toSafeExpert(expert),
+      expert: { ...toSafeExpert(expert), email_verified: false },
       token,
     },
     { status: 201 }

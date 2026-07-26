@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { verifyAdmin } from "@/lib/admin";
 import { isDatabaseAvailable } from "@/lib/db";
-import { approveArticle, getArticleById } from "@/lib/models";
+import { approveArticle, getArticleById, getExpertById } from "@/lib/models";
+import { sendMail } from "@/lib/mail";
+import { articleApprovedEmail } from "@/lib/mail-templates";
+import { articleUrl } from "@/lib/routes";
 
 const bodySchema = z.object({
   articleId: z.string().min(1),
@@ -38,6 +41,21 @@ export async function POST(request: NextRequest) {
         { error: "Статья не в статусе ожидания проверки" },
         { status: 409 }
       );
+    }
+    const expert = await getExpertById(article.expertId);
+    if (expert?.email) {
+      sendMail({
+        to: expert.email,
+        subject: "Статья опубликована — Expers",
+        html: articleApprovedEmail(
+          article.title,
+          articleUrl({
+            id: article.id,
+            slug: article.slug ?? undefined,
+            industryId: article.industryId,
+          })
+        ),
+      }).catch((err) => console.error("Approval email failed:", err));
     }
     return NextResponse.json({ success: true });
   } catch (err) {

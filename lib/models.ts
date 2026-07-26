@@ -10,6 +10,7 @@ import {
   sectionSubscriptions,
   payments,
   passwordResets,
+  emailVerifications,
 } from "./schema";
 
 export interface SocialLink {
@@ -1389,20 +1390,25 @@ export async function getModerationQueue(): Promise<Article[]> {
 }
 
 export async function approveArticle(id: string): Promise<boolean> {
-  const result = db.update(articles)
+  const result = db
+    .update(articles)
     .set({ status: "published", updatedAt: new Date().toISOString() })
     .where(and(eq(articles.id, id), eq(articles.status, "pending_review")))
     .run();
   return result.changes > 0;
 }
 
-export async function rejectArticle(id: string, reason: string): Promise<boolean> {
+export async function rejectArticle(
+  id: string,
+  reason: string
+): Promise<boolean> {
   const article = await getArticleById(id);
   const rejectionNote = article
     ? `[Отклонено: ${reason}] ${article.description}`
     : `[Отклонено: ${reason}]`;
 
-  const result = db.update(articles)
+  const result = db
+    .update(articles)
     .set({
       status: "draft",
       updatedAt: new Date().toISOString(),
@@ -1420,4 +1426,257 @@ export async function getModerationCount(): Promise<number> {
     .where(eq(articles.status, "pending_review"))
     .all();
   return rows[0]?.count ?? 0;
+}
+
+export async function createEmailVerification(
+  expertId: string,
+  email: string
+): Promise<string> {
+  const id = crypto.randomUUID();
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+  db.insert(emailVerifications)
+    .values({
+      id,
+      expertId,
+      email,
+      code,
+      expiresAt,
+      used: false,
+      createdAt: now.toISOString(),
+    })
+    .run();
+  return code;
+}
+
+export async function verifyEmailCode(
+  expertId: string,
+  code: string
+): Promise<boolean> {
+  const now = new Date().toISOString();
+  const rows = db
+    .select()
+    .from(emailVerifications)
+    .where(
+      and(
+        eq(emailVerifications.expertId, expertId),
+        eq(emailVerifications.code, code),
+        eq(emailVerifications.used, false)
+      )
+    )
+    .orderBy(desc(emailVerifications.createdAt))
+    .limit(1)
+    .all();
+  if (rows.length === 0) return false;
+  if (rows[0].expiresAt < now) return false;
+  db.update(emailVerifications)
+    .set({ used: true })
+    .where(eq(emailVerifications.id, rows[0].id))
+    .run();
+  db.update(experts)
+    .set({ emailVerified: true, updatedAt: now })
+    .where(eq(experts.id, expertId))
+    .run();
+  return true;
+}
+
+export async function getPaymentWithArticle(
+  orderId: string
+): Promise<(Payment & { authorEmail: string }) | null> {
+  const rows = db
+    .select({
+      orderId: payments.orderId,
+      paymentId: payments.paymentId,
+      articleId: payments.articleId,
+      title: payments.title,
+      userId: payments.userId,
+      amount: payments.amount,
+      status: payments.status,
+      createdAt: payments.createdAt,
+      updatedAt: payments.updatedAt,
+      authorEmail: experts.email,
+    })
+    .from(payments)
+    .innerJoin(experts, eq(payments.userId, experts.id))
+    .where(eq(payments.orderId, orderId))
+    .all();
+  if (rows.length === 0) return null;
+  return rows[0] as Payment & { authorEmail: string };
+}
+
+export async function getExpertsWithArticles(): Promise<Expert[]> {
+  const rows = db
+    .selectDistinct({
+      id: experts.id,
+      name: experts.name,
+      email: experts.email,
+      passwordHash: experts.passwordHash,
+      role: experts.role,
+      avatar: experts.avatar,
+      bio: experts.bio,
+      expertise: experts.expertise,
+      credentials: experts.credentials,
+      socialLinks: experts.socialLinks,
+      workExperience: experts.workExperience,
+      publications: experts.publications,
+      achievements: experts.achievements,
+      mediaMentions: experts.mediaMentions,
+      faq: experts.faq,
+      testimonials: experts.testimonials,
+      callToAction: experts.callToAction,
+      authorPageSlug: experts.authorPageSlug,
+      authorPagePublished: experts.authorPagePublished,
+      emailVerified: experts.emailVerified,
+      createdAt: experts.createdAt,
+      updatedAt: experts.updatedAt,
+    })
+    .from(experts)
+    .innerJoin(articles, eq(experts.id, articles.expertId))
+    .all();
+  return rows.map(rowToExpert);
+}
+
+export async function getAuthorWeeklyStats(
+  authorId: string,
+  since: string,
+  until: string
+): Promise<{
+  authorName: string;
+  authorEmail: string;
+  articlesPublished: number;
+  articlesInModeration: number;
+  articlesTotal: number;
+  newSubscribers: number;
+  newComments: number;
+  newFavorites: number;
+  paymentsCount: number;
+  paymentsTotal: number;
+  topArticleTitle: string | null;
+  topArticleComments: number;
+  periodStart: string;
+  periodEnd: string;
+}> {
+  const expert = await getExpertById(authorId);
+
+  const publishedRows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(articles)
+    .where(
+      and(
+        eq(articles.expertId, authorId),
+        eq(articles.status, "published"),
+        sql`${articles.updatedAt} >= ${since}`,
+        sql`${articles.updatedAt} <= ${until}`
+      )
+    )
+    .all();
+
+  const moderationRows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(articles)
+    .where(
+      and(
+        eq(articles.expertId, authorId),
+        eq(articles.status, "pending_review")
+      )
+    )
+    .all();
+
+  const totalRows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(articles)
+    .where(
+      and(
+        eq(articles.expertId, authorId),
+        sql`${articles.status} != 'archived'`
+      )
+    )
+    .all();
+
+  const subRows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(subscriptions)
+    .where(
+      and(
+        eq(subscriptions.authorId, authorId),
+        sql`${subscriptions.createdAt} >= ${since}`,
+        sql`${subscriptions.createdAt} <= ${until}`
+      )
+    )
+    .all();
+
+  const commentRows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(comments)
+    .innerJoin(articles, eq(comments.articleId, articles.id))
+    .where(
+      and(
+        eq(articles.expertId, authorId),
+        sql`${comments.createdAt} >= ${since}`,
+        sql`${comments.createdAt} <= ${until}`
+      )
+    )
+    .all();
+
+  const favRows = db
+    .select({ count: sql<number>`count(*)` })
+    .from(favorites)
+    .innerJoin(articles, eq(favorites.articleId, articles.id))
+    .where(
+      and(
+        eq(articles.expertId, authorId),
+        sql`${favorites.createdAt} >= ${since}`,
+        sql`${favorites.createdAt} <= ${until}`
+      )
+    )
+    .all();
+
+  const payRows = db
+    .select({
+      count: sql<number>`count(*)`,
+      total: sql<number>`coalesce(sum(${payments.amount}), 0)`,
+    })
+    .from(payments)
+    .where(
+      and(
+        eq(payments.userId, authorId),
+        eq(payments.status, "CONFIRMED"),
+        sql`${payments.createdAt} >= ${since}`,
+        sql`${payments.createdAt} <= ${until}`
+      )
+    )
+    .all();
+
+  const topRows = db
+    .select({
+      title: articles.title,
+      c: sql<number>`count(${comments.id})`,
+    })
+    .from(articles)
+    .leftJoin(comments, eq(comments.articleId, articles.id))
+    .where(
+      and(eq(articles.expertId, authorId), eq(articles.status, "published"))
+    )
+    .groupBy(articles.id)
+    .orderBy(desc(sql`c`))
+    .limit(1)
+    .all();
+
+  return {
+    authorName: expert?.name ?? "",
+    authorEmail: expert?.email ?? "",
+    articlesPublished: publishedRows[0]?.count ?? 0,
+    articlesInModeration: moderationRows[0]?.count ?? 0,
+    articlesTotal: totalRows[0]?.count ?? 0,
+    newSubscribers: subRows[0]?.count ?? 0,
+    newComments: commentRows[0]?.count ?? 0,
+    newFavorites: favRows[0]?.count ?? 0,
+    paymentsCount: payRows[0]?.count ?? 0,
+    paymentsTotal: payRows[0]?.total ?? 0,
+    topArticleTitle: topRows[0]?.title ?? null,
+    topArticleComments: topRows[0]?.c ?? 0,
+    periodStart: since,
+    periodEnd: until,
+  };
 }

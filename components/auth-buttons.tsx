@@ -54,9 +54,8 @@ export function AuthButtons() {
     });
     const data = await res.json();
     if (res.ok) {
-      setForgotCode(data.code);
       setForgotStep("reset");
-      toast.success("Код сброса пароля получен");
+      toast.success("Код отправлен на email. Проверьте почту.");
     } else {
       toast.error(data.error || "Ошибка");
     }

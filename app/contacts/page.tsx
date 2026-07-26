@@ -17,6 +17,7 @@ import {
   Clock,
   FileText,
 } from "lucide-react";
+import { FeedbackForm } from "@/components/feedback-form";
 
 export const metadata: Metadata = {
   title: "Контакты — EXPERS.ru",
@@ -56,7 +57,10 @@ export default function ContactsPage() {
                 <Building2 className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h2 suppressHydrationWarning className="text-2xl font-bold tracking-tight text-[#2C3E50] mb-3">
+                <h2
+                  suppressHydrationWarning
+                  className="text-2xl font-bold tracking-tight text-[#2C3E50] mb-3"
+                >
                   ООО «ФОНИИ»
                 </h2>
                 <p className="text-base leading-relaxed text-gray-600 mb-4">
@@ -80,7 +84,10 @@ export default function ContactsPage() {
 
         {/* Направления */}
         <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <h2 suppressHydrationWarning className="text-2xl font-bold tracking-tight text-[#2C3E50] text-center mb-8">
+          <h2
+            suppressHydrationWarning
+            className="text-2xl font-bold tracking-tight text-[#2C3E50] text-center mb-8"
+          >
             Чем мы занимаемся
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -88,7 +95,10 @@ export default function ContactsPage() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0039CA]/10 mb-4">
                 <Megaphone className="h-5 w-5 text-[#0039CA]" />
               </div>
-              <h3 suppressHydrationWarning className="text-lg font-semibold text-[#2C3E50] mb-2">
+              <h3
+                suppressHydrationWarning
+                className="text-lg font-semibold text-[#2C3E50] mb-2"
+              >
                 Цифровой маркетинг
               </h3>
               <p className="text-sm leading-relaxed text-gray-500">
@@ -102,7 +112,10 @@ export default function ContactsPage() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0039CA]/10 mb-4">
                 <Bot className="h-5 w-5 text-[#0039CA]" />
               </div>
-              <h3 suppressHydrationWarning className="text-lg font-semibold text-[#2C3E50] mb-2">
+              <h3
+                suppressHydrationWarning
+                className="text-lg font-semibold text-[#2C3E50] mb-2"
+              >
                 Внедрение искусственного интеллекта
               </h3>
               <p className="text-sm leading-relaxed text-gray-500">
@@ -116,7 +129,10 @@ export default function ContactsPage() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0039CA]/10 mb-4">
                 <Sparkles className="h-5 w-5 text-[#0039CA]" />
               </div>
-              <h3 suppressHydrationWarning className="text-lg font-semibold text-[#2C3E50] mb-2">
+              <h3
+                suppressHydrationWarning
+                className="text-lg font-semibold text-[#2C3E50] mb-2"
+              >
                 Generative Engine Optimization
               </h3>
               <p className="text-sm leading-relaxed text-gray-500">
@@ -130,7 +146,10 @@ export default function ContactsPage() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0039CA]/10 mb-4">
                 <Code2 className="h-5 w-5 text-[#0039CA]" />
               </div>
-              <h3 suppressHydrationWarning className="text-lg font-semibold text-[#2C3E50] mb-2">
+              <h3
+                suppressHydrationWarning
+                className="text-lg font-semibold text-[#2C3E50] mb-2"
+              >
                 Web-разработка и prompt-инжиниринг
               </h3>
               <p className="text-sm leading-relaxed text-gray-500">
@@ -150,7 +169,10 @@ export default function ContactsPage() {
                 <Zap className="h-5 w-5 text-[#0039CA]" />
               </div>
               <div>
-                <h3 suppressHydrationWarning className="text-lg font-semibold text-[#2C3E50] mb-2">
+                <h3
+                  suppressHydrationWarning
+                  className="text-lg font-semibold text-[#2C3E50] mb-2"
+                >
                   Наш принцип
                 </h3>
                 <p className="text-base leading-relaxed text-gray-600">
@@ -166,7 +188,10 @@ export default function ContactsPage() {
 
         {/* Контактные данные */}
         <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <h2 suppressHydrationWarning className="text-2xl font-bold tracking-tight text-[#2C3E50] text-center mb-8">
+          <h2
+            suppressHydrationWarning
+            className="text-2xl font-bold tracking-tight text-[#2C3E50] text-center mb-8"
+          >
             Как с нами связаться
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -176,7 +201,12 @@ export default function ContactsPage() {
                   <MapPin className="h-6 w-6 text-[#0039CA]" />
                 </div>
               </div>
-              <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50] mb-1.5">Адрес</h3>
+              <h3
+                suppressHydrationWarning
+                className="font-semibold text-[#2C3E50] mb-1.5"
+              >
+                Адрес
+              </h3>
               <p className="text-sm text-gray-500">
                 111141, г. Москва, пр-кт Зелёный, д. 3а, стр. 1
               </p>
@@ -191,7 +221,12 @@ export default function ContactsPage() {
                   <Mail className="h-6 w-6 text-[#0039CA]" />
                 </div>
               </div>
-              <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50] mb-1.5">Email</h3>
+              <h3
+                suppressHydrationWarning
+                className="font-semibold text-[#2C3E50] mb-1.5"
+              >
+                Email
+              </h3>
               <p className="text-sm text-[#0039CA] font-medium">
                 info@fonai.ru
               </p>
@@ -206,7 +241,12 @@ export default function ContactsPage() {
                   <Phone className="h-6 w-6 text-[#0039CA]" />
                 </div>
               </div>
-              <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50] mb-1.5">Телефон</h3>
+              <h3
+                suppressHydrationWarning
+                className="font-semibold text-[#2C3E50] mb-1.5"
+              >
+                Телефон
+              </h3>
               <p className="text-sm text-[#0039CA] font-medium">
                 +7 (495) 324-30-88
               </p>
@@ -218,7 +258,10 @@ export default function ContactsPage() {
                   <Clock className="h-6 w-6 text-[#0039CA]" />
                 </div>
               </div>
-              <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50] mb-1.5">
+              <h3
+                suppressHydrationWarning
+                className="font-semibold text-[#2C3E50] mb-1.5"
+              >
                 Режим работы
               </h3>
               <p className="text-sm text-gray-500">пн–пт 10:00–18:00 (МСК)</p>
@@ -229,7 +272,10 @@ export default function ContactsPage() {
             <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-6">
               <div className="flex items-center gap-3 mb-2">
                 <Users className="h-5 w-5 text-[#0039CA]" />
-                <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50]">
+                <h3
+                  suppressHydrationWarning
+                  className="font-semibold text-[#2C3E50]"
+                >
                   По вопросам публикаций
                 </h3>
               </div>
@@ -243,7 +289,10 @@ export default function ContactsPage() {
             <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-6">
               <div className="flex items-center gap-3 mb-2">
                 <MessageSquare className="h-5 w-5 text-[#0039CA]" />
-                <h3 suppressHydrationWarning className="font-semibold text-[#2C3E50]">
+                <h3
+                  suppressHydrationWarning
+                  className="font-semibold text-[#2C3E50]"
+                >
                   По вопросам сотрудничества
                 </h3>
               </div>
@@ -261,7 +310,10 @@ export default function ContactsPage() {
           <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-8">
             <div className="flex items-center gap-3 mb-6">
               <FileText className="h-5 w-5 text-[#0039CA]" />
-              <h2 suppressHydrationWarning className="text-xl font-bold tracking-tight text-[#2C3E50]">
+              <h2
+                suppressHydrationWarning
+                className="text-xl font-bold tracking-tight text-[#2C3E50]"
+              >
                 Реквизиты
               </h2>
             </div>
@@ -312,11 +364,19 @@ export default function ContactsPage() {
           </div>
         </section>
 
+        {/* Форма обратной связи */}
+        <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <FeedbackForm />
+        </section>
+
         {/* CTA */}
         <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="rounded-2xl bg-[#0039CA] px-6 py-10 sm:px-10 text-center relative overflow-hidden">
             <div className="relative">
-              <h2 suppressHydrationWarning className="text-2xl sm:text-3xl font-bold text-white mb-4">
+              <h2
+                suppressHydrationWarning
+                className="text-2xl sm:text-3xl font-bold text-white mb-4"
+              >
                 Знакомство лучше начать с каталога
               </h2>
               <p className="text-white/80 leading-relaxed max-w-2xl mx-auto mb-8">

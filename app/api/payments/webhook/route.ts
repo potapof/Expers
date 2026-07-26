@@ -5,9 +5,12 @@ import {
   updatePaymentStatus,
   updatePaymentStatusAtomic,
   setArticleStatus,
+  getPaymentWithArticle,
   type PaymentStatus,
 } from "@/lib/models";
 import { verifyNotificationToken } from "@/lib/tbank";
+import { sendMail } from "@/lib/mail";
+import { paymentSuccessEmail, paymentFailedEmail } from "@/lib/mail-templates";
 
 function ok() {
   return new NextResponse("OK", {
@@ -54,8 +57,28 @@ export async function POST(request: NextRequest) {
       if (updated && payment.articleId !== "publication-right") {
         await setArticleStatus(payment.articleId, "pending_review");
       }
+      if (updated) {
+        const enriched = await getPaymentWithArticle(orderId);
+        if (enriched?.authorEmail) {
+          sendMail({
+            to: enriched.authorEmail,
+            subject: "Оплата получена — Expers",
+            html: paymentSuccessEmail(enriched.title),
+          }).catch((err) =>
+            console.error("Payment success email failed:", err)
+          );
+        }
+      }
     } else if (status === "REJECTED" || status === "CANCELED") {
       await updatePaymentStatus(orderId, status as PaymentStatus, paymentId);
+      const enriched = await getPaymentWithArticle(orderId);
+      if (enriched?.authorEmail) {
+        sendMail({
+          to: enriched.authorEmail,
+          subject: "Платёж не прошёл — Expers",
+          html: paymentFailedEmail(enriched.title),
+        }).catch((err) => console.error("Payment failed email failed:", err));
+      }
     } else if (status === "REFUNDED") {
       const updatedRefund = await updatePaymentStatusAtomic(
         orderId,
@@ -65,6 +88,16 @@ export async function POST(request: NextRequest) {
       );
       if (updatedRefund && payment.articleId !== "publication-right") {
         await setArticleStatus(payment.articleId, "archived");
+      }
+      if (updatedRefund) {
+        const enriched = await getPaymentWithArticle(orderId);
+        if (enriched?.authorEmail) {
+          sendMail({
+            to: enriched.authorEmail,
+            subject: "Возврат платежа — Expers",
+            html: paymentFailedEmail(enriched.title),
+          }).catch((err) => console.error("Refund email failed:", err));
+        }
       }
     }
   } catch (err) {
