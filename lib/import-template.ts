@@ -145,10 +145,6 @@ ${sectionLines.join("\n\n")}
 ${formatBlock}`;
 }
 
-function buildGeoFormatBlock(fields: { key: string; desc: string }[]): string {
-  return fields.map((f) => `### ${f.key}\n<${f.desc}>`).join("\n\n");
-}
-
 /* ================================================================
    SELF-ANNOTATION: 11 итераций шаблона.
    Итерации 1-7 — заголовок + основной контент (шаги 6-7 визарда).

@@ -15,11 +15,12 @@
 - **Фреймворк:** Next.js 16 (SSR/App Router), React 19, TypeScript
 - **Стилизация:** Tailwind CSS 4, shadcn/ui, tw-animate-css
 - **Иконки:** lucide-react
-- **Baлидация:** zod
+- **Валидация:** zod
 - **Уведомления:** sonner
-- **База данных:** DynamoDB (Yandex Cloud Document API)
-- **Аутентификация:** bcryptjs, jsonwebtoken
-- **Инфраструктура:** Docker Compose (dynamodb-local для разработки)
+- **База данных:** SQLite (better-sqlite3 + drizzle-orm)
+- **Почта:** nodemailer (SMTP Mail.ru)
+- **Аутентификация:** bcrypt, jsonwebtoken
+- **Инфраструктура:** Docker Compose (SQLite, Caddy reverse proxy)
 
 ## Запуск
 
@@ -34,7 +35,7 @@
 # Установка зависимостей
 npm install
 
-# Запуск инфраструктуры (DynamoDB local) и приложения
+# Запуск инфраструктуры и приложения
 docker compose up -d
 
 # Применение миграций БД

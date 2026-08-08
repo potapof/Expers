@@ -3,6 +3,16 @@ import tseslint from "@typescript-eslint/eslint-plugin";
 import tsparser from "@typescript-eslint/parser";
 
 const eslintConfig = [
+  {
+    ignores: [
+      "coverage/**",
+      ".next/**",
+      "test-results/**",
+      "playwright-report/**",
+      "ci-visual-diffs/**",
+      "public/uploads/**",
+    ],
+  },
   ...nextConfig,
   {
     files: ["**/*.{ts,tsx}"],

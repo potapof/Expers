@@ -119,11 +119,8 @@ export async function PATCH(
     );
   }
 
-  const {
-    status: requestedStatus,
-    _publishAction,
-    ...updateFields
-  } = parsed.data as Record<string, unknown>;
+  const { status: requestedStatus, ...updateFields } =
+    parsed.data as Record<string, unknown>;
 
   let targetStatus = transitionStatus(
     article.status,

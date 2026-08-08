@@ -13,11 +13,20 @@ const WINDOW_MS = 15 * 60 * 1000;
 function getClientIp(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) {
-    return forwarded.split(",")[0].trim();
+    // Trusted reverse proxy (Caddy) APPENDS the real client IP at the end.
+    // Attacker-controlled values are PREPENDED, so the last entry is the
+    // one added by the proxy and cannot be spoofed by the client.
+    const ips = forwarded
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (ips.length > 0) {
+      return ips[ips.length - 1];
+    }
   }
   const realIp = request.headers.get("x-real-ip");
   if (realIp) {
-    return realIp;
+    return realIp.trim();
   }
   return "unknown";
 }

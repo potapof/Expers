@@ -6,7 +6,6 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Download, HelpCircle, Upload } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { parseAllIterations, buildArticleData } from "@/lib/import-parser";
 
 export function ArticleImportClient() {

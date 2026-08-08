@@ -3,6 +3,7 @@ import { isDatabaseAvailable } from "@/lib/db";
 import { createPayment } from "@/lib/models";
 import { verifyToken } from "@/lib/auth";
 import { resolveBaseUrl } from "@/lib/base-url";
+import { checkRateLimit } from "@/lib/rate-limiter";
 import {
   initPayment,
   isPaymentConfigured,
@@ -21,6 +22,9 @@ export async function POST(request: NextRequest) {
       { status: 401 }
     );
   }
+
+  const rateLimit = checkRateLimit(request);
+  if (rateLimit) return rateLimit;
 
   if (!isPaymentConfigured()) {
     return NextResponse.json(

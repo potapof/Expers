@@ -112,20 +112,22 @@ describe("rate-limiter", () => {
     expect(checkRateLimit(makeRequest("1.2.3.4"))).toBeNull();
   });
 
-  it("should use first IP from x-forwarded-for list", () => {
+  it("should use LAST IP from x-forwarded-for list (proxy-appended)", () => {
+    // Trusted proxy appends the real client IP last. Client-supplied
+    // headers are prepended and must NOT be trusted for rate limiting.
     const req = new NextRequest("http://localhost/api/test", {
-      headers: { "x-forwarded-for": "192.168.1.1, 10.0.0.1, 172.16.0.1" },
+      headers: { "x-forwarded-for": "1.2.3.4, 5.6.7.8, 10.0.0.1" },
     });
 
-    // All 5 from first IP
+    // All 5 from last IP (10.0.0.1)
     for (let i = 0; i < 5; i++) {
       expect(checkRateLimit(req)).toBeNull();
     }
     expect(checkRateLimit(req)?.status).toBe(429);
 
-    // A request claiming to be from the second IP should not be rate-limited
+    // A request with a different last IP is tracked independently
     const req2 = new NextRequest("http://localhost/api/test", {
-      headers: { "x-forwarded-for": "10.0.0.1" },
+      headers: { "x-forwarded-for": "1.2.3.4, 5.6.7.8, 8.8.8.8" },
     });
     expect(checkRateLimit(req2)).toBeNull();
   });

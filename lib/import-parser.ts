@@ -28,34 +28,6 @@ const VALID_DESIGNS = [
   "table",
 ] as const;
 
-function parseTable(md: string): { headers: string[]; rows: string[][] } {
-  const lines = md.trim().split("\n").filter(Boolean);
-  if (lines.length < 2) return { headers: [], rows: [] };
-
-  const headerLine = lines[0];
-  const headers = headerLine
-    .split("|")
-    .map((h) => h.trim())
-    .filter(Boolean);
-
-  const rows: string[][] = [];
-  let startIdx = 1;
-  if (lines[1] && lines[1].includes("---")) {
-    startIdx = 2;
-  }
-  for (let i = startIdx; i < lines.length; i++) {
-    const cells = lines[i]
-      .split("|")
-      .map((c) => c.trim())
-      .filter(Boolean);
-    if (cells.length > 0) {
-      rows.push(cells);
-    }
-  }
-
-  return { headers, rows };
-}
-
 export function parseIterationMarkdown(
   md: string,
   outputFields: string[],

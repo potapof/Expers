@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { sanitizeHtml } from "@/lib/sanitize";
 import {
   Dialog,
   DialogContent,
@@ -251,7 +252,7 @@ function InlineToolbar({
   function notifyChange() {
     const editorEl = editorRef.current;
     if (!editorEl) return;
-    onTextChange?.(editorEl.innerHTML);
+    onTextChange?.(sanitizeHtml(editorEl.innerHTML));
   }
 
   function findAncestorTag(
@@ -554,9 +555,9 @@ function ResizableSplit({
             contentEditable
             suppressContentEditableWarning
             className="w-full h-full min-h-[200px] p-3 text-sm text-gray-700 leading-relaxed outline-none rounded-lg border border-gray-200 focus:border-[#0039CA] focus:ring-1 focus:ring-[#0039CA] overflow-auto"
-            dangerouslySetInnerHTML={{ __html: textContent }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(textContent) }}
             onInput={(e) =>
-              onTextChange((e.target as HTMLDivElement).innerHTML)
+              onTextChange(sanitizeHtml((e.target as HTMLDivElement).innerHTML))
             }
           />
         )}
@@ -586,9 +587,9 @@ function ResizableSplit({
             contentEditable
             suppressContentEditableWarning
             className="w-full h-full min-h-[200px] p-3 text-sm text-gray-700 leading-relaxed outline-none rounded-lg border border-gray-200 focus:border-[#0039CA] focus:ring-1 focus:ring-[#0039CA] overflow-auto"
-            dangerouslySetInnerHTML={{ __html: textContent }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(textContent) }}
             onInput={(e) =>
-              onTextChange((e.target as HTMLDivElement).innerHTML)
+              onTextChange(sanitizeHtml((e.target as HTMLDivElement).innerHTML))
             }
           />
         )}
@@ -827,9 +828,13 @@ function SectionCard({
                   contentEditable
                   suppressContentEditableWarning
                   className="w-full min-h-[200px] p-3 text-sm text-gray-700 leading-relaxed outline-none rounded-lg border border-gray-200 focus:border-[#0039CA] focus:ring-1 focus:ring-[#0039CA] overflow-auto"
-                  dangerouslySetInnerHTML={{ __html: section.text }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.text) }}
                   onInput={(e) =>
-                    update({ text: (e.target as HTMLDivElement).innerHTML })
+                    update({
+                      text: sanitizeHtml(
+                        (e.target as HTMLDivElement).innerHTML
+                      ),
+                    })
                   }
                 />
               )}
@@ -888,7 +893,7 @@ function SectionCard({
               {section.design === "text-only" && section.text && (
                 <div
                   className="text-sm text-gray-700 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: section.text }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.text) }}
                 />
               )}
               {(section.design === "image-right" ||
@@ -907,7 +912,9 @@ function SectionCard({
                   {section.text && (
                     <div
                       className="text-sm text-gray-700 leading-relaxed flex-1"
-                      dangerouslySetInnerHTML={{ __html: section.text }}
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeHtml(section.text),
+                      }}
                     />
                   )}
                   {section.design === "image-right" && (

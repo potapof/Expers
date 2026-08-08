@@ -12,6 +12,7 @@ import {
 } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { sanitizeHtml } from "@/lib/sanitize";
 import { toast } from "sonner";
 import {
   Check,
@@ -49,7 +50,6 @@ import {
   User,
   X,
   Save,
-  PenSquare,
   ImageIcon,
 } from "lucide-react";
 import { TbankPaymentDialog } from "./tbank-payment-dialog";
@@ -245,7 +245,8 @@ function cn(...classes: (string | false | undefined | null)[]) {
 }
 
 function sectionTextToHtml(text: string): string {
-  if (text.includes("<p") || text.includes("<br")) return text;
+  if (text.includes("<p") || text.includes("<br"))
+    return sanitizeHtml(text);
 
   let result = text;
 
@@ -280,7 +281,7 @@ function sectionTextToHtml(text: string): string {
     .map((p) => `<p>${p.trim()}</p>`)
     .join("");
 
-  return result;
+  return sanitizeHtml(result);
 }
 
 function markdownTableToHtml(lines: string[]): string {
